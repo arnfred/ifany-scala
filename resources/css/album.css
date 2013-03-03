@@ -1,0 +1,119 @@
+/* Fade album out do begin with */
+div.album {
+	opacity: 0.5;
+}
+
+/* Album info */
+h2.album-title {
+	line-height: 1.2em;
+	margin-bottom: 0.2em;
+}
+p.album-date {
+	font-style:italic;
+	margin-bottom: 2em;
+
+}
+div.album-images {
+}
+
+/* Album Nav */
+div.span5.album-nav {
+	max-width:50%;
+	float:left;
+}
+
+div.next {
+	text-align:right;
+}
+div.album-nav a {
+	margin-top:2em;
+	height:2em;
+	color:#888;
+	display:block
+}
+div.album-nav a:hover {
+	color:#555;
+	cursor:pointer;
+}
+span.laquo {
+	height:1em;
+	font-size: 3em;
+	display:block;
+}
+div.prev span.nav {
+	float:right;
+}
+div.next span.laquo {
+	float:left;
+}
+div.prev span.laquo {
+	float:right;
+}
+span.nav {
+	display:block;
+	float:left;
+	font-size: 1.2em;
+	line-height: 1.5em;
+	padding: 0.05em 0.5em;
+}
+
+/* Thumbnails */
+div.album-row {
+	margin-bottom:2em;
+}
+div.img img {
+	cursor:pointer;
+}
+div.img img:hover {
+	background-color:#aaa;
+}
+
+
+/* Overlay */
+div#overlay {
+	position:fixed;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	background: rgb(0, 0, 0) transparent;
+	background-color:rgba(32,32,32,0.9);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
+	display:none;
+}
+
+div#overlay-img img {
+	display:inline-block;
+	max-height: 100%;
+	border:thin solid #666;
+}
+div.overlay-nav {
+	height:100%;
+}
+div#overlay-prev, div#overlay-next, div#overlay-img {
+	height:100%;
+	display:table;
+	text-align:center;
+	color:#bbb;
+}
+div#overlay-prev, div#overlay-next {
+	width:100%;
+}
+div#overlay-prev span, div#overlay-next span, div#overlay-img div {
+	display:table-cell;
+	vertical-align:middle;
+	overflow:hidden;
+}
+
+div#overlay-prev:hover, div#overlay-next:hover {
+	background-color: #555;
+	cursor:pointer;
+}
+
+
+span#caption {
+	width:100%;
+	display:inline-block;
+}
+

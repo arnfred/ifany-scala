@@ -1,0 +1,88 @@
+/* Css for frontpage */
+
+
+/* Configure the header */
+h1#header {
+	font-size: 7em;
+	line-height: 1.5em;
+	margin-left: -0.1em;
+}
+span#if {
+	color: #888;
+}
+h4#subheader {
+	color: #888;
+	margin-top:-2.3em;
+}
+
+/* About text */
+p#about-text {
+	margin-top:3em;
+}
+
+/* Separator */
+div.separator {
+	text-align:center;
+}
+
+/* Category */
+div.category:hover {
+	background-color:#eaeaea;
+	cursor:pointer;
+}
+
+div.category {
+	padding: 1em 0;
+	margin: 5.5em 0 1.5em 0;
+}
+
+
+/* Album  */
+div.album:hover {
+	background-color:#eaeaea;
+	cursor:pointer;
+}
+
+div.album {
+	padding: 1em 0;
+	margin: 1em 0;
+}
+
+div.album a { 
+	color:#666;
+}
+div.album a:hover{
+	color:#555;
+}
+
+
+p.cat-meta, p.album-meta {
+	font-style:italic;
+	display:inline;
+}
+
+p.cat-date {
+	display:inline;
+}
+
+p.album-date {
+	margin-bottom:0;
+}
+
+div.album {
+	display:none;
+}
+
+div.album-info {
+	text-align:right;
+}
+
+div.album-arrow p {
+	padding-top:75%;
+	font-size:3em;
+}
+
+
+
+
+

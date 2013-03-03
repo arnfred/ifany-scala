@@ -1,0 +1,56 @@
+/* css global to the whole site */
+
+/* Set top margin */
+div.top {
+	padding-top:4% 
+}
+
+/* Heading behavior */
+h2, h3 {
+	line-height:1.5em;
+	margin: 0;
+}
+
+/* Clear floats */
+br.clear {
+	clear:both;
+}
+
+/* Image behavior */
+img.frame {
+	padding:1px;
+	border: thin solid grey;
+	max-width:99%;
+}
+div.span3.img {
+	width:22.7%;
+	margin-left:3%;
+	margin-right:0;
+	float:left;
+}
+div.span3.img:first-child {
+	margin-left:0;
+}
+
+/* Text behavior */
+body {
+	color: #666;
+	background-color:#fafafa;
+}
+
+/* Links */
+a {
+	color: rgb(15, 172, 90);
+}
+a:hover {
+	color: rgb(27, 85, 18);
+}
+a:visited {
+	color: rgb(27, 85, 18);
+}
+
+/* Credit */
+div#credits p {
+	float:right;
+	padding-top:2em;
+}
