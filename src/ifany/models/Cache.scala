@@ -6,6 +6,7 @@ import scala.util.Properties
 object Cache {
 
   val dataField = "data"
+  println(Properties.envOrNone("MONGOHQ_URL"));
   val MongoSetting(mongoDB) = Properties.envOrNone("MONGOHQ_URL")
   //val mongoDB = MongoClient(mongoString)(dbName)
 
