@@ -20,10 +20,16 @@ object SmugmugPlan extends async.Plan with ServerErrorResponse {
       val gallery = Gallery.fetch
       val frontpageImages = Image.getAll(id = "12121179", key = "C3Ks6")
 
-      // Map the promises
-      val frontpage = for (f <- frontpageImages;
-                           g <- gallery;
-                           gi <- g.getImages) yield getFrontpage(f, gi)
+      try {
+
+        // Map the promises
+        val frontpage = for (f <- frontpageImages;
+                             g <- gallery;
+                             gi <- g.getImages) yield getFrontpage(f, gi)
+
+      } catch {
+        case e => { println("Out of memory error"); dispatch.Http.promise("Error") }
+      } 
 
       // Respond to request
       frontpage.map { f => req.respond(HtmlContent ~> ResponseString(f)) }
@@ -55,13 +61,21 @@ object SmugmugPlan extends async.Plan with ServerErrorResponse {
   // Serve an album
   def serveAlbum(url : String) = {
     val album : Promise[Option[String]] = {
-      Gallery.fetch.flatMap { g =>
-        g.album(url) match {
-          case None     => dispatch.Http.promise(None)
-          case Some(a)  => {
-            for (ai <- a.getImages; ae <- ai.getExif) yield Some(getAlbum(ae, g))
+
+      try {
+
+        Gallery.fetch.flatMap { g =>
+          g.album(url) match {
+            case None     => dispatch.Http.promise(None)
+            case Some(a)  => {
+              for (ai <- a.getImages; ae <- ai.getExif) yield Some(getAlbum(ae, g))
+            }
           }
         }
+      } 
+
+      catch {
+        case e => { println("Out of memory error"); dispatch.Http.promise(None) }
       }
     }
 
