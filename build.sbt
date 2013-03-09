@@ -21,7 +21,10 @@ libraryDependencies  ++= Seq(
 			"net.databinder" %% "unfiltered-json" % "0.6.7",
 			"net.databinder.dispatch" %% "dispatch-core" % "0.9.5",
 			"com.dongxiguo" %% "fastring" % "0.2.1",
-			"org.mongodb" %% "casbah" % "2.5.0"
+			"org.mongodb" %% "casbah" % "2.5.0",
+			"com.novus" %% "salat" % "1.9.2-SNAPSHOT",
+			"joda-time" % "joda-time" % "2.2",
+			"org.joda" % "joda-convert" % "1.2"
 )
 
 resolvers ++= Seq(
@@ -29,7 +32,8 @@ resolvers ++= Seq(
             // if you want to use snapshot builds (currently 0.2-SNAPSHOT), use this.
 			"akr4 release" at "http://akr4.github.com/mvn-repo/releases",
 			"Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-			"Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/"
+			"Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
+			"Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 )
 
 // The main class
