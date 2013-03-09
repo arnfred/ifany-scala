@@ -14,7 +14,7 @@ sealed trait SmugmugData
 case class Album(id : String, key : String, title : String, description : String, url : String, categoryId : Option[String], subCategoryId : Option[String], cover : Cover) extends SmugmugData
 
 // Data for an Image
-case class Image(id : String, key : String, caption : String, urls : Urls, size : Size) extends SmugmugData
+case class Image(id : String, key : String, albumID : String, caption : String, url : String, size : Size) extends SmugmugData
 
 // Data for exif
 case class EXIF(id : String, key : String, aperture : String, focalLength : String, iso : Int, model : String, dateTime : DateTime) extends SmugmugData
@@ -28,19 +28,12 @@ case class SubCategory(id : String, name : String, url : String) extends Smugmug
 // Suplementary fields
 case class Size(width : Int, height : Int)
 case class Cover(id : String, key : String)
-case class Urls(tiny : String, thumb : String, small : String, medium : String, large : String, xlarge : String, x2large : String, x3large : String, original : String)
 
 
 
 object Album extends DataLoader {
 
   val collection : String = "albums"
-  val method : String = "albums.get"
-
-  def treatResponse(data : DataResponse) : Iterator[JValue] = data match {
-    case DataList(ds) => for (d <- ds) yield parse(d)
-    case DataItem(d) => (for (json <- (parse(d) \ "Albums").children) yield json).toIterator
-  }
 
 
   def parseJSON(json : JValue) : Album = {
@@ -64,14 +57,21 @@ object Album extends DataLoader {
   }
 }
 
+case class Urls(tiny : String, thumb : String, small : String, medium : String, large : String, xlarge : String, x2large : String, x3large : String, original : String)
 object Image extends DataLoader {
 
   val collection : String = "images"
-  val method : String = "images.get"
 
-  def treatResponse(data : DataResponse) : Iterator[JValue] = data match {
-    case DataList(ds) => for (d <- ds) yield parse(d)
-    case DataItem(d) => (for (json <- (parse(d) \ "Album" \ "Images").children) yield json).toIterator
+  def getUrl(img : Image, size : String) : String = size match {
+    case "tiny" => img.url.replace("__SIZE__","Ti")
+    case "thumb" => img.url.replace("__SIZE__","Th")
+    case "small" => img.url.replace("__SIZE__","S")
+    case "medium" => img.url.replace("__SIZE__","M")
+    case "large" => img.url.replace("__SIZE__","L")
+    case "xlarge" => img.url.replace("__SIZE__","XL")
+    case "x2large" => img.url.replace("__SIZE__","X2")
+    case "x3large" => img.url.replace("__SIZE__","X3")
+    case "original" => img.url.replace("__SIZE__","O").replace("-O","")
   }
 
   def parseJSON(json : JValue) : Image = {
@@ -89,8 +89,16 @@ object Image extends DataLoader {
     val JString(original) = json \ "OriginalURL";
     val JInt(height) = json \ "Height";
     val JInt(width) = json \ "Width";
-    val urls = Urls(tiny, thumb, small, medium, large, xlarge, x2large, x3large, original)
-    Image(id.toString, key, caption, urls, Size(width.toInt, height.toInt))
+    val albumID = json \ "Album" \ "id" match {
+      case JInt(id)     => id.toString
+      case _            => "0"
+    }
+    val url = tiny.replace("Ti","__SIZE__")
+    Image(id.toString, key, albumID, caption, url, Size(width.toInt, height.toInt))
+  }
+
+  def getAlbumImages(albumID : String, limit : Option[Int] = None) : Iterator[Image] = {
+    Cache.getQuery[Image](collection, Map("AlbumID" -> albumID), limit)
   }
 }
 
@@ -98,12 +106,6 @@ object Image extends DataLoader {
 object EXIF extends DataLoader {
 
   val collection : String = "exif"
-  val method : String = "images.getEXIF"
-
-  def treatResponse(data : DataResponse) : Iterator[JValue] = data match {
-    case DataList(ds) => for (d <- ds) yield parse(d) \ "Image"
-    case DataItem(d) => Iterator(parse(d) \ "Image")
-  }
 
   def parseJSON(json : JValue) : EXIF = {
     val JString(key) = json \ "Key"
@@ -120,7 +122,7 @@ object EXIF extends DataLoader {
     val JString(dateTime) = json \ "DateTime"
     val JString(model) = json \ "Model"
     val date = if (dateTimeOriginal.take(10) == "2000-01-01") dateTime else dateTimeOriginal
-    EXIF(id.toString, key, aperture, focalLength, iso, model, new DateTime(date))
+    EXIF(id.toString, key, aperture, focalLength, iso, model, new DateTime(date.replace(" ","T")))
   }
 }
 

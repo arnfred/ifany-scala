@@ -6,11 +6,11 @@ import com.novus.salat._
 import com.novus.salat.global._
 import com.mongodb.casbah.Imports._
 import scala.util.Properties
+import com.mongodb.casbah.commons.conversions.scala._
 
 object Cache {
 
-  //import com.mongodb.casbah.conversions.scala._
-  //RegisterJodaTimeConversionHelpers()
+  RegisterJodaTimeConversionHelpers()
 
   println(Properties.envOrNone("MONGOHQ_URL"));
   val MongoSetting(mongoDB) = Some(Properties.envOrElse("MONGOHQ_URL", "mongodb://heroku:d9aa08dde373b85276f93b9b44dfdaa8@linus.mongohq.com:10004/app12728917"))
@@ -48,8 +48,18 @@ object Cache {
     for (data <- mongoColl.find(q)) yield grater[A].asObject(data)
   }
 
+  def getQuery[A <: SmugmugData : Manifest](collection : String, query : Map[String, String], limit : Option[Int] = None) : Iterator[A] = {
 
+    // Get the right collection
+    val mongoColl = mongoDB(collection)
+
+    limit match {
+      case Some(n) => for (data <- mongoColl.find(query).limit(n)) yield grater[A].asObject(data)
+      case None    => for (data <- mongoColl.find(query)) yield grater[A].asObject(data)
+    }
+  }
 }
+
 
 // From:
 // http://nihito.tumblr.com/post/12106440217/a-easy-setting-of-mongohq-by-scala-on-heroku-com

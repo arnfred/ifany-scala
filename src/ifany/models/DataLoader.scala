@@ -11,12 +11,19 @@ case class DataItem(data : String) extends DataResponse
 trait DataLoader {
 
   val collection : String
-  val method : String
+
+  def putItem[A <: SmugmugData : Manifest](id : String, data : A) : Unit = {
+    Cache.putItem[A](collection, id, data)
+  }
 
   def getList[A <: SmugmugData : Manifest](ids : Iterator[String]) : Iterator[A] = {
     Cache.getList[A](collection, ids)
   }
 
+  def getQuery[A <: SmugmugData : Manifest](query : Map[String, String] = Map.empty, 
+                                            limit : Option[Int] = None) : Iterator[A] = {
+    Cache.getQuery[A](collection, query, limit)
+  }
 
   def getItem[A <: SmugmugData : Manifest](id : String = "none") : A = {
 
@@ -27,10 +34,6 @@ trait DataLoader {
     }
   }
 
-
-  // Take a dataresponse and either break up the json or keep it as is
-  def treatResponse(data : DataResponse) : Iterator[JValue]
-  
 
   // Parse a response in JSON to the object
   def parseJSON(json : JValue) : SmugmugData

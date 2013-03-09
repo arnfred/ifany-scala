@@ -18,17 +18,58 @@ object SmugmugAPI {
   /**
    * Fetches a query from the smugmug api
    */
-  def update(method : String, collection : String, id : String = defaultId, params : Map[String,String] = Map.empty) : Promise[Option[String]]= {
+  def get(method : String, params : Map[String,String] = Map.empty) : Promise[String]= {
 
     println("fetching " + method)
 
     // Create a request which isn't evaluated yet
     val m = "smugmug." + method
     val p = getParams(m) ++ params
-    lazy val request = Http((url(endpoint) <<? p) OK as.String).option
+    lazy val request = Http((url(endpoint) <<? p) OK as.String)
 
     // Make sure we're saving the answer to cache
     for (_ <- handshake; r <- request) yield r
+  }
+
+
+  def getImages(albumID : String, albumKey : String) : Promise[List[Image]] = {
+    val imagesPromise = SmugmugAPI.get("images.get", Map("AlbumID" -> albumID, 
+                                                         "AlbumKey" -> albumKey,
+                                                         "Heavy" -> "true"))
+
+    imagesPromise map { data =>
+      for (json <- (parse(data) \ "Album" \ "Images").children) yield {
+        Image.parseJSON(json)
+      }
+    }
+  }
+
+  def getAlbums : Promise[List[Album]] = {
+    val albumsPromise = SmugmugAPI.get("albums.get", Map("Heavy" -> "true"))
+
+    albumsPromise map { data =>
+      for (json <- (parse(data) \ "Albums").children) yield {
+        Album.parseJSON(json)
+      }
+    }
+  }
+
+  def getEXIF(imageID : String, imageKey : String) : Promise[EXIF] = {
+    val exifPromise = SmugmugAPI.get("images.getEXIF", Map("ImageID" -> imageID, 
+                                                           "ImageKey" -> imageKey))
+
+    exifPromise map { data => EXIF.parseJSON(parse(data) \ "Image") }
+  }
+
+
+  def getCategories : Promise[List[Category]] = {
+    val categoriesPromise = SmugmugAPI.get("categories.get")
+
+    categoriesPromise map { data =>
+      for (json <- (parse(data) \ "Categories").children) yield {
+        Category.parseJSON(json)
+      }
+    }
   }
 
 
