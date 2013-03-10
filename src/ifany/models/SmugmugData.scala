@@ -9,12 +9,26 @@ import com.novus.salat.annotations._
 @Salat
 sealed trait SmugmugData
 
+sealed abstract class ImageUrl(url : String) {
+  def urls(size : String) : String = size match {
+    case "tiny" => url.replace("__SIZE__","Ti")
+    case "thumb" => url.replace("__SIZE__","Th")
+    case "small" => url.replace("__SIZE__","S")
+    case "medium" => url.replace("__SIZE__","M")
+    case "large" => url.replace("__SIZE__","L")
+    case "xlarge" => url.replace("__SIZE__","XL")
+    case "x2large" => url.replace("__SIZE__","X2")
+    case "x3large" => url.replace("__SIZE__","X3")
+    case "original" => url.replace("__SIZE__","O").replace("-O","")
+  }
+}
+
 
 // Data for an album
-case class Album(id : String, key : String, title : String, description : String, url : String, categoryId : Option[String], subCategoryId : Option[String], cover : Cover) extends SmugmugData
+case class Album(id : String, key : String, title : String, description : String, imageIDs : List[String], url : String, categoryID : Option[String], cover : Cover) extends SmugmugData
 
 // Data for an Image
-case class Image(id : String, key : String, albumID : String, caption : String, url : String, size : Size) extends SmugmugData
+case class Image(id : String, key : String, albumID : String, caption : String, url : String, size : Size) extends ImageUrl(url) with SmugmugData
 
 // Data for exif
 case class EXIF(id : String, key : String, aperture : String, focalLength : String, iso : Int, model : String, dateTime : DateTime) extends SmugmugData
@@ -48,31 +62,15 @@ object Album extends DataLoader {
       case JInt(id)   => Some(id.toString)
       case _          => None
     }
-    val subcategoryId = json \ "SubCategory" \ "id" match {
-      case JInt(id)   => Some(id.toString)
-      case _          => None
-    }
     // Use June scala dates instead of java date
-    Album(id.toString, key, title, description, url, categoryId, subcategoryId, Cover(coverId.toString, coverKey))
+    Album(id.toString, key, title, description, Nil, url, categoryId, Cover(coverId.toString, coverKey))
   }
 }
 
-case class Urls(tiny : String, thumb : String, small : String, medium : String, large : String, xlarge : String, x2large : String, x3large : String, original : String)
 object Image extends DataLoader {
 
   val collection : String = "images"
 
-  def getUrl(img : Image, size : String) : String = size match {
-    case "tiny" => img.url.replace("__SIZE__","Ti")
-    case "thumb" => img.url.replace("__SIZE__","Th")
-    case "small" => img.url.replace("__SIZE__","S")
-    case "medium" => img.url.replace("__SIZE__","M")
-    case "large" => img.url.replace("__SIZE__","L")
-    case "xlarge" => img.url.replace("__SIZE__","XL")
-    case "x2large" => img.url.replace("__SIZE__","X2")
-    case "x3large" => img.url.replace("__SIZE__","X3")
-    case "original" => img.url.replace("__SIZE__","O").replace("-O","")
-  }
 
   def parseJSON(json : JValue) : Image = {
     val JInt(id) = json \ "id";   

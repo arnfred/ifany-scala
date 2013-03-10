@@ -39,8 +39,7 @@ object Ifany {
     //val srv = unfiltered.jetty.Http(testPort).resources(resourceDir.toURI.toURL)
 
     // Run server
-    srv
-    //srv.handler(SmugmugPlan).handler(DataPlan)
+    srv.handler(GalleryPlan)//.handler(DataPlan)
   }
 
 }
