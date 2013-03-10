@@ -7,7 +7,7 @@ import scala.util.Random.nextInt
 
 object Update {
 
-  def updateAll : Unit = {
+  def updateAll(withExif : Boolean = true) : Unit = {
 
     // Get the images for the frontpage
     val banners_P = SmugmugAPI.getImages("12121179","C3Ks6")

@@ -102,22 +102,29 @@ object EXIF extends DataLoader {
 
   val collection : String = "exif"
 
+
   def parseJSON(json : JValue) : EXIF = {
-    val JString(key) = json \ "Key"
-    val JInt(id) = json \ "id"
-    val JString(aperture) = json \ "Aperture"
-    val JString(focalLength) = json \ "FocalLength"
-    // TODO, figure out why the iso is so problematic
-    val iso = json \ "ISO" match {
-      case JInt(n) => n.toInt
-      case _ => 0
+    var exif = EXIF("","","","","",0,"",new DateTime)
+    try {
+      val JString(key) = json \ "Key"
+      val JInt(id) = json \ "id"
+      val JString(aperture) = json \ "Aperture"
+      val JString(focalLength) = json \ "FocalLength"
+      val iso = json \ "ISO" match {
+        case JInt(n) => n.toInt
+        case _ => 0
+      }
+      val JString(exposure) = json \ "ExposureTime"
+      val JString(dateTimeOriginal) = json \ "DateTimeOriginal"
+      val JString(dateTime) = json \ "DateTime"
+      val JString(model) = json \ "Model"
+      val date = if (dateTimeOriginal.take(10) == "2000-01-01") dateTime else dateTimeOriginal
+      exif = EXIF(id.toString, key, "none", aperture, focalLength, iso, model, new DateTime(date.replace(" ","T")))
     }
-    val JString(exposure) = json \ "ExposureTime"
-    val JString(dateTimeOriginal) = json \ "DateTimeOriginal"
-    val JString(dateTime) = json \ "DateTime"
-    val JString(model) = json \ "Model"
-    val date = if (dateTimeOriginal.take(10) == "2000-01-01") dateTime else dateTimeOriginal
-    EXIF(id.toString, key, "none", aperture, focalLength, iso, model, new DateTime(date.replace(" ","T")))
+    catch {
+      case e : Throwable => { println(e); println(json) }
+    }
+    return exif
   }
 }
 

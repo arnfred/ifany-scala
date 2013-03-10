@@ -16,6 +16,8 @@ object AlbumModel {
     for (albums <- SmugmugAPI.getAlbums; 
          a <- albums if (a.url == url)) yield {
 
+      println(a)
+
       for (images <- SmugmugAPI.getImages(a.id, a.key)) yield {
 
         val exifs_P = for (i <- images) yield SmugmugAPI.getEXIF(i.id, i.key)
@@ -23,7 +25,7 @@ object AlbumModel {
         for (exifs <- Http.promise.all(exifs_P)) yield {
 
           val exifMap = images.map(_.id).zip(exifs).toMap
-          save(images, exifMap, a.id)
+          save(images, exifMap, a)
         }
       }
     }
@@ -58,25 +60,27 @@ object AlbumModel {
   }
 
 
-  def save(images : List[Image], exifMap : Map[String, EXIF], albumID : String) : Unit = {
+  def save(images : List[Image], exifMap : Map[String, EXIF], album : Album) : Unit = {
 
-    def addAlbumIDtoImage(im : Image, albumID : String) : Image = {
+    val albumID = album.id
+
+    def addAlbumIDtoImage(im : Image) : Image = {
       Image(im.id, im.key, albumID, im.caption, im.url, im.size)
     }
       
-    def addAlbumIDtoEXIF(exif : EXIF, albumID : String) : EXIF = {
+    def addAlbumIDtoEXIF(exif : EXIF) : EXIF = {
       EXIF(exif.id, exif.key, albumID, exif.aperture, exif.focalLength, exif.iso, exif.model, exif.dateTime)
     }
 
     println("saving images")
     for (i <- images) {
-      Image.putItem(i.id, addAlbumIDtoImage(i, albumID))
+      Image.putItem(i.id, addAlbumIDtoImage(i))
     }
 
     println("saving exifs")
-    for ((albumID, exif) <- exifMap) {
-      val e = addAlbumIDtoEXIF(exif, albumID)
-      EXIF.putItem(exif.id, e)
+    for ((id, exif) <- exifMap) {
+      val e = addAlbumIDtoEXIF(exif)
+      EXIF.putItem(e.id, e)
     }
   }
 }

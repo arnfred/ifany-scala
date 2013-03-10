@@ -19,8 +19,8 @@ br.clear {
 /* Image behavior */
 img.frame {
 	padding:1px;
-	border: thin solid grey;
-	max-width:99%;
+	/* border: thin solid grey; /*
+	max-width:100%;
 }
 div.span3.img {
 	width:22.7%;

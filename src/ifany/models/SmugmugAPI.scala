@@ -58,7 +58,7 @@ object SmugmugAPI {
     val exifPromise = SmugmugAPI.get("images.getEXIF", Map("ImageID" -> imageID, 
                                                            "ImageKey" -> imageKey))
 
-    exifPromise map { data => EXIF.parseJSON(parse(data) \ "Image") }
+    exifPromise map { data => { EXIF.parseJSON(parse(data) \ "Image") }}
   }
 
 
