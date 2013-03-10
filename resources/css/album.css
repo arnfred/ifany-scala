@@ -37,10 +37,6 @@ div.album-nav a:hover {
 	cursor:pointer;
 	background-color:#f8f8f8;
 }
-div.span3.img {
-	max-width:24%;
-	float:left;
-}
 div#credits p {
 	float:right;
 }

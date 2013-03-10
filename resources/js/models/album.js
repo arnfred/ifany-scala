@@ -49,6 +49,7 @@ define(["radio", "util/cache", "lib/history", "util/foreach"],
 		// Broadcast arrow click event
 		$("#overlay-prev").click(function() { goPrev(); });
 		$("#overlay-next").click(function() { goNext(); });
+		$("#overlay-img").click(function() { console.debug("here"); closeOverlay() });
 
 		// History change
 		history.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate

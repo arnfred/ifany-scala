@@ -86,7 +86,7 @@ define(["jquery", "radio", "util/size", "lib/history", "util/cache"],
 		$("#overlay-img img").remove();
 		$("#overlay-img div").prepend(domImg);
 		$("#caption").html(img.caption);
-		$("#overlay-img").attr("alt",img.caption);
+		$("#overlay-img img").attr("alt",img.caption);
 	}
 
 
