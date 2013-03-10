@@ -45,53 +45,37 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 	//                  Album                   //
 	//                                          //
 	//////////////////////////////////////////////
-    //case req @ Path(Seg(albumURL :: Nil)) => serveAlbum(albumURL) map { page =>
-    //  req.respond(page)
-    //}
 
+    case req @ Path(Seg(albumURL :: whatever)) => {
+      
+      // Get frontpage model
+      val album_F = AlbumModel.get(albumURL)
 
+      // In case we succeed
+      album_F onSuccess {
+        case model => {
+          val album = getAlbum(model)
+          req.respond(HtmlContent ~> ResponseString(album))
+        }
+      }
 
-	//////////////////////////////////////////////
-	//                                          //
-	//              Album - Image               //
-	//                                          //
-	//////////////////////////////////////////////
-    // case req @ Path(Seg(albumURL :: image :: Nil)) => serveAlbum(albumURL) map { page =>
-    //   req.respond(page)
-    // }
+      // In case we fail
+      album_F onFailure {
+        case error => {
+          req.respond(HtmlContent ~> ResponseString("Error occured: " + error.toString))
+        }
+      }
+    }
+
   }
 
 
-  // Serve an album
-  // def serveAlbum(url : String) = {
-  //   val album : Promise[Option[String]] = try {
 
-  //     Gallery.fetch.flatMap { g =>
-  //       g.album(url) match {
-  //         case None     => dispatch.Http.promise(None)
-  //         case Some(a)  => {
-  //           for (ai <- a.getImages; ae <- ai.getExif) yield Some(getAlbum(ae, g))
-  //         }
-  //       }
-  //     }
-  //   } 
-
-  //   catch {
-  //     case e => { println("Out of memory error"); dispatch.Http.promise(None) }
-  //   }
-
-  //   album map {
-  //     case None       => Pass
-  //     case Some(a)    => HtmlContent ~> ResponseString(a)
-  //   }
-  // }
-
-
-  // // get the Album view
-  // def getAlbum(a : Album, g : Gallery) : String = {
-  //     val view = AlbumView(a, g)
-  //     AlbumTemplate(view).toString
-  // }
+  // get the Album view
+  def getAlbum(model : AlbumModel) : String = {
+      val view = AlbumView(model)
+      AlbumTemplate(view).toString
+  }
 
 
   // Get the frontpage view

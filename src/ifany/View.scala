@@ -42,7 +42,7 @@ trait View {
         return {
           if (sameMonth) day(first) + ", " + year(first)
           else if (sameYear) day(first) + " to " + day(last) + ", " + year(first)
-          else day(first) + ", " + year(first) + " to " + day(last) + ", " + year(last)
+          else day(first) + " " + year(first) + " to " + day(last) + " " + year(last)
         }
       }
     }

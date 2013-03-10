@@ -39,23 +39,23 @@ object Cache {
     }
   }
 
-  def getList[A <: SmugmugData : Manifest](collection : String, ids : Iterator[String]) : Iterator[A] = {
+  def getList[A <: SmugmugData : Manifest](collection : String, ids : List[String]) : List[A] = {
     // Get the right collection
     val mongoColl = mongoDB(collection)
 
     // Load all ids
     val q : DBObject = ("_id" $in ids.toList)
-    for (data <- mongoColl.find(q)) yield grater[A].asObject(data)
+    (for (data <- mongoColl.find(q)) yield grater[A].asObject(data)).toList
   }
 
-  def getQuery[A <: SmugmugData : Manifest](collection : String, query : Map[String, String], limit : Option[Int] = None) : Iterator[A] = {
+  def getQuery[A <: SmugmugData : Manifest](collection : String, query : Map[String, String], limit : Option[Int] = None) : List[A] = {
 
     // Get the right collection
     val mongoColl = mongoDB(collection)
 
     limit match {
-      case Some(n) => for (data <- mongoColl.find(query).limit(n)) yield grater[A].asObject(data)
-      case None    => for (data <- mongoColl.find(query)) yield grater[A].asObject(data)
+      case Some(n) => (for (data <- mongoColl.find(query).limit(n)) yield grater[A].asObject(data)).toList
+      case None    => (for (data <- mongoColl.find(query)) yield grater[A].asObject(data)).toList
     }
   }
 }

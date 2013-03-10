@@ -27,7 +27,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
         </div>
 
         <div class="span7" id="image">
-            <img src="${ view.getBanner.urls("large") }" class="frame"/>
+            <img src="${ view.banner.urls("large") }" class="frame"/>
         </div>
     </div>
   """)

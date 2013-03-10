@@ -4,7 +4,7 @@ import net.liftweb.json._
 
 
 sealed abstract class DataResponse
-case class DataList(data : Iterator[String]) extends DataResponse
+case class DataList(data : List[String]) extends DataResponse
 case class DataItem(data : String) extends DataResponse
 
 
@@ -16,12 +16,12 @@ trait DataLoader {
     Cache.putItem[A](collection, id, data)
   }
 
-  def getList[A <: SmugmugData : Manifest](ids : Iterator[String]) : Iterator[A] = {
+  def getList[A <: SmugmugData : Manifest](ids : List[String]) : List[A] = {
     Cache.getList[A](collection, ids)
   }
 
   def getQuery[A <: SmugmugData : Manifest](query : Map[String, String] = Map.empty, 
-                                            limit : Option[Int] = None) : Iterator[A] = {
+                                            limit : Option[Int] = None) : List[A] = {
     Cache.getQuery[A](collection, query, limit)
   }
 

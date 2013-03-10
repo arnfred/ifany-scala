@@ -25,13 +25,13 @@ sealed abstract class ImageUrl(url : String) {
 
 
 // Data for an album
-case class Album(id : String, key : String, title : String, description : String, imageIDs : List[String], url : String, categoryID : Option[String], cover : Cover) extends SmugmugData
+case class Album(id : String, key : String, title : String, description : String, imageIDs : List[String], url : String, categoryID : Option[String], cover : Cover, nav : Navigation) extends SmugmugData
 
 // Data for an Image
 case class Image(id : String, key : String, albumID : String, caption : String, url : String, size : Size) extends ImageUrl(url) with SmugmugData
 
 // Data for exif
-case class EXIF(id : String, key : String, aperture : String, focalLength : String, iso : Int, model : String, dateTime : DateTime) extends SmugmugData
+case class EXIF(id : String, key : String, albumID : String, aperture : String, focalLength : String, iso : Int, model : String, dateTime : DateTime) extends SmugmugData
 
 // Data for category
 case class Category(id : String, name : String, description : String, url : String) extends SmugmugData
@@ -42,6 +42,7 @@ case class SubCategory(id : String, name : String, url : String) extends Smugmug
 // Suplementary fields
 case class Size(width : Int, height : Int)
 case class Cover(id : String, key : String)
+case class Navigation(next : Option[String], prev : Option[String])
 
 
 
@@ -63,7 +64,7 @@ object Album extends DataLoader {
       case _          => None
     }
     // Use June scala dates instead of java date
-    Album(id.toString, key, title, description, Nil, url, categoryId, Cover(coverId.toString, coverKey))
+    Album(id.toString, key, title, description, Nil, url, categoryId, Cover(coverId.toString, coverKey), Navigation(None,None))
   }
 }
 
@@ -87,16 +88,12 @@ object Image extends DataLoader {
     val JString(original) = json \ "OriginalURL";
     val JInt(height) = json \ "Height";
     val JInt(width) = json \ "Width";
-    val albumID = json \ "Album" \ "id" match {
-      case JInt(id)     => id.toString
-      case _            => "0"
-    }
     val url = tiny.replace("Ti","__SIZE__")
-    Image(id.toString, key, albumID, caption, url, Size(width.toInt, height.toInt))
+    Image(id.toString, key, "none", caption, url, Size(width.toInt, height.toInt))
   }
 
-  def getAlbumImages(albumID : String, limit : Option[Int] = None) : Iterator[Image] = {
-    Cache.getQuery[Image](collection, Map("AlbumID" -> albumID), limit)
+  def getAlbumImages(albumID : String, limit : Option[Int] = None) : List[Image] = {
+    Cache.getQuery[Image](collection, Map("albumID" -> albumID), limit)
   }
 }
 
@@ -120,7 +117,7 @@ object EXIF extends DataLoader {
     val JString(dateTime) = json \ "DateTime"
     val JString(model) = json \ "Model"
     val date = if (dateTimeOriginal.take(10) == "2000-01-01") dateTime else dateTimeOriginal
-    EXIF(id.toString, key, aperture, focalLength, iso, model, new DateTime(date.replace(" ","T")))
+    EXIF(id.toString, key, "none", aperture, focalLength, iso, model, new DateTime(date.replace(" ","T")))
   }
 }
 
@@ -130,10 +127,10 @@ object Category extends DataLoader {
   val collection : String = "categories"
   val method : String = "categories.get"
 
-  def treatResponse(data : DataResponse) : Iterator[JValue] = data match {
+  def treatResponse(data : DataResponse) : List[JValue] = data match {
     case DataList(ds) => for (d <- ds) yield parse(d)
     case DataItem(d) => (for (json <- (parse(d) \ "Categories").children;
-                              JString(t) = json \ "Type" if t == "User") yield json).toIterator
+                              JString(t) = json \ "Type" if t == "User") yield json)
   }
 
   def parseJSON(json : JValue) : Category = {
