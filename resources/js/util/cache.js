@@ -15,6 +15,16 @@ define(["util/size", "jquery", "radio"], function(size, $, radio) {
 
 	cache.nbLoaded = 0;
 	cache.images = {};
+	cache.urlSize = {
+		tiny	: "Ti",
+		thumb	: "Th",
+		small	: "S",
+		medium	: "M",
+		large	: "L",
+		xlarge	: "XL",
+		x2large	: "X2",
+		x3large	: "X3"
+	}
 
 	//////////////////////////////////////////////
 	//											//
@@ -26,7 +36,8 @@ define(["util/size", "jquery", "radio"], function(size, $, radio) {
 	cache.save = function(img) {
 
 		// Cache image
-		var url = img.urls[size.getImageSize(img).url];
+		console.debug(size.getImageSize(img))
+		var url = img.url.replace("__SIZE__", cache.urlSize[size.getImageSize(img).url]);
 		var domImg = $("<img src=\"" + url + "\"/>");
 		cache.images[img.id] = domImg;
 

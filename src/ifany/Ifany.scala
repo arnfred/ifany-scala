@@ -39,7 +39,7 @@ object Ifany {
     //val srv = unfiltered.jetty.Http(testPort).resources(resourceDir.toURI.toURL)
 
     // Run server
-    srv.handler(GalleryPlan)//.handler(DataPlan)
+    srv.handler(DataPlan).handler(GalleryPlan)
   }
 
 }

@@ -7,7 +7,6 @@ define(["radio", "util/cache", "lib/history", "util/foreach"],
 	//											//
 	//////////////////////////////////////////////
 	var album = {};
-	album.images = null;
 
 
 	//////////////////////////////////////////////
@@ -69,8 +68,9 @@ define(["radio", "util/cache", "lib/history", "util/foreach"],
 	album.init = function() {
 
 		// Get images
-		var images = $.getJSON("/album/" + albumData.id + "/" + albumData.key)
+		var images = $.getJSON("/album/" + albumData.id + "/")
 		images.then(function(im) { 
+			console.debug(im)
 			album.images = im; 
 			album.events();
 			openOverlayDirectly();
