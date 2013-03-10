@@ -22,7 +22,14 @@ object Update {
     for (banners <- banners_P; cats <- cats_P; albums <- albums_P) yield {
 
       // Get all images
-      val images_P = for (a <- albums) yield SmugmugAPI.getImages(a.id, a.key)
+      val images_P = for (a <- albums) yield {
+        SmugmugAPI.getImages(a.id, a.key).map { images =>
+          for (image <- images) yield {
+            val withID = addAlbumIDtoImage(image, a.id)
+            withID
+          }
+        }
+      }
 
       // When these have loaded, then do:
       for (images <- Http.promise.all(images_P)) yield {
@@ -33,7 +40,12 @@ object Update {
         val exifs_P = for ((albumID, images) <- imageMap; i <- images) yield {
           Thread.sleep(nextInt(500)) 
           println("Getting exif for image " + i.id)
-          SmugmugAPI.getEXIF(i.id, i.key)
+          SmugmugAPI.getEXIF(i.id, i.key).map { exif =>
+            val withID = addAlbumIDtoEXIF(exif, albumID)
+            println("Saving exif with id: " + exif.id)
+            EXIF.putItem(exif.id, withID)
+            withID
+          }
         }
         
         for (exifs <- Http.promise.all(exifs_P)) yield {
@@ -42,7 +54,7 @@ object Update {
           val exifMap : Map[String, EXIF] = albumList.zip(exifs).toMap
 
           // Save this info in db
-          save(cats, albums, banners, exifMap, imageMap)
+          save(cats, albums, banners, imageMap, exifMap)
         }
 
       }
@@ -68,20 +80,19 @@ object Update {
 
   }
 
-  def save(categories : List[Category], albums : List[Album], banners : List[Image], exifMap : Map[String, EXIF], imageMap : Map[String, List[Image]]) : Unit = {
+  def addAlbumIDtoEXIF(exif : EXIF, albumID : String) : EXIF = {
+    EXIF(exif.id, exif.key, albumID, exif.aperture, exif.focalLength, exif.iso, exif.model, exif.dateTime)
+  }
+
+  def addAlbumIDtoImage(im : Image, albumID : String) : Image = {
+    Image(im.id, im.key, albumID, im.caption, im.url, im.size)
+  }
+
+  def save(categories : List[Category], albums : List[Album], banners : List[Image], imageMap : Map[String, List[Image]], exifMap : Map[String, EXIF]) : Unit = {
 
     def addImagesToAlbum(a : Album, images : List[Image]) : Album = {
       Album(a.id, a.key, a.title, a.description, images.map { _.id }, a.url, a.categoryID, a.cover, a.nav)
     }
-
-    def addAlbumIDtoImage(im : Image, albumID : String) : Image = {
-      Image(im.id, im.key, albumID, im.caption, im.url, im.size)
-    }
-      
-    def addAlbumIDtoEXIF(exif : EXIF, albumID : String) : EXIF = {
-      EXIF(exif.id, exif.key, albumID, exif.aperture, exif.focalLength, exif.iso, exif.model, exif.dateTime)
-    }
-
 
     // Update albums with prev and next
     val as = setPrevNext(albums, exifMap)
@@ -95,23 +106,15 @@ object Update {
     for (a <- as) {
       Album.putItem(a.id, addImagesToAlbum(a, imageMap(a.id)))
     }
+    // Save images
+    println("saving images")
+    for ((id, images) <- imageMap; i <- images) {
+      Image.putItem(i.id, i)
+    }
 
     // Save banners
     println("saving banners")
     Album.putItem("12121179", Album("12121179","none","banner images","banner images", banners.map(_.id), "none", None, Cover("0","0"), Navigation(None,None)))
-
-    // Save exifs
-    println("saving exifs")
-    for ((albumID, exif) <- exifMap) {
-      val e = addAlbumIDtoEXIF(exif, albumID)
-      EXIF.putItem(exif.id, e)
-    }
-
-    // Save images
-    println("saving images")
-    for ((id, images) <- imageMap; i <- images) {
-      Image.putItem(i.id, addAlbumIDtoImage(i, id))
-    }
 
   }
 
