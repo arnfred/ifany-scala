@@ -17,7 +17,7 @@ div.album-images {
 }
 
 /* Album Nav */
-div.span5.album-nav {
+div.span4.album-nav {
 	max-width:50%;
 	float:left;
 }
@@ -36,6 +36,14 @@ div.album-nav a:hover {
 	color:#555;
 	cursor:pointer;
 	background-color:#f8f8f8;
+}
+div.home span {
+	width:100%;
+	float:none;
+}
+div.home.span2.album-nav {
+	text-align:center;
+	float:left;
 }
 div#credits p {
 	float:right;
