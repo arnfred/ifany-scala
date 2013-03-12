@@ -36,7 +36,6 @@ define(["util/size", "jquery", "radio"], function(size, $, radio) {
 	cache.save = function(img) {
 
 		// Cache image
-		console.debug(size.getImageSize(img))
 		var url = img.url.replace("__SIZE__", cache.urlSize[size.getImageSize(img).url]);
 		var domImg = $("<img src=\"" + url + "\"/>");
 		cache.images[img.id] = domImg;

@@ -1,5 +1,5 @@
 define(["radio", "util/cache", "lib/history", "lib/hammer.min", "util/foreach"], 
-	function(radio, cache, history, hammer) {
+	function(radio, cache, history, Hammer) {
 
 	//////////////////////////////////////////////
 	//											//
@@ -49,7 +49,7 @@ define(["radio", "util/cache", "lib/history", "lib/hammer.min", "util/foreach"],
 		// Broadcast arrow click event
 		$("#overlay-prev").click(function() { goPrev(); });
 		$("#overlay-next").click(function() { goNext(); });
-		$("#overlay-img").click(function() { console.debug("here"); closeOverlay() });
+		$("#overlay-img").click(function() { closeOverlay() });
 
 		// History change
 		history.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
@@ -60,8 +60,9 @@ define(["radio", "util/cache", "lib/history", "lib/hammer.min", "util/foreach"],
 		radio("window:resize").subscribe(cacheImages);
 
 		// On swipe
-		hammer(window).on("swipeleft", function() { goPrev(); });
-		hammer(window).on("swiperight", function() { goNext(); });
+		var overlay_img = document.getElementById('overlay-img');
+		hammer(overlay_img).on("swipeleft", function() { goPrev(); });
+		hammer(overlay_img).on("swiperight", function() { goNext(); });
 	}
 
 	//////////////////////////////////////////////
@@ -75,7 +76,6 @@ define(["radio", "util/cache", "lib/history", "lib/hammer.min", "util/foreach"],
 		// Get images
 		var images = $.getJSON("/album/" + albumData.id + "/")
 		images.then(function(im) { 
-			console.debug(im)
 			album.images = im; 
 			album.events();
 			openOverlayDirectly();

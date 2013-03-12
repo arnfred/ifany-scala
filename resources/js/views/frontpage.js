@@ -67,10 +67,7 @@ define(["jquery"],
 	var setCategoryClick = function(index, cat) {
 		// Unfold categories
 		var toggleAlbums = function(albums) { 
-			console.debug(albums)
-			console.debug(albums.find("img"))
 			albums.find("img").each(function (index, im) {
-				console.debug(im)
 				$(im).attr("src", $(im).attr("href"))
 			})
 			albums.fadeToggle("fast");
