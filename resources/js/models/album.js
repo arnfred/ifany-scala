@@ -61,8 +61,8 @@ define(["radio", "util/cache", "lib/history", "lib/hammer.min", "util/foreach"],
 
 		// On swipe
 		var overlay_img = document.getElementById('overlay-img');
-		hammer(overlay_img).on("swipeleft", function() { goPrev(); });
-		hammer(overlay_img).on("swiperight", function() { goNext(); });
+		Hammer(overlay_img).on("swipeleft", function() { goPrev(); });
+		Hammer(overlay_img).on("swiperight", function() { goNext(); });
 	}
 
 	//////////////////////////////////////////////
