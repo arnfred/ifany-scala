@@ -118,6 +118,14 @@ div#overlay-prev, div#overlay-next, div#overlay-img {
 div#overlay-prev, div#overlay-next {
 	width:100%;
 }
+div#oprev, div#onext {
+	min-width:8.3%;
+	float:left;
+}
+div.overlay-img {
+	min-width:83%
+	float:left;
+}
 div#overlay-prev span, div#overlay-next span, div#overlay-img div {
 	display:table-cell;
 	vertical-align:middle;
