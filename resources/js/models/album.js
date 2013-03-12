@@ -1,5 +1,5 @@
-define(["radio", "util/cache", "lib/history", "util/foreach"], 
-	function(radio, cache, history) {
+define(["radio", "util/cache", "lib/history", "lib/hammer.min", "util/foreach"], 
+	function(radio, cache, history, hammer) {
 
 	//////////////////////////////////////////////
 	//											//
@@ -58,6 +58,10 @@ define(["radio", "util/cache", "lib/history", "util/foreach"],
 
 		// On resize, recache
 		radio("window:resize").subscribe(cacheImages);
+
+		// On swipe
+		hammer(window).on("swipeleft", function() { goPrev(); });
+		hammer(window).on("swiperight", function() { goNext(); });
 	}
 
 	//////////////////////////////////////////////
@@ -147,6 +151,7 @@ define(["radio", "util/cache", "lib/history", "util/foreach"],
 
 
 	var goNext = function() {
+		if (album.overlayActive == false) return
 		var nextId = getNextId(album.currentId);
 		if (nextId != -1) {
 			setOverlayId(nextId);
@@ -157,6 +162,7 @@ define(["radio", "util/cache", "lib/history", "util/foreach"],
 
 
 	var goPrev = function() {
+		if (album.overlayActive == false) return
 		var prevId = getPrevId(album.currentId);
 		if (prevId != -1) {
 			setOverlayId(prevId);
