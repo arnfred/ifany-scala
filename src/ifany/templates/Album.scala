@@ -29,7 +29,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
           ${ if (next != None) getLink(next.get.replace("-"," "), "/" + next.get + "/", "&laquo;") else "" }
         </div>
         <div class="span2 home album-nav hidden-phone">
-          <a href="/"><span class="nav">Home</span></a>
+          <a href="/"><span class="nav-home">Home</span></a>
         </div>
         <div class="span4 album-nav prev">
           ${ if (prev != None) getLink(prev.get.replace("-", " "), "/" + prev.get + "/", "&raquo;") else "" }
