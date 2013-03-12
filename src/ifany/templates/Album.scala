@@ -57,7 +57,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
             <span id="caption">Sample Caption</span>
           </div>
       </div>
-      <div class="span1 overlay-next overlay-nav hidden-phone">
+      <div class="span1 overlay-next overlay-nav">
         <div id="overlay-next">
           <span class="laquo">&raquo;</span>
         </div>
