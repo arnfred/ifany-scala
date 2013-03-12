@@ -100,7 +100,6 @@ object FrontpageModel {
         println("fetched " + exifs.size + " covers")
         val exifMap = exifs groupBy { _.albumID } map { case (id,exifList) => (id -> exifList.head) }
         val imageMap = images.toList groupBy { _.albumID }
-        println(exifs.map{_.dateTime})
 
         // Get model
         val model = FrontpageModel(cats, albums, bannerID, exifMap, imageMap)
