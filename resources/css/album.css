@@ -11,7 +11,12 @@ h2.album-title {
 p.album-date {
 	font-style:italic;
 	margin-bottom: 2em;
-
+}
+p.album-desc {
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
 }
 
 /* Album Nav */
@@ -26,7 +31,7 @@ div.span2.album-nav {
 
 div.album-nav a {
 	margin-top:1em;
-	padding:1em 0;
+	padding:1em 0 0 0;
 	height:2em;
 	color:#888;
 	display:block
@@ -68,6 +73,7 @@ div.album-row {
 }
 div.img img {
 	cursor:pointer;
+	float:right;
 }
 div.img img:hover {
 	background-color:#aaa;
