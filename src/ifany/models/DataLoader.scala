@@ -30,7 +30,7 @@ trait DataLoader {
     // TODO: wrap the whole thing in a future
     Cache.getItem[A](collection, id) match {
       case Some(response)  => response
-      case None            => throw new Exception("error")//parseJSON(SmugmugAPI.getList(dataType, ids, params))
+      case None            => throw new InternalError("Error getting item " + id + " from " + collection)//parseJSON(SmugmugAPI.getList(dataType, ids, params))
     }
   }
 

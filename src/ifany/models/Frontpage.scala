@@ -49,9 +49,9 @@ object FrontpageModel {
   }
 
   def getBannerID(albums : List[Album]) : String = albums filter(_.id == "12121179") match {
-    case Nil    => throw new Exception("The album with the banners hasn't been loaded")
+    case Nil    => throw new InternalError("The album with the banners hasn't been loaded")
     case list   => list.head.imageIDs match {
-      case Nil    => throw new Exception("The banner album doesn't have any images")
+      case Nil    => throw new InternalError("The banner album doesn't have any images")
       case ids    => shuffle(ids).head
     }
   }

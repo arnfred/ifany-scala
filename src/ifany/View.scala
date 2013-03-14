@@ -56,7 +56,7 @@ trait View {
 
   def getAlbumCoverImage(album : Album, imageMap : Map[String, List[Image]]) : Image = {
     imageMap(album.id) filter { _.id == album.cover.id } match {
-      case Nil => throw new Exception("Cover image requested in view, but no cover image was set")
+      case Nil => throw new InternalError("Cover image requested in view, but no cover image was set")
       case list => list.head
     }
   }

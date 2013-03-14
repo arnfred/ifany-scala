@@ -13,14 +13,14 @@ case class FrontpageView(data : FrontpageModel) extends View {
 
   val banner : Image = {
     (for ((albumID,imgs) <- data.imageMap; i <- imgs if i.id == data.bannerID) yield i) match {
-      case Nil   => throw new Exception("Banner image with id: " + data.bannerID + " not found among images")
+      case Nil   => throw new InternalError("Banner image with id: " + data.bannerID + " not found among images")
       case list  => list.head
     }
   }
 
   val bannerAlbum : Album = {
     (for (album <- data.albums if banner.albumID == album.id) yield album) match {
-      case Nil   => throw new Exception("The album of the banner image with id: " + banner.albumID + " not found")
+      case Nil   => throw new InternalError("The album of the banner image with id: " + banner.albumID + " not found")
       case list  => list.head
     }
   }
@@ -78,13 +78,13 @@ case class FrontpageView(data : FrontpageModel) extends View {
 
 
   private def getRandAlbum(albums : List[Album]) : Album = albums.size match {
-    case 0 => throw new Exception("No album supplied to getRandomAlbum")
+    case 0 => throw new InternalError("No album supplied to getRandomAlbum")
     case n => albums(abs(nextInt) % n)
   }
 
 
   private def getRandImage(images : List[Image]) : Image = images.size match {
-    case 0 => throw new Exception("No images supplied to getRandomImages")
+    case 0 => throw new InternalError("No images supplied to getRandomImages")
     case n => images(abs(nextInt) % n)
   }
 }
