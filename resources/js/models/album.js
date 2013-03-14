@@ -74,8 +74,9 @@ define(["radio", "util/cache", "lib/history", "lib/hammer.min", "util/foreach"],
 	album.init = function() {
 
 		// Get images
-		var images = $.getJSON("/album/" + albumData.id + "/")
+		//var images = $.getJSON("/album/" + albumData.id + "/")
 		images.then(function(im) { 
+			console.debug("here")
 			album.images = im; 
 			album.events();
 			openOverlayDirectly();

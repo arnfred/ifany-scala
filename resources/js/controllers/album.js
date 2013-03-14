@@ -20,7 +20,12 @@ curl(
 		"css!css/global",
 		"css!css/album",
 		"css!css/overlay"
-	]
+	],
+
+	function($) {
+		// Polluting the global namespace, I know
+		images = $.getJSON("/album/" + albumData.id + "/")
+	}
 )
 .next(
 	[
