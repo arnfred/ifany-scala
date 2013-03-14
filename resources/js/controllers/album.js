@@ -29,6 +29,7 @@ curl(
 )
 .next(
 	[
+		"lib/scrollTo",
 		"models/album",
 		"views/album",
 		"domReady!"

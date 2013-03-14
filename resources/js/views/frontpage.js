@@ -68,13 +68,16 @@ define(["jquery"],
 		// Unfold categories
 		var toggleAlbums = function(albums) { 
 			albums.find("img").each(function (index, im) {
-				$(im).attr("src", $(im).attr("href"))
+				$(im).attr("src", $(im).attr("href"));
 			})
 			albums.fadeToggle("fast");
 		}
 
-		var c = $(cat)
-		c.click(function() { toggleAlbums(c.nextUntil(".category, .credits")) })
+		var c = $(cat);
+		c.click(function() { 
+			$.scrollTo(c,400); 
+			toggleAlbums(c.nextUntil(".category, .credits")) 
+		});
 	}
 	
 

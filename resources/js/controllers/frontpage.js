@@ -14,14 +14,15 @@ curl(
 	// Set up the required modules
 	[
 		//"googleAnalytics", 
-		"views/frontpage"
+		"views/frontpage",
+		"lib/scrollTo"
 		//"css!css/bootstrap.min.css", 
 		//"css!css/bootstrap-responsive.min.css", 
 		//"css!css/global",
 		//"css!css/frontpage"
 	],
 	// The call back function
-	function(frontpage) {
+	function(frontpage, scrollTo) {
 
 		// Initialize frontpage
 		frontpage.init();

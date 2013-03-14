@@ -60,6 +60,7 @@ define(["jquery", "radio", "util/size", "lib/history", "util/cache"],
 		$("#overlay").fadeIn();
 		$("body").css("overflow-y", "hidden");
 		resizeOverlay();
+		$.scrollTo($("body"), 200)
 	}
 
 
