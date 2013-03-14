@@ -174,12 +174,14 @@ object FrontpageModel {
 
     val sorted = albums.sortBy { a => exifMap(a.id).dateTime.getMillis } reverse
 
+    def getNav(album : Album) : NavElem = NavElem(album.url, album.title)
+
 
     val navs = for (index <- (0 to (sorted.size - 1))) yield (index == 0, index == (albums.size -1)) match {
       case (true, true) => Navigation(None, None)
-      case (true, _) => Navigation(None, Some(sorted(index+1).url))
-      case (_, true) => Navigation(Some(sorted(index-1).url), None)
-      case (false, false) => Navigation(Some(sorted(index-1).url), Some(sorted(index+1).url))
+      case (true, _) => Navigation(None, Some(getNav(sorted(index+1))))
+      case (_, true) => Navigation(Some(getNav(sorted(index-1))), None)
+      case (false, false) => Navigation(Some(getNav(sorted(index-1))), Some(getNav(sorted(index+1))))
     }
 
     for ((a,nav) <- sorted.zip(navs)) yield {

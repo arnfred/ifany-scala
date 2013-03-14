@@ -6,8 +6,8 @@ case class AlbumView(data : AlbumModel) extends View {
   def getTitle : String = data.album.title
   def getDescription : String = data.album.description
 
-  def getNextAlbum : Option[String] = data.album.nav.next
-  def getPrevAlbum : Option[String] = data.album.nav.prev
+  def getNextAlbum : Option[NavElem] = data.album.nav.next
+  def getPrevAlbum : Option[NavElem] = data.album.nav.prev
 
   def getAlbumKey : String = data.album.key
   def getAlbumId : String = data.album.id

@@ -29,7 +29,8 @@ case class SubCategory(id : String, name : String, url : String) extends Smugmug
 // Suplementary fields
 case class Size(width : Int, height : Int)
 case class Cover(id : String, key : String)
-case class Navigation(next : Option[String], prev : Option[String])
+case class Navigation(next : Option[NavElem], prev : Option[NavElem])
+case class NavElem(url : String, title : String)
 
 
 
