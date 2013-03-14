@@ -27,14 +27,23 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
       frontpage_F onSuccess {
         case model => {
           val frontpage = getFrontpage(model)
-          req.respond(HtmlContent ~> ResponseString(frontpage))
+          req.respond(Ok ~> HtmlContent ~> ResponseString(frontpage))
         }
       }
 
       // In case we fail
       frontpage_F onFailure {
+        case InternalError(msg) => {
+          println("* INTERNAL ERROR * : " + msg)
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString("An error occured"))
+        }
+        case AlbumNotFound(url) => {
+          println("* ALBUM NOT FOUND * : " + url)
+          req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
+        }
         case error => {
-          req.respond(HtmlContent ~> ResponseString("Error occured: " + error.toString))
+          println("* UNKNOWN ERROR * : " + error.toString)
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
         }
       }
     }

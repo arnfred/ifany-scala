@@ -41,7 +41,7 @@ object AlbumModel {
 
       // If we don't have an album of this name, throw an error
       val album = albums match {
-        case Nil    => throw new Exception("No album with the url: " + url)
+        case Nil    => throw new AlbumNotFound(url)
         case list   => list.head
       }
 
