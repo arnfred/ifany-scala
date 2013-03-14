@@ -9,19 +9,6 @@ import com.novus.salat.annotations._
 @Salat
 sealed trait SmugmugData
 
-sealed abstract class ImageUrl(url : String) {
-  def urls(size : String) : String = size match {
-    case "tiny" => url.replace("__SIZE__","Ti")
-    case "thumb" => url.replace("__SIZE__","Th")
-    case "small" => url.replace("__SIZE__","S")
-    case "medium" => url.replace("__SIZE__","M")
-    case "large" => url.replace("__SIZE__","L")
-    case "xlarge" => url.replace("__SIZE__","XL")
-    case "x2large" => url.replace("__SIZE__","X2")
-    case "x3large" => url.replace("__SIZE__","X3")
-    case "original" => url.replace("__SIZE__","O").replace("-O","")
-  }
-}
 
 
 // Data for an album
@@ -146,5 +133,20 @@ object Category extends DataLoader {
     val JInt(id) = json \ "id";
     val JString(t) = json \ "Type";
     Category(id.toString, url.replace('-',' '), desc, url)
+  }
+}
+
+
+sealed abstract class ImageUrl(url : String) {
+  def urls(size : String) : String = size match {
+    case "tiny" => url.replace("__SIZE__","Ti")
+    case "thumb" => url.replace("__SIZE__","Th")
+    case "small" => url.replace("__SIZE__","S")
+    case "medium" => url.replace("__SIZE__","M")
+    case "large" => url.replace("__SIZE__","L")
+    case "xlarge" => url.replace("__SIZE__","XL")
+    case "x2large" => url.replace("__SIZE__","X2")
+    case "x3large" => url.replace("__SIZE__","X3")
+    case "original" => url.replace("__SIZE__","O").replace("-O","")
   }
 }

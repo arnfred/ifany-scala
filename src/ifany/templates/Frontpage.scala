@@ -28,6 +28,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
 
         <div class="span7" id="image">
             <img src="${ view.banner.urls("large") }" class="frame"/>
+            <p>From the album "<a href="${ view.bannerAlbum.url }/" >${ view.bannerAlbum.title }</a>"</p>
         </div>
     </div>
   """)

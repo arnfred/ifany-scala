@@ -18,6 +18,13 @@ case class FrontpageView(data : FrontpageModel) extends View {
     }
   }
 
+  val bannerAlbum : Album = {
+    (for (album <- data.albums if banner.albumID == album.id) yield album) match {
+      case Nil   => throw new Exception("The album of the banner image with id: " + banner.albumID + " not found")
+      case list  => list.head
+    }
+  }
+
 
   // Return the date of an album
   def getAlbumDate(album : Album) : DateTime = data.exifMap(album.id).dateTime
