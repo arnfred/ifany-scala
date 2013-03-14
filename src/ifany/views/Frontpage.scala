@@ -19,15 +19,16 @@ case class FrontpageView(data : FrontpageModel) extends View {
   }
 
 
-  // TODO: return in the right order
-  def getCategories : List[(Category, List[Album])] = {
+  // Return the date of an album
+  def getAlbumDate(album : Album) : DateTime = data.exifMap(album.id).dateTime
 
-    def getDate(album : Album) : DateTime = data.exifMap(album.id).dateTime
+  // Return categories with albums, all in the right order
+  def getCategories : List[(Category, List[Album])] = {
 
     val cats = data.categories.zip(data.categories.map(getCatAlbums(_)))
     cats.filter { case(c,as) => as.size > 0 } sortBy { case (_,as) =>
       // Get all the dates of the album
-      as.map { getDate(_).getMillis }.max
+      as.map { getAlbumDate(_).getMillis }.max
     } reverse
   }
 
@@ -52,18 +53,19 @@ case class FrontpageView(data : FrontpageModel) extends View {
     shuffle(data.imageMap(album.id)).take(n)
   }
 
-  def getCatDate(albums : List[Album]) : String = {
-    getDate(albums.map(getAlbumCoverEXIF(_, data.exifMap)), false)
+  def getCatDateString(albums : List[Album]) : String = {
+    getDateString(albums.map(getAlbumCoverEXIF(_, data.exifMap)), false)
   }
 
 
-  def getAlbumDate(album : Album) : String = {
-    getDate(List(getAlbumCoverEXIF(album, data.exifMap)), true)
+  def getAlbumDateString(album : Album) : String = {
+    getDateString(List(getAlbumCoverEXIF(album, data.exifMap)), true)
   }
 
   // Expensive
   private def getCatAlbums(cat : Category) : List[Album] = {
-    for (a <- data.albums if a.categoryID == Some(cat.id)) yield a
+    val albums = for (a <- data.albums if a.categoryID == Some(cat.id)) yield a
+    albums.sortBy { getAlbumDate(_).getMillis }
   }
 
 

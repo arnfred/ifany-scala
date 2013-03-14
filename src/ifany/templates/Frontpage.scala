@@ -49,7 +49,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
 
           <div class="span7" class="cat-info">
               <h2 class="cat-title">${ cat.name }</h2>
-              <p class="cat-date">${ view.getCatDate(albums) }.</p>
+              <p class="cat-date">${ view.getCatDateString(albums) }.</p>
               <p class="cat-meta">This gallery contains 
                 <span class="num">${ albums.size }</span> 
                 ${ if (albums.size == 1) "album" else "albums" } with 
@@ -67,7 +67,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
         <a href="/${ album.url }/">
           <div class="span3 offset1 album-info">
             <h3 class="album-title">${ album.title }</h3>
-            <p class="album-date">${ view.getAlbumDate(album) }</p>
+            <p class="album-date">${ view.getAlbumDateString(album) }</p>
             <p class="album-meta">
               <span class="num">${ view.getAlbumSize(album) }</span> 
               ${ if (view.getAlbumSize(album) == 1) "Image" else "Images" } 

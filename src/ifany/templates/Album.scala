@@ -18,18 +18,25 @@ case class AlbumTemplate(view : AlbumView) extends Template {
   """)
 
   def navigation(next : Option[String], prev : Option[String]) : Template = Template(fast"""
+
     <div class="row-fluid visible-phone">
-        <div class="span2 offset5 album-nav home">
+        <div class="span4 offset1 album-nav next">
+          ${ if (next != None) getLink("Newer", "/" + next.get + "/", "&laquo;") else "" }
+        </div>
+        <div class="span2 home album-nav">
           <a href="/"><span class="nav">Home</span></a>
         </div>
+        <div class="span4 album-nav prev">
+          ${ if (prev != None) getLink("Older", "/" + prev.get + "/", "&raquo;") else "" }
+        </div>
     </div>
-    <div class="row-fluid">
 
+    <div class="row-fluid hidden-phone">
         <div class="span4 offset1 album-nav next">
           ${ if (next != None) getLink(next.get.replace("-"," "), "/" + next.get + "/", "&laquo;") else "" }
         </div>
-        <div class="span2 home album-nav hidden-phone">
-          <a href="/"><span class="nav-home">Home</span></a>
+        <div class="span2 home album-nav">
+          <a href="/"><span class="nav">Home</span></a>
         </div>
         <div class="span4 album-nav prev">
           ${ if (prev != None) getLink(prev.get.replace("-", " "), "/" + prev.get + "/", "&raquo;") else "" }

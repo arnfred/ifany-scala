@@ -9,14 +9,16 @@ trait View {
   val name : String
   def getTitle : String
 
-  def getPostfix(d : DateTime) : String = d.getDayOfMonth.toString.last match {
-    case '1' => "st"
-    case '2' => "nd"
-    case '3' => "rd"
-    case _ => "th"
+  def getPostfix(d : DateTime) : String = (d.getDayOfMonth % 100, d.getDayOfMonth % 10) match {
+    case (11,_) => "th"
+    case (_,1)  => "st"
+    case (_,2)  => "nd"
+    case (_,3)  => "rd"
+    case _      => "th"
   }
 
-  def getDate(exifs : List[EXIF], withDay : Boolean) : String = {
+
+  def getDateString(exifs : List[EXIF], withDay : Boolean) : String = {
 
     // Get a list of all dates
     val dates : List[DateTime] = {
