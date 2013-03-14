@@ -14,12 +14,12 @@ curl(
 	// Set up the required modules
 	[
 		//"googleAnalytics", 
-		"jquery",
-		"css!css/bootstrap.min.css", 
-		"css!css/bootstrap-responsive.min.css", 
-		"css!css/global",
-		"css!css/album",
-		"css!css/overlay"
+		"jquery"
+		// "css!css/bootstrap.min.css", 
+		// "css!css/bootstrap-responsive.min.css", 
+		// "css!css/global",
+		// "css!css/album",
+		//"css!css/overlay"
 	],
 
 	function($) {
