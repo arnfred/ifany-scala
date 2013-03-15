@@ -41,7 +41,7 @@ define(["jquery", "radio", "util/size", "lib/history", "util/cache"],
 
 	album.init = function() {
 
-		// Toggle events
+		// Toggle events 
 		album.events();
 	}
 
@@ -60,7 +60,7 @@ define(["jquery", "radio", "util/size", "lib/history", "util/cache"],
 		$("#overlay").fadeIn();
 		$("body").css("overflow-y", "hidden");
 		resizeOverlay();
-		$.scrollTo($("body"), 200)
+		$.scrollTo($("body"), 200, {offset:-1})
 	}
 
 
@@ -92,6 +92,7 @@ define(["jquery", "radio", "util/size", "lib/history", "util/cache"],
 
 
 	var albumReady = function() {
+		console.debug("fading in")
 		$("div.album").fadeTo(400,1);
 	}
 
