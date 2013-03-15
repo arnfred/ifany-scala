@@ -60,7 +60,8 @@ define(["jquery", "radio", "util/size", "lib/history", "util/cache"],
 		$("#overlay").fadeIn();
 		$("body").css("overflow-y", "hidden");
 		resizeOverlay();
-		$.scrollTo($("body"), 200, {offset:-1})
+		resizeOverlay();
+		//$.scrollTo($("body"), 200, {offset:1})
 	}
 
 
@@ -92,20 +93,23 @@ define(["jquery", "radio", "util/size", "lib/history", "util/cache"],
 
 
 	var albumReady = function() {
-		console.debug("fading in")
 		$("div.album").fadeTo(400,1);
 	}
 
 
 	var resizeOverlay = function() {
+		window.scrollTo(0, 1);
 		var captionHeight = $("#caption").height()
-		$("div#overlay-img div").css("height", size.getHeight() - captionHeight - 4 + "px");
+		var ratio = $("div#overlay-img img").width() / $("div#overlay-img").height();
+		var height = size.getHeight() - captionHeight - 4;
+		// var width = ratio * height;
+		// console.debug(ratio)
+		$("div#overlay-img div").css("height", height + "px");
+		// $("div#overlay-img div").css("width", width + "px");
 		var w = $("#overlay-img img").width();
 		var p = ($("#overlay-img div").width() - w) / 2.0;
-		if (w > 250) {
-			$("#caption").css("padding", "0 " + Math.floor(p) + "px");
-			$("#caption").css("width", w + "px");
-		}
+		$("#caption").css("padding", "0 " + Math.floor(p) + "px");
+		$("#caption").css("width", w + "px");
 	}
 
 
