@@ -29,6 +29,9 @@ define(["jquery", "radio", "util/size", "lib/history", "util/cache"],
 	
 		// Overlay close
 		radio("overlay:close").subscribe(overlayClose);
+
+		// Resize when overlay is loaded
+		radio("overlay:loaded").subscribe(resizeOverlay);
 	}
 
 
@@ -59,7 +62,6 @@ define(["jquery", "radio", "util/size", "lib/history", "util/cache"],
 		//historyUpdate(img);
 		$("#overlay").fadeIn();
 		$("body").css("overflow-y", "hidden");
-		resizeOverlay();
 		resizeOverlay();
 		//$.scrollTo($("body"), 200, {offset:1})
 	}

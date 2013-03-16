@@ -109,17 +109,22 @@ define(["radio", "views/album", "util/cache", "lib/history", "lib/hammer.min", "
 
 	var createOverlay = function(id) {
 
-		// cache images used
-		cacheImages();
-
 		// Update id and state
 		album.currentId = id;
 		album.overlayActive = true;
+
+		// Exit if array doesn't contain object
+		if (album.images[id] == undefined) { closeOverlay(); return }
 
 		// Get image and prev and next ids
 		var img = album.images[id];
 		var prev = getPrevId(id);
 		var next = getNextId(id);
+
+		// cache images used but make sure to cache the current image first
+		cache.save(img)
+		cacheImages();
+
 
 		// Broadcast
 		radio("overlay:set").broadcast(img, (prev != -1), (next != -1));
