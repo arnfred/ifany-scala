@@ -1,5 +1,5 @@
-define(["radio", "util/cache", "lib/history", "lib/hammer.min", "util/foreach"], 
-	function(radio, cache, history, Hammer) {
+define(["radio", "views/album", "util/cache", "lib/history", "lib/hammer.min", "util/foreach"], 
+	function(radio, albumView, cache, history, Hammer) {
 
 	//////////////////////////////////////////////
 	//											//
@@ -75,8 +75,10 @@ define(["radio", "util/cache", "lib/history", "lib/hammer.min", "util/foreach"],
 
 	album.init = function() {
 
+		// Init albumView
+		albumView.init();
+
 		// Get images
-		//var images = $.getJSON("/album/" + albumData.id + "/")
 		images.then(function(im) { 
 			album.images = im; 
 			album.events();

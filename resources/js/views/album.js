@@ -119,6 +119,6 @@ define(["jquery", "radio", "util/size", "lib/history", "util/cache"],
 	//					Return					//
 	//											//
 	//////////////////////////////////////////////
-	album.init();
+	//album.init();
 	return album
 });
