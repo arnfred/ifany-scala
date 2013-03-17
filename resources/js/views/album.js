@@ -76,12 +76,12 @@ define(["jquery", "radio", "util/size", "lib/history", "util/cache"],
 
 	var navArrowUpdate = function(hasPrev, hasNext) {
 		// Make sure we hide or show previous arrow
-		if (hasPrev) $("#overlay-prev span").fadeIn("fast")
-		else $("#overlay-prev span").hide();
+		if (hasPrev) $("#overlay-prev").fadeIn(300)
+		else $("#overlay-prev").hide();
 
 		// Make sure we hide or show next arrow
-		if (hasNext) $("#overlay-next span").fadeIn("fast")
-		else $("#overlay-next span").hide();
+		if (hasNext) $("#overlay-next").fadeIn(300)
+		else $("#overlay-next").hide();
 	}
 
 
@@ -104,10 +104,7 @@ define(["jquery", "radio", "util/size", "lib/history", "util/cache"],
 		var captionHeight = $("#caption").height()
 		var ratio = $("div#overlay-img img").width() / $("div#overlay-img").height();
 		var height = size.getHeight() - captionHeight - 4;
-		// var width = ratio * height;
-		// console.debug(ratio)
 		$("div#overlay-img div").css("height", height + "px");
-		// $("div#overlay-img div").css("width", width + "px");
 		var w = $("#overlay-img img").width();
 		var p = ($("#overlay-img div").width() - w) / 2.0;
 		$("#caption").css("padding", "0 " + Math.floor(p) + "px");
