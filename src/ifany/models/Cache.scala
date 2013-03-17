@@ -14,7 +14,6 @@ object Cache {
 
   println(Properties.envOrNone("MONGOHQ_URL"));
   val MongoSetting(mongoDB) = Some(Properties.envOrElse("MONGOHQ_URL", "mongodb://heroku:d9aa08dde373b85276f93b9b44dfdaa8@linus.mongohq.com:10004/app12728917"))
-  //val mongoDB = MongoClient(mongoString)(dbName)
 
   def putItem[A <: SmugmugData : Manifest](collection : String, id : String, data : A) : Unit = {
 

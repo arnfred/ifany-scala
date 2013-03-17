@@ -16,7 +16,6 @@ object Main {
     // Run the server
     srv.run
   }
-
 }
 
 
