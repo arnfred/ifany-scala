@@ -7,7 +7,8 @@ case class AlbumTemplate(view : AlbumView) extends Template {
   implicit val v = view
 
   override def toString : String = Base(
-    Template(javascript + navigation(view.getNextAlbum, view.getPrevAlbum) + overlay + album)
+    Template(navigation(view.getNextAlbum, view.getPrevAlbum) + overlay + album), 
+    Some(javascript)
   )
 
   def javascript : Template = Template(fast"""

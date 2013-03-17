@@ -2,7 +2,7 @@ package ifany
 
 import com.dongxiguo.fastring.Fastring.Implicits._
 
-case class Base(body : Template) extends Template {
+case class Base(body : Template, header : Option[Template] = None) extends Template {
 
   implicit val view = body.view
 
@@ -19,6 +19,8 @@ case class Base(body : Template) extends Template {
       <link rel="stylesheet" type="text/css" href="/css/bootstrap-responsive.min.css"/>
       <link rel="stylesheet" type="text/css" href="/css/global.css"/>
       <link rel="stylesheet" type="text/css" href="/css/${ view.name }.css"/>
+
+      ${ if (header != None) header.get }
 
       <script type="text/javascript" src="/js/lib/curl/curl.js"></script>
       <script type="text/javascript" src="/js/controllers/${ view.name }.js"></script>
