@@ -20,14 +20,14 @@ case class Base(body : Template, header : Option[Template] = None) extends Templ
       <link rel="stylesheet" type="text/css" href="/css/global.css"/>
       <link rel="stylesheet" type="text/css" href="/css/${ view.name }.css"/>
 
-      ${ if (header != None) header.get }
+      ${ if (header != None) header.get else "" }
 
       <script type="text/javascript" src="/js/lib/curl/curl.js"></script>
       <script type="text/javascript" src="/js/controllers/${ view.name }.js"></script>
 
     </head>
     <body>
-      
+
       $body
 
       <div class="row-fluid">
