@@ -51,11 +51,6 @@ define(["radio", "views/album", "util/cache", "lib/history", "lib/hammer.min", "
 		$("#overlay-next").click(function() { goNext(); });
 		$("#overlay-img").click(function() { closeOverlay() });
 
-		// History change
-		history.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
-			openOverlayDirectly();
-		});
-
 		// On resize, recache
 		radio("window:resize").subscribe(cacheImages);
 
@@ -82,7 +77,7 @@ define(["radio", "views/album", "util/cache", "lib/history", "lib/hammer.min", "
 		images.then(function(im) { 
 			album.images = im; 
 			album.events();
-			openOverlayDirectly();
+			openOverlayIfNecessary();
 		}, function() { 
 			throw Error("error while fetching image data");
 		})
@@ -100,7 +95,7 @@ define(["radio", "views/album", "util/cache", "lib/history", "lib/hammer.min", "
 	//											//
 	//////////////////////////////////////////////
 
-	var openOverlayDirectly = function() {
+	var openOverlayIfNecessary = function() {
 		// Check if we have to open up an overlay directly
 		var url = document.URL.split("/");
 		var id = url[4];
@@ -113,7 +108,7 @@ define(["radio", "views/album", "util/cache", "lib/history", "lib/hammer.min", "
 		album.currentId = id;
 		album.overlayActive = true;
 
-		// Exit if array doesn't contain object
+		// Exit if array doesn't contain an object
 		if (album.images[id] == undefined) { closeOverlay(); return }
 
 		// Get image and prev and next ids
@@ -195,6 +190,7 @@ define(["radio", "views/album", "util/cache", "lib/history", "lib/hammer.min", "
 
 		// Change state to new url string
 		history.pushState(null, null, newUrl + "/" + id + "/");
+		createOverlay(id)
 	}
 
 
