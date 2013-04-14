@@ -7,7 +7,7 @@ div.top {
 
 /* Heading behavior */
 h2, h3 {
-	line-height:1.5em;
+	line-height:1.3em;
 	margin: 0;
 }
 
@@ -32,9 +32,32 @@ div.span3.img:first-child {
 	margin-left:0;
 }
 
+/* Header behavior */
+h1#header {
+	font-size: 7em;
+	line-height: 1.5em;
+	margin-left: -0.06em;
+}
+div#image p {
+	float:right;
+	font-style:italic;
+	opacity:0.7;
+	padding-top:0.2em;
+}
+span#if {
+	color: #888;
+}
+span#any {
+	color: #444;
+}
+h4#subheader {
+	color: #888;
+	margin-top:-2.3em;
+}
+
 /* Text behavior */
 body {
-	color: #666;
+	color: #222;
 	background-color:#fafafa;
 }
 

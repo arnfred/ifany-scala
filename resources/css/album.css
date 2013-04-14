@@ -37,7 +37,7 @@ div.album-nav a {
 	display:block
 }
 div.album-nav a:hover {
-	color:#555;
+	color:#222;
 	background-color:#f6f6f6;
 	text-decoration:none;
 }
@@ -127,7 +127,7 @@ div#overlay-prev span, div#overlay-next span, div#overlay-img div {
 }
 
 div#overlay-prev:hover, div#overlay-next:hover {
-	background-color: #555;
+	background-color: #222;
 	cursor:pointer;
 }
 

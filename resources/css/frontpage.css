@@ -1,26 +1,6 @@
 /* Css for frontpage */
 
 
-/* Configure the header */
-h1#header {
-	font-size: 7em;
-	line-height: 1.5em;
-	margin-left: -0.1em;
-}
-div#image p {
-	float:right;
-	font-style:italic;
-	opacity:0.7;
-	padding-top:0.2em;
-}
-span#if {
-	color: #888;
-}
-h4#subheader {
-	color: #888;
-	margin-top:-2.3em;
-}
-
 /* About text */
 p#about-text {
 	margin-top:3em;
@@ -55,10 +35,10 @@ div.album {
 }
 
 div.album a { 
-	color:#666;
+	color:#444;
 }
 div.album a:hover{
-	color:#555;
+	color:#222;
 }
 
 
@@ -87,7 +67,6 @@ div.album-arrow p {
 	padding-top:75%;
 	font-size:3em;
 }
-
 
 
 
