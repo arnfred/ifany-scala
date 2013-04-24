@@ -189,7 +189,9 @@ define(["radio", "views/album", "util/cache", "lib/history", "lib/hammer.min", "
 		else newUrl = oldUrl.slice(0,-2).join("/");
 
 		// Change state to new url string
+		t = document.title;
 		history.pushState(null, null, newUrl + "/" + id + "/");
+		document.title = t;
 		createOverlay(id)
 	}
 
@@ -203,7 +205,9 @@ define(["radio", "views/album", "util/cache", "lib/history", "lib/hammer.min", "
 
 		// Update url
 		var newUrl = document.URL.split("/").slice(0,-2).join("/") + "/";
+		t = document.title;
 		history.pushState(null, null, newUrl);
+		document.title = t;
 
 		// Broadcast close event
 		radio("overlay:close").broadcast();

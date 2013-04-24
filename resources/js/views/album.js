@@ -1,5 +1,5 @@
-define(["jquery", "radio", "util/size", "lib/history", "util/cache"],
-	function($, radio, size, history, cache) {
+define(["jquery", "radio", "util/size", "util/cache"],
+	function($, radio, size, cache) {
 
 	//////////////////////////////////////////////
 	//											//
@@ -59,7 +59,6 @@ define(["jquery", "radio", "util/size", "lib/history", "util/cache"],
 	var overlayChange = function(img, hasPrev, hasNext) {
 		navArrowUpdate(hasPrev, hasNext);
 		overlayUpdate(img);
-		//historyUpdate(img);
 		$("#overlay").fadeIn();
 		$("body").css("overflow-y", "hidden");
 		resizeOverlay();
@@ -68,7 +67,6 @@ define(["jquery", "radio", "util/size", "lib/history", "util/cache"],
 
 
 	var overlayClose = function() {
-		//historyClose();
 		$("body").css("overflow-y", "auto");
 		$("#overlay").fadeOut();
 	}
