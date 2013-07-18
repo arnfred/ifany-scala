@@ -32,9 +32,10 @@ object DataPlan extends async.Plan with ServerErrorResponse {
           req.respond(HtmlContent ~> ResponseString("Error occured: " + error.toString))
         }
       }
-      
+
       images_F
     }
+
   }
 
   def toJSON(obj : AnyRef) : String = {

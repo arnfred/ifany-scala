@@ -15,6 +15,29 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 
 	//////////////////////////////////////////////
 	//                                          //
+	//                 Update                   //
+	//                                          //
+	//////////////////////////////////////////////
+    case req @ Path(Seg(albumURL :: "update" :: Nil)) => {
+
+      // Just update
+      AlbumModel.update(albumURL)
+
+      // Respond, just so we know the server hasn't crashed
+      req.respond(HtmlContent ~> ResponseString("<body><p>Updating ... </p></body>"))
+    }
+
+    case req @ Path(Seg("update" :: Nil)) => {
+
+      // Just update
+      FrontpageModel.update
+
+      // Respond, just so we know the server hasn't crashed
+      req.respond(HtmlContent ~> ResponseString("<body><p>Updating ... </p></body>"))
+    }
+
+	//////////////////////////////////////////////
+	//                                          //
 	//                Frontpage                 //
 	//                                          //
 	//////////////////////////////////////////////
@@ -75,6 +98,8 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         }
       }
     }
+
+
 
   }
 
