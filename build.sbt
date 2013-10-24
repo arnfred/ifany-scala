@@ -12,10 +12,6 @@ scalaSource in Compile <<= baseDirectory(_ / "src")
 
 scalacOptions ++= Seq("-unchecked", "-Ywarn-dead-code", "-deprecation")
 
-val buildSettings = Defaults.defaultSettings ++ Seq(
-   javaOptions += "-Xmx512m",
-)
-
 libraryDependencies  ++= Seq(
             // other dependencies here
             // pick and choose:
