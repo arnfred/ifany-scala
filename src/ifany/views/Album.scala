@@ -1,26 +1,30 @@
 package ifany
 
-case class AlbumView(data : AlbumModel) extends View {
+case class AlbumView(model : AlbumModel) extends View {
 
   val name = "album"
-  def getTitle : String = data.album.title
-  def getDescription : String = data.album.description
+  val directory = "/photos/" + model.url + "/"
+  def getTitle : String = model.title
+  def getDescription : String = model.description
 
-  def getNextAlbum : Option[NavElem] = data.album.nav.next
-  def getPrevAlbum : Option[NavElem] = data.album.nav.prev
+  def getNextAlbum : Option[NavElem] = None //data.album.nav.next
+  def getPrevAlbum : Option[NavElem] = None //data.album.nav.prev
 
-  def getAlbumKey : String = data.album.key
-  def getAlbumId : String = data.album.id
+  def getDateString : String = "" //getDateString(data.exifs, true)
 
-  def getDateString : String = getDateString(data.exifs, true)
+  def getImgUrl(img : AlbumImage, size : String) : String = size match {
+    case "original"     => directory + img.file + ".jpg"
+    case "thumbnail"    => directory + img.file + "_150x150.jpg"
+    case s              => directory + img.file + "_" + s + ".jpg"
+  }
 
-  def getThumbnailRows : List[List[Image]] = {
-    val sorted = data.images.zip(data.exifs).sortBy { case (i,e) => e.dateTime.getMillis } map { _._1 }
-    //val sorted = data.images//.zip(data.exifs).sortBy { case (i,e) => e.dateTime.getMillis } map { _._1 }
-    val rows = data.images.foldLeft(List(List().asInstanceOf[List[Image]])) { case (a,b) => 
-      if (a.head.size < 4) (b :: a.head) :: a.tail else List(b) :: a 
+  def getThumbnailRows : List[List[AlbumImage]] = {
+    val rows = model.images.foldLeft(List(List().asInstanceOf[List[AlbumImage]])) { case (a,b) => 
+      if (a.head.size < 4) (b :: a.head) :: a.tail else List(b) :: a
     }
 
-    rows.map(_.reverse).reverse
+    rows
+
+    //rows.map(_.reverse).reverse
   }
 }

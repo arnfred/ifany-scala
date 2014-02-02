@@ -14,29 +14,6 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 
 	//////////////////////////////////////////////
 	//                                          //
-	//                 Update                   //
-	//                                          //
-	//////////////////////////////////////////////
-    case req @ Path(Seg(albumURL :: "update" :: Nil)) => {
-
-      // Just update
-      AlbumModel.update(albumURL)
-
-      // Respond, just so we know the server hasn't crashed
-      req.respond(HtmlContent ~> ResponseString("<body><p>Updating ... </p></body>"))
-    }
-
-    case req @ Path(Seg("update" :: Nil)) => {
-
-      // Just update
-      FrontpageModel.update
-
-      // Respond, just so we know the server hasn't crashed
-      req.respond(HtmlContent ~> ResponseString("<body><p>Updating ... </p></body>"))
-    }
-
-	//////////////////////////////////////////////
-	//                                          //
 	//                Frontpage                 //
 	//                                          //
 	//////////////////////////////////////////////
@@ -79,21 +56,25 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 
     case req @ Path(Seg(albumURL :: whatever)) => {
       
-      // Get frontpage model
-      val album_F = AlbumModel.get(albumURL)
+      try {
+        val model = AlbumModel.get(albumURL)
+        val view = AlbumView(model)
+        val output = AlbumTemplate(view).toString
+        req.respond(HtmlContent ~> ResponseString(output))
+        
+      } catch {
 
-      // In case we succeed
-      album_F onSuccess {
-        case model => {
-          val album = getAlbum(model)
-          req.respond(HtmlContent ~> ResponseString(album))
+        case InternalError(msg) => {
+          println("* INTERNAL ERROR * : " + msg)
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString("An error occured"))
         }
-      }
-
-      // In case we fail
-      album_F onFailure {
-        case error => {
-          req.respond(HtmlContent ~> ResponseString("Error occured: " + error.toString))
+        case AlbumNotFound(url) => {
+          println("* ALBUM NOT FOUND * : " + url)
+          req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
+        }
+        case error : Throwable => {
+          println("* UNKNOWN ERROR * : " + error.toString)
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
         }
       }
     }
@@ -103,12 +84,6 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
   }
 
 
-
-  // get the Album view
-  def getAlbum(model : AlbumModel) : String = {
-      val view = AlbumView(model)
-      AlbumTemplate(view).toString
-  }
 
 
   // Get the frontpage view

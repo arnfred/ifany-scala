@@ -12,10 +12,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
   )
 
   def javascript : Template = Template(fast"""
-    <script type="text/javascript">var albumData = { 
-      key: "${ view.getAlbumKey }",
-      id: "${ view.getAlbumId }"
-    };</script>
+    <script type="text/javascript"></script>
   """)
 
   def navigation(next : Option[NavElem], prev : Option[NavElem]) : Template = Template(fast"""
@@ -96,10 +93,10 @@ case class AlbumTemplate(view : AlbumView) extends Template {
     """}.mkString
   )
 
-  def thumbnailRow(row : List[Image]) : Template = Template({
+  def thumbnailRow(row : List[AlbumImage]) : Template = Template({
     for (thumb <- row) yield fast"""
       <div class="span3 img">
-          <img src="${ thumb.urls("thumb") }" id="${ thumb.id }" class="frame"/>
+          <img src="${ view.getImgUrl(thumb, "thumbnail") }" id="${ thumb.file }" class="frame"/>
       </div>
     """}.mkString
   )
