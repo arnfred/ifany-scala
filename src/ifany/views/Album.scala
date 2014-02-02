@@ -16,6 +16,7 @@ case class AlbumView(data : AlbumModel) extends View {
 
   def getThumbnailRows : List[List[Image]] = {
     val sorted = data.images.zip(data.exifs).sortBy { case (i,e) => e.dateTime.getMillis } map { _._1 }
+    //val sorted = data.images//.zip(data.exifs).sortBy { case (i,e) => e.dateTime.getMillis } map { _._1 }
     val rows = data.images.foldLeft(List(List().asInstanceOf[List[Image]])) { case (a,b) => 
       if (a.head.size < 4) (b :: a.head) :: a.tail else List(b) :: a 
     }

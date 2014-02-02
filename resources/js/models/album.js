@@ -1,5 +1,16 @@
-define(["radio", "views/album", "util/cache", "lib/history", "lib/hammer.min", "util/foreach"], 
-	function(radio, albumView, cache, history, Hammer) {
+define(["radio", 
+		"views/album", 
+		"util/cache", 
+		"lib/history", 
+		//"lib/hammer.min", 
+		"util/foreach"
+	], 
+	function(radio, 
+		albumView, 
+		cache, 
+		history
+		//Hammer
+	) {
 
 	//////////////////////////////////////////////
 	//											//
@@ -58,8 +69,8 @@ define(["radio", "views/album", "util/cache", "lib/history", "lib/hammer.min", "
 		var overlay_img = document.getElementById('overlay-img');
 		var credits = document.getElementById('credits');
 		var hammer_options = { transform: true };
-		Hammer(overlay_img, hammer_options).on("dragleft", function() { goNext(); });
-		Hammer(overlay_img, hammer_options).on("dragright", function() { goPrev(); });
+		//Hammer(overlay_img, hammer_options).on("dragleft", function() { goNext(); });
+		//Hammer(overlay_img, hammer_options).on("dragright", function() { goPrev(); });
 	}
 
 	//////////////////////////////////////////////

@@ -40,6 +40,7 @@ object Album extends DataLoader {
 
 
   def parseJSON(json : JValue) : Album = {
+    println(json)
     val JInt(id) = json \ "id";
     val JString(key) = json \ "Key";
     val JString(url) = json \ "NiceName";

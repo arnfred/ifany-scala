@@ -28,6 +28,8 @@ object FrontpageModel {
     // When these have loaded, then do:
     for (banners <- banners_P; cats <- cats_P; albums <- albums_P) yield {
 
+      println(albums)
+
       // Get all images
       val images_P = for (a <- albums) yield SmugmugAPI.getImages(a.id, a.key)
 

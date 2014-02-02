@@ -12,7 +12,6 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 
   def intent = {
 
-
 	//////////////////////////////////////////////
 	//                                          //
 	//                 Update                   //

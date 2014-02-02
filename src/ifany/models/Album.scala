@@ -33,7 +33,7 @@ object AlbumModel {
 
 
   def get(url : String) : Future[AlbumModel] = {
-    
+
     // Get album
     val albums_F = future { Album.getQuery[Album](Map("url" -> url)) }
 
@@ -67,7 +67,7 @@ object AlbumModel {
     def addAlbumIDtoImage(im : Image) : Image = {
       Image(im.id, im.key, albumID, im.caption, im.url, im.size)
     }
-      
+
     def addAlbumIDtoEXIF(exif : EXIF) : EXIF = {
       EXIF(exif.id, exif.key, albumID, exif.aperture, exif.focalLength, exif.iso, exif.model, exif.dateTime)
     }
