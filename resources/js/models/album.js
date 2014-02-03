@@ -49,9 +49,6 @@ define(["radio",
 		// Broadcast resize event
 		$(window).resize(function() { radio("window:resize").broadcast(); })
 
-		// Broadcast that album is ready
-		radio("album:ready").broadcast();
-
 		// Broadcast overlay key events
 		$(window).keydown(function(e){ 
 			if (album.overlayActive) { overlayKeypress(e.keyCode); }
@@ -84,19 +81,10 @@ define(["radio",
 		// Init albumView
 		albumView.init();
 
-		// Get images
-		images.then(function(im) { 
-			album.images = im; 
-			album.events();
-			openOverlayIfNecessary();
-		}, function() { 
-			throw Error("error while fetching image data");
-		})
-
-		// Get id's
-		album.ids = $("img.frame").map(function(index,im) { return $(im).attr("id") });
-
-
+		// Get data
+		album.images = data.images; 
+		album.events();
+		openOverlayIfNecessary();
 	}
 
 

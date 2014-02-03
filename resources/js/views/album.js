@@ -18,9 +18,6 @@ define(["jquery", "radio", "util/size", "util/cache"],
 
 	album.events = function() {
 
-		// Album ready event
-		radio("album:ready").subscribe(albumReady);
-
 		// Window resize event
 		radio("window:resize").subscribe(resizeOverlay);
 
@@ -89,11 +86,6 @@ define(["jquery", "radio", "util/size", "util/cache"],
 		$("#overlay-img div").prepend(domImg);
 		$("#caption").html(img.caption);
 		$("#overlay-img img").attr("alt",img.caption);
-	}
-
-
-	var albumReady = function() {
-		$("div.album").fadeTo(400,1);
 	}
 
 

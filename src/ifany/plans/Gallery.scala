@@ -55,13 +55,13 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 	//////////////////////////////////////////////
 
     case req @ Path(Seg(albumURL :: whatever)) => {
-      
+
       try {
-        val model = AlbumModel.get(albumURL)
+        val model = AlbumModel(albumURL)
         val view = AlbumView(model)
         val output = AlbumTemplate(view).toString
         req.respond(HtmlContent ~> ResponseString(output))
-        
+
       } catch {
 
         case InternalError(msg) => {

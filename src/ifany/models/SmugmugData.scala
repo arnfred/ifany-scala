@@ -9,8 +9,6 @@ import com.novus.salat.annotations._
 @Salat
 sealed trait SmugmugData
 
-
-
 // Data for an album
 case class Album(id : String, key : String, title : String, description : String, imageIDs : List[String], url : String, categoryID : Option[String], cover : Cover, nav : Navigation) extends SmugmugData
 

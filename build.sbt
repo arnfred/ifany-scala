@@ -22,7 +22,7 @@ libraryDependencies  ++= Seq(
 			"net.databinder.dispatch" %% "dispatch-core" % "0.9.5",
 			"com.dongxiguo" %% "fastring" % "0.2.1",
 			"org.mongodb" %% "casbah" % "2.5.0",
-			"com.novus" %% "salat" % "1.9.2-SNAPSHOT",
+			"com.novus" %% "salat" % "1.9.2",
 			"joda-time" % "joda-time" % "2.2",
 			"org.joda" % "joda-convert" % "1.2"
 )
