@@ -26,6 +26,7 @@ define(["jquery", "radio", "util/size", "util/cache"],
 	
 		// Overlay close
 		radio("overlay:close").subscribe(overlayClose);
+
 	}
 
 

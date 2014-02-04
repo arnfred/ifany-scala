@@ -71,6 +71,9 @@ define(["radio",
 		var hammer_options = { transform: true };
 		//Hammer(overlay_img, hammer_options).on("dragleft", function() { goNext(); });
 		//Hammer(overlay_img, hammer_options).on("dragright", function() { goPrev(); });
+		
+		// Change in browser history
+		history.Adapter.bind(window, 'statechange', respondHistory)
 	}
 
 	//////////////////////////////////////////////
@@ -173,13 +176,29 @@ define(["radio",
 
 		// Generate new url string
 		var parts = getURLParts();
-		var new_url = parts[0] + name;
+		var new_url = (name == null) ? parts[0] : parts[0] + name;
 
 		// Check if we are already at expected state
 		if (parts[1] == name) return;
 
 		// Change state to new url string
-		history.pushState({ 'state' : name }, document.title, new_url);
+		history.pushState({ 'state_index' : history.getCurrentIndex(), 'name' : name }, document.title, new_url);
+	}
+
+
+	// Update page when we change browser history
+	var respondHistory = function() {
+
+		var state_data = history.getState().data;
+		// If the state index has 1 added to it, then it's an internal state change
+		if (state_data.state_index != (History.getCurrentIndex() - 1)) {
+			if (state_data.name != null) {
+				createOverlay(state_data.name);
+			}
+			else {
+				closeOverlay();
+			}
+		} 
 	}
 
 
@@ -191,8 +210,7 @@ define(["radio",
 		album.overlayActive = false;
 
 		// Update url
-		var new_url = getURLParts()[0];
-		history.pushState({ 'state' : null }, document.title, new_url);
+		updateHistory(null)
 
 		// Broadcast close event
 		radio("overlay:close").broadcast();
