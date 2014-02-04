@@ -31,6 +31,7 @@ define(["radio",
 	album.names = null;
 	album.url = null;
 	album.current_image = null;
+	album.title = null;
 	album.overlayActive = false;
 
 
@@ -91,6 +92,7 @@ define(["radio",
 		album.images = _.indexBy(data.images, "file");
 		album.names = _.pluck(data.images, "file");
 		album.url = data.url
+		album.title = document.title;
 		album.events();
 		openOverlayIfNecessary();
 	}
@@ -181,8 +183,11 @@ define(["radio",
 		// Check if we are already at expected state
 		if (parts[1] == name) return;
 
+		// Find image caption and create new title
+		var title = (name == null) ? album.title : album.title + " : " + album.images[name].description;
+
 		// Change state to new url string
-		history.pushState({ 'state_index' : history.getCurrentIndex(), 'name' : name }, document.title, new_url);
+		history.pushState({ 'state_index' : history.getCurrentIndex(), 'name' : name }, title, new_url);
 	}
 
 
