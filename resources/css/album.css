@@ -1,8 +1,3 @@
-/* Fade album out do begin with */
-div.album {
-	opacity: 0.5;
-}
-
 /* Album info */
 h2.album-title {
 	line-height: 1.2em;
@@ -132,7 +127,7 @@ div#overlay-prev:hover, div#overlay-next:hover {
 }
 
 span#caption {
-	width:100%;
+	width:80%;
 	display:inline-block;
 }
 

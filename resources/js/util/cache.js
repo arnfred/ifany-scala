@@ -33,15 +33,15 @@ define(["util/size", "jquery", "radio"], function(size, $, radio) {
 	//////////////////////////////////////////////
 	
 	// Given an image, the url is loaded
-	cache.save = function(img) {
+	cache.save = function(img, url) {
 
 		// Cache image
-		var url = img.url.replace("__SIZE__", cache.urlSize[size.getImageSize(img).url]);
-		var domImg = $("<img src=\"" + url + "\"/>");
-		cache.images[img.id] = domImg;
+		var img_url = getImgURL(img, url)
+		var dom_img = $("<img src=\"" + img_url + "\"/>");
+		cache.images[img.file] = dom_img;
 
 		// set callback
-		$(domImg).load(function() {
+		$(dom_img).load(function() {
 			cache.nbLoaded += 1;
 			radio("overlay:loaded").broadcast(cache.nbLoaded);
 		});
@@ -49,9 +49,20 @@ define(["util/size", "jquery", "radio"], function(size, $, radio) {
 
 	// Given an id, the domImg is returned
 	cache.load = function(img) {
-		var img = cache.images[img.id]
-		if (img == undefined) throw Error("Image with id " + img.id + " hasn't been cached");
-		return img
+		if (img == undefined) throw Error("Image with name " + img.file + " hasn't been cached");
+		var dom_img = cache.images[img.file]
+		return dom_img
+	}
+
+
+	//////////////////////////////////////////////
+	//											//
+	//			  Private Functions				//
+	//											//
+	//////////////////////////////////////////////
+	
+	var getImgURL = function(img, url) {
+		return "/photos/" + url + "/" + img.file + "_" + size.getImageSize(img).url + ".jpg"
 	}
 
 

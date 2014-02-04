@@ -7,7 +7,7 @@ curl(
 		paths: {
 			"css": "./../css/",
 			"jquery": "lib/jquery/jquery",
-			"radio": "lib/radio/radio.min"
+			"radio": "lib/radio/radio.min",
 		},
 	}, 
 

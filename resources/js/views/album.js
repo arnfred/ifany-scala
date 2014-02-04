@@ -26,9 +26,6 @@ define(["jquery", "radio", "util/size", "util/cache"],
 	
 		// Overlay close
 		radio("overlay:close").subscribe(overlayClose);
-
-		// Resize when overlay is loaded
-		radio("overlay:loaded").subscribe(resizeOverlay);
 	}
 
 
@@ -59,7 +56,6 @@ define(["jquery", "radio", "util/size", "util/cache"],
 		$("#overlay").fadeIn();
 		$("body").css("overflow-y", "hidden");
 		resizeOverlay();
-		//$.scrollTo($("body"), 200, {offset:1})
 	}
 
 
@@ -81,11 +77,11 @@ define(["jquery", "radio", "util/size", "util/cache"],
 
 
 	var overlayUpdate = function(img) {
-		var domImg = cache.load(img);
+		var dom_img = cache.load(img);
 		$("#overlay-img img").remove();
-		$("#overlay-img div").prepend(domImg);
-		$("#caption").html(img.caption);
-		$("#overlay-img img").attr("alt",img.caption);
+		$("#overlay-img div").prepend(dom_img);
+		$("#caption").html(img.description);
+		$("#overlay-img img").attr("alt",img.description);
 	}
 
 
@@ -97,8 +93,8 @@ define(["jquery", "radio", "util/size", "util/cache"],
 		$("div#overlay-img div").css("height", height + "px");
 		var w = $("#overlay-img img").width();
 		var p = ($("#overlay-img div").width() - w) / 2.0;
-		$("#caption").css("padding", "0 " + Math.floor(p) + "px");
-		$("#caption").css("width", w + "px");
+		//$("#caption").css("padding", "0 " + Math.floor(p) + "px");
+		//$("#caption").css("width", w + "px");
 	}
 
 

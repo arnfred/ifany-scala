@@ -44,38 +44,37 @@ define(function() {
 	size.getImageSize = function(img) {
 		var h = size.getHeight() + 20; // 20 is arbitrary margin
 		var w = size.getWidth() + 40; // 40 is arbitrary margin as well
-		var o = (img.size.width > img.size.height) ? "h" : "v";
-		var r = img.size.height / img.size.width;
+		var o = (img.size[0] > img.size[1]) ? "h" : "v";
+		var r = img.size[1] / img.size[0];
 		var maxH = 600;
 		var maxW = 800;
 		var result = {};
 
 		if ((o == "v" && h > 960 && w > 960/r) || (o == "h" && w > 1280 && h > 1280*r)) {
-			result.url = 'x2large';
 			maxH = 960;
 			maxW = 1280;
 		} 
 		else if ((o == "v" && h > 768 && w > 768/r) || (o == "h" && w > 1024 && h > 1024*r)) {
-			result.url = 'xlarge';
 			maxH = 768;
 			maxW = 1024;
 		} 
 		else if ((o == "v" && h > 600 && w > 600/r) || (o == "h" && w > 800 && h > 800*r)) {
-			result.url = 'large';
 			maxH = 600;
 			maxW = 800;
 		} 
 		else if ((o == "v" && h > 450 && w > 450/r) || (o == "h" && w > 600 && h > 600*r)) {
-			result.url = 'medium';
 			maxH = 450;
 			maxW = 600;
 		} 
 		else {
-			result.url = 'small';
 			maxH = 300;
 			maxW = 400;
 		}
 
+		// Set url
+		result.url = maxW + "x" + maxH
+
+		// Set actual size
 		if (o == "v") {
 			result.width = Math.floor(maxH / r);
 			result.height = maxH;

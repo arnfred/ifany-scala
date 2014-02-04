@@ -1,14 +1,15 @@
 define(["radio", 
-		"views/album", 
-		"util/cache", 
-		"lib/history", 
-		//"lib/hammer.min", 
-		"util/foreach"
+		"views/album",
+		"util/cache",
+		"lib/history",
+		"lib/underscore",
+		//"lib/hammer.min",
 	], 
-	function(radio, 
-		albumView, 
-		cache, 
-		history
+	function(radio,
+		albumView,
+		cache,
+		history,
+		_
 		//Hammer
 	) {
 
@@ -27,9 +28,10 @@ define(["radio",
 	//////////////////////////////////////////////
 
 	album.images = null;
-	album.currentId = null;
+	album.names = null;
+	album.url = null;
+	album.current_image = null;
 	album.overlayActive = false;
-	album.ids = [];
 
 
 
@@ -43,11 +45,12 @@ define(["radio",
 	album.events = function() {
 
 		$("img.frame").each(function (index, im) { 
-			$(im).click(function () { setOverlayId($(im).attr("id")) });
+			$(im).click(function () { createOverlay($(im).attr("id")) });
 		})
 
 		// Broadcast resize event
-		$(window).resize(function() { radio("window:resize").broadcast(); })
+		lazy_resize = _.debounce(function() { radio("window:resize").broadcast(); }, 300);
+		$(window).resize(lazy_resize)
 
 		// Broadcast overlay key events
 		$(window).keydown(function(e){ 
@@ -82,7 +85,9 @@ define(["radio",
 		albumView.init();
 
 		// Get data
-		album.images = data.images; 
+		album.images = _.indexBy(data.images, "file");
+		album.names = _.pluck(data.images, "file");
+		album.url = data.url
 		album.events();
 		openOverlayIfNecessary();
 	}
@@ -94,51 +99,43 @@ define(["radio",
 	//											//
 	//////////////////////////////////////////////
 
-	var openOverlayIfNecessary = function() {
-		// Check if we have to open up an overlay directly
-		var url = document.URL.split("/");
-		var id = url[4];
-		if (url.length > 5) createOverlay(id);
+	var getURLParts = function() {
+		var parts = document.URL.split(album.url + "/")
+		return [parts[0] + album.url + "/", parts[1]]
 	}
 
-	var createOverlay = function(id) {
+	var openOverlayIfNecessary = function() {
+		// Check if we have to open up an overlay directly
+		name = getURLParts()[1];
+		if (name != "" && album.images[name] != undefined) {
+			createOverlay(name)
+		}
+	}
+
+	var createOverlay = function(name) {
+
+		// Update browser location
+		updateHistory(name);
 
 		// Update id and state
-		album.currentId = id;
+		album.current_name = name;
 		album.overlayActive = true;
 
 		// Exit if array doesn't contain an object
-		if (album.images[id] == undefined) { closeOverlay(); return }
+		if (album.images[name] == undefined) { closeOverlay(); return }
 
-		// Get image and prev and next ids
-		var img = album.images[id];
-		var prev = getPrevId(id);
-		var next = getNextId(id);
+		// Get image and prev and next names
+		var img = album.images[name];
+		var prev = getPrevImg(name);
+		var next = getNextImg(name);
 
-		// cache images used but make sure to cache the current image first
-		cache.save(img)
+		// cache surrounding images
 		cacheImages();
-
 
 		// Broadcast
-		radio("overlay:set").broadcast(img, (prev != -1), (next != -1));
+		radio("overlay:set").broadcast(img, (prev != undefined), (next != undefined));
 	}
 
-
-	var overlayInit = function(id) {
-		album.overlayActive = true;
-		cacheImages();
-		var img = album.images[album.currentId];
-		overlayUpdate(img);
-	}
-
-	var overlayUpdate = function(img) {
-		album.currentId = img.id;
-		var prevId = getPrevId(album.currentId);
-		var nextId = getNextId(album.currentId);
-
-		radio("overlay:set").broadcast(img, (prevId != -1), (nextId != -1));
-	}
 
 	var overlayKeypress = function(keyCode) {
 
@@ -155,43 +152,34 @@ define(["radio",
 
 	var goNext = function() {
 		if (album.overlayActive == false) return
-		var nextId = getNextId(album.currentId);
-		if (nextId != -1) {
-			setOverlayId(nextId);
-			//var img = album.images[nextId];
-			//overlayUpdate(img);
+		var next_name = getNextImg(album.current_name);
+		if (next_name != undefined) {
+			createOverlay(next_name);
 		}
 	}
 
 
 	var goPrev = function() {
 		if (album.overlayActive == false) return
-		var prevId = getPrevId(album.currentId);
-		if (prevId != -1) {
-			setOverlayId(prevId);
-			// var img = album.images[prevId];
-			// overlayUpdate(img);
+		var prev_name = getPrevImg(album.current_name);
+		if (prev_name != undefined) {
+			createOverlay(prev_name);
 		}
 	}
 
 
 	// Updates the url to reflect the overlay we are going to
-	var setOverlayId = function(id) {
-
-		// Update the current overlay id
-		album.currentId = id;
+	var updateHistory = function(name) {
 
 		// Generate new url string
-		var oldUrl = document.URL.split("/");
-		var newUrl = oldUrl.join("/");
-		if (!album.overlayActive) newUrl = oldUrl.slice(0,-1).join("/");
-		else newUrl = oldUrl.slice(0,-2).join("/");
+		var parts = getURLParts();
+		var new_url = parts[0] + name;
+
+		// Check if we are already at expected state
+		if (parts[1] == name) return;
 
 		// Change state to new url string
-		t = document.title;
-		history.pushState(null, null, newUrl + "/" + id + "/");
-		document.title = t;
-		createOverlay(id)
+		history.pushState({ 'state' : name }, document.title, new_url);
 	}
 
 
@@ -199,14 +187,12 @@ define(["radio",
 	var closeOverlay = function() {
 
 		// Update state
-		album.currentId = null;
+		album.current_name = null;
 		album.overlayActive = false;
 
 		// Update url
-		var newUrl = document.URL.split("/").slice(0,-2).join("/") + "/";
-		t = document.title;
-		history.pushState(null, null, newUrl);
-		document.title = t;
+		var new_url = getURLParts()[0];
+		history.pushState({ 'state' : null }, document.title, new_url);
 
 		// Broadcast close event
 		radio("overlay:close").broadcast();
@@ -215,23 +201,26 @@ define(["radio",
 
 
 
-	var getNextId = function(id) {
-		var next = album.ids.filter(function(index) { 
-			return album.ids[index-1] == id;
-		})
-		return (next.length == 0) ? -1 : next[0]
+	var getNextImg = function(name) {
+		var index = album.names.indexOf(name)
+		var last_index = album.names.length - 1
+		return (index == -1 || index == last_index) ? undefined : album.names[index+1]
 	}
 
-	var getPrevId = function(id) {
-		var next = album.ids.filter(function(index) { 
-			return album.ids[index+1] == id;
-		})
-		return (next.length == 0) ? -1 : next[0]
+	var getPrevImg = function(name) {
+		var index = album.names.indexOf(name)
+		return (index == -1 || index == 0) ? undefined : album.names[index-1]
 	}
 
 	var cacheImages = function() {
-		for (var id in album.images) {
-			cache.save(album.images[id]);
+		if (album.overlayActive) {
+			var next = getNextImg(album.current_name)
+			var nextnext = getNextImg(next)
+			var prev = getPrevImg(album.current_name)
+			cache.save(album.images[album.current_name], album.url)
+			if (next != undefined) cache.save(album.images[next], album.url)
+			if (nextnext != undefined) cache.save(album.images[nextnext], album.url)
+			if (prev != undefined) cache.save(album.images[prev], album.url)
 		}
 	}
 
