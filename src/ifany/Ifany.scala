@@ -24,6 +24,8 @@ object Ifany {
 
   import util.Properties
 
+  val photoDir : String = "/photos/"
+
   def init = {
 
     // Where files for the web server are located
@@ -35,10 +37,10 @@ object Ifany {
 
     // Initialize Server
     var srv = unfiltered.netty.Http(testPort).chunked(1048576).resources(resourceDir.toURI.toURL);
-    //val srv = unfiltered.jetty.Http(testPort).resources(resourceDir.toURI.toURL)
 
     // Run server
-    srv.handler(DataPlan).handler(GalleryPlan)
+    //srv.handler(DataPlan).handler(GalleryPlan)
+    srv.handler(GalleryPlan)
   }
 
 }

@@ -94,8 +94,6 @@ define(["jquery", "radio", "util/size", "util/cache"],
 		$("div#overlay-img div").css("height", height + "px");
 		var w = $("#overlay-img img").width();
 		var p = ($("#overlay-img div").width() - w) / 2.0;
-		//$("#caption").css("padding", "0 " + Math.floor(p) + "px");
-		//$("#caption").css("width", w + "px");
 	}
 
 
@@ -105,6 +103,6 @@ define(["jquery", "radio", "util/size", "util/cache"],
 	//					Return					//
 	//											//
 	//////////////////////////////////////////////
-	//album.init();
+	
 	return album
 });

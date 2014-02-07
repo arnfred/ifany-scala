@@ -6,7 +6,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
   import com.dongxiguo.fastring.Fastring.Implicits._
   implicit val v = view
 
-  override def toString : String = Base(Template(header + categories))
+  override def toString : String = Base(Template(header + galleries))
 
   def header : Template = Template(fast"""
     <div class="row-fluid top topmost">
@@ -27,43 +27,44 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
         </div>
 
         <div class="span7" id="image">
-            <img src="${ view.banner.urls("large") }" class="frame"/>
-            <p>From the album "<a href="${ view.bannerAlbum.url }/" >${ view.bannerAlbum.title }</a>"</p>
+            <img src="${ view.cover.image.url("l", view.cover.albumURL) }" class="frame"/>
+            <p>From the album "<a href="${ view.cover.albumURL }/" >${ view.cover.albumTitle }</a>"</p>
         </div>
     </div>
   """)
 
-
-  def categories : Template = Template({
-    for ((cat, albums) <- view.getCategories) yield {
-       val cover = view.getRandCover(albums)
-       category(cat, cover, albums) + categoryAlbums(albums)
+  def galleries : Template = Template({
+    for (g <- view.getGalleries) yield {
+       val cover = view.getGalleryCover(g)
+       gallery(g, cover) + galleryAlbums(g)
     }
   }.mkString)
 
-  def category(cat : Category, cover : Image, albums : List[Album]) : Template = Template { 
+  def gallery(g : Gallery, cover : Cover) : Template = Template { 
+    val albumNum : Int = g.albums.size
+    val imagesNum : Int = view.getGallerySize(g)
     fast"""
       <div class="row-fluid category">
           <div class="span3 offset1 cat-image">
-              <img src="${ cover.urls("small") }" class="frame"/>
+              <img src="${ cover.image.url("s", cover.albumURL) }" class="frame"/>
           </div>
 
           <div class="span7" class="cat-info">
-              <h2 class="cat-title">${ cat.name }</h2>
-              <p class="cat-date">${ view.getCatDateString(albums) }.</p>
+              <h2 class="cat-title">${ g.name }</h2>
+              <p class="cat-date">${ view.getGalleryDateString(g) }.</p>
               <p class="cat-meta">This gallery contains 
-                <span class="num">${ albums.size }</span> 
-                ${ if (albums.size == 1) "album" else "albums" } with 
-                <span class="num">${ view.getCatNumImages(albums) }</span> images.
+                <span class="num">${ albumNum }</span> 
+                ${ if (albumNum == 1) "album" else "albums" } with 
+                <span class="num">${ imagesNum }</span> images.
               </p>
-              <p class="cat-desc">${ cat.description }</p>
+              <p class="cat-desc">${ g.description }</p>
           </div>
       </div>
     """
   }
 
-  def categoryAlbums(albums : List[Album]) : Template = Template {
-    (for (album <- albums) yield fast"""
+  def galleryAlbums(g : Gallery) : Template = Template {
+    (for (album <- g.albums) yield fast"""
       <div class="row-fluid album">
         <a href="/${ album.url }/">
           <div class="span3 offset1 album-info">
@@ -91,7 +92,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
   def albumThumbnails(album : Album) : Template = Template {
     (for (image <- view.getAlbumImages(album, 4)) yield fast"""
       <div class="span3 img">
-        <img href="${ image.urls("thumb") }" class="frame" src="/img/loader.gif"/>
+        <img href="${ image.url("t", album.url) }" class="frame" src="/img/loader.gif"/>
       </div>
     """).mkString
   }

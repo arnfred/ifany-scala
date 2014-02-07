@@ -5,86 +5,60 @@ import scala.util.Random.shuffle
 import scala.math.abs
 import org.joda.time.DateTime
 
-case class FrontpageView(data : FrontpageModel) extends View {
+case class FrontpageView(frontpage : Frontpage) extends View {
 
   val name = "frontpage"
   def getTitle : String = "Photos by Jonas Arnfred"
 
+  // Choose a random cover
+  val cover : Cover = shuffle(frontpage.covers).head
 
-  val banner : Image = {
-    (for ((albumID,imgs) <- data.imageMap; i <- imgs if i.id == data.bannerID) yield i) match {
-      case Nil   => throw new InternalError("Banner image with id: " + data.bannerID + " not found among images")
-      case list  => list.head
+  // Return all galleries
+  def getGalleries : List[Gallery] = frontpage.galleries
+
+
+  // The amount of images in an album
+  def getAlbumSize(album : Album) : Int = album.images.size
+
+
+  // The amount of images in a gallery
+  def getGallerySize(gallery : Gallery) : Int = {
+    gallery.albums.map { a => a.images.size }.sum
+  }
+
+
+  // Find a cover image for the gallery
+  def getGalleryCover(gallery : Gallery) : Cover = {
+    val covers = for (a <- gallery.albums; i <- a.images if i.cover) yield {
+      Cover(i, a.title, a.url)
+    }
+    if (covers.size > 0) shuffle(covers).head
+
+    // If we have no covers, just use any image in landscape format (width > height)
+    else {
+      println("No covers in '" + gallery.name)
+      val landscapes = {
+        for (a <- gallery.albums; i <- a.images if i.size(0) > i.size( 1 )) yield {
+          Cover(i, a.title, a.url)
+        }
+      }
+      shuffle(landscapes).head
     }
   }
 
-  val bannerAlbum : Album = {
-    (for (album <- data.albums if banner.albumID == album.id) yield album) match {
-      case Nil   => throw new InternalError("The album of the banner image with id: " + banner.albumID + " not found")
-      case list  => list.head
-    }
-  }
 
-
-  // Return the date of an album
-  def getAlbumDate(album : Album) : DateTime = data.exifMap(album.id).dateTime
-
-  // Return categories with albums, all in the right order
-  def getCategories : List[(Category, List[Album])] = {
-
-    val cats = data.categories.zip(data.categories.map(getCatAlbums(_)))
-    cats.filter { case(c,as) => as.size > 0 } sortBy { case (_,as) =>
-      // Get all the dates of the album
-      as.map { getAlbumDate(_).getMillis }.max
-    } reverse
-  }
-
-
-
-  def getAlbumSize(album : Album) : Int = album.imageIDs.size
-
-
-  def getCatNumImages(albums : List[Album]) : Int = {
-    albums.map { a => a.imageIDs.size }.sum
-  }
-
-
-  // TODO: get album cover
-  def getRandCover(albums : List[Album]) : Image = {
-    getAlbumCoverImage(getRandAlbum(albums), data.imageMap)
-  }
-
-
-  // TODO: convert to ajax call
+  // Find n pictures from an album to display
   def getAlbumImages(album : Album, n : Int) : Iterable[Image] = { 
-    shuffle(data.imageMap(album.id)).take(n)
+    shuffle(album.images).take(n)
   }
 
-  def getCatDateString(albums : List[Album]) : String = {
-    getDateString(albums.map(getAlbumCoverEXIF(_, data.exifMap)), false)
+  def getGalleryDateString(gallery : Gallery) : String = {
+    getDateString(for (a <- gallery.albums; i <- a.images) yield i, false)
   }
 
 
   def getAlbumDateString(album : Album) : String = {
-    getDateString(List(getAlbumCoverEXIF(album, data.exifMap)), true)
+    getDateString(album.images, true)
   }
 
-  // Expensive
-  private def getCatAlbums(cat : Category) : List[Album] = {
-    val albums = for (a <- data.albums if a.categoryID == Some(cat.id)) yield a
-    albums.sortBy { getAlbumDate(_).getMillis }
-  }
-
-
-
-  private def getRandAlbum(albums : List[Album]) : Album = albums.size match {
-    case 0 => throw new InternalError("No album supplied to getRandomAlbum")
-    case n => albums(abs(nextInt) % n)
-  }
-
-
-  private def getRandImage(images : List[Image]) : Image = images.size match {
-    case 0 => throw new InternalError("No images supplied to getRandomImages")
-    case n => images(abs(nextInt) % n)
-  }
 }

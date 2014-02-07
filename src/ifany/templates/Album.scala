@@ -93,10 +93,10 @@ case class AlbumTemplate(view : AlbumView) extends Template {
     """}.mkString
   )
 
-  def thumbnailRow(row : List[ImageData]) : Template = Template({
+  def thumbnailRow(row : List[Image]) : Template = Template({
     for (thumb <- row) yield fast"""
       <div class="span3 img">
-          <img src="${ view.getImgUrl(thumb, "thumbnail") }" id="${ thumb.file }" class="frame"/>
+          <img src="${ thumb.url("t", view.getURL) }" id="${ thumb.file }" class="frame"/>
       </div>
     """}.mkString
   )

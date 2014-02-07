@@ -18,11 +18,11 @@ trait View {
   }
 
 
-  def getDateString(exifs : List[EXIF], withDay : Boolean) : String = {
+  def getDateString(images : List[Image], withDay : Boolean) : String = {
 
     // Get a list of all dates
     val dates : List[DateTime] = {
-      (for (exif <- exifs) yield exif.dateTime).sortBy(_.getMillis)
+      (for (i <- images; dt <- i.datetime) yield dt).sortBy(_.getMillis)
     }
 
     // Get the day
@@ -50,14 +50,4 @@ trait View {
     }
   }
 
-  def getAlbumCoverEXIF(album : Album, exifMap : Map[String, EXIF]) : EXIF = {
-    exifMap(album.id) 
-  }
-
-  def getAlbumCoverImage(album : Album, imageMap : Map[String, List[Image]]) : Image = {
-    imageMap(album.id) filter { _.id == album.cover.id } match {
-      case Nil => throw new InternalError("Cover image requested in view, but no cover image was set")
-      case list => list.head
-    }
-  }
 }

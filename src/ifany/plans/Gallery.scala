@@ -19,19 +19,14 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 	//////////////////////////////////////////////
     case req @ Path(Seg(Nil)) => {
 
-      // Get frontpage model
-      val frontpage_F = FrontpageModel.get
+      try {
+        val frontpage : Frontpage = Frontpage.get()
+        val view = FrontpageView(frontpage)
+        val output = FrontpageTemplate(view).toString
+        req.respond(HtmlContent ~> ResponseString(output))
 
-      // In case we succeed
-      frontpage_F onSuccess {
-        case model => {
-          val frontpage = getFrontpage(model)
-          req.respond(Ok ~> HtmlContent ~> ResponseString(frontpage))
-        }
-      }
+      } catch {
 
-      // In case we fail
-      frontpage_F onFailure {
         case InternalError(msg) => {
           println("* INTERNAL ERROR * : " + msg)
           req.respond(InternalServerError ~> HtmlContent ~> ResponseString("An error occured"))
@@ -40,7 +35,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
           println("* ALBUM NOT FOUND * : " + url)
           req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
         }
-        case error => {
+        case error : Throwable => {
           println("* UNKNOWN ERROR * : " + error.toString)
           req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
         }
@@ -56,12 +51,15 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 
     case req @ Path(Seg(albumURL :: whatever)) => {
 
+      // Piece together the album data
       try {
-        val model = AlbumModel(albumURL)
-        val view = AlbumView(model)
+        val album : Album = Album.get(albumURL)
+        val nav : Navigation = Navigation.get(albumURL)
+        val view = AlbumView(album, nav)
         val output = AlbumTemplate(view).toString
         req.respond(HtmlContent ~> ResponseString(output))
 
+      // Respond to errors that might occur
       } catch {
 
         case InternalError(msg) => {
@@ -83,13 +81,5 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 
   }
 
-
-
-
-  // Get the frontpage view
-  def getFrontpage(model : FrontpageModel) : String = {
-    val view = FrontpageView(model)
-    FrontpageTemplate(view).toString
-  }
 }
 

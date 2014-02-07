@@ -1,27 +1,21 @@
 package ifany
 
-case class AlbumView(model : AlbumModel) extends View {
+case class AlbumView(album : Album, nav : Navigation) extends View {
 
   val name = "album"
-  val directory = "/photos/" + model.data.url + "/"
-  def getTitle : String = model.data.title
-  def getDescription : String = model.data.description
+  def getTitle : String = album.title
+  def getDescription : String = album.description
+  def getURL = album.url
 
-  def getNextAlbum : Option[NavElem] = None //data.album.nav.next
-  def getPrevAlbum : Option[NavElem] = None //data.album.nav.prev
+  def getNextAlbum : Option[NavElem] = nav.next
+  def getPrevAlbum : Option[NavElem] = nav.prev
 
-  def getDateString : String = "" //getDateString(data.exifs, true)
+  def getDateString : String = getDateString(album.images, true)
 
-  def getJson : String = model.json
+  def getJson : String = album.json
 
-  def getImgUrl(img : ImageData, size : String) : String = size match {
-    case "original"     => directory + img.file + ".jpg"
-    case "thumbnail"    => directory + img.file + "_150x150.jpg"
-    case s              => directory + img.file + "_" + s + ".jpg"
-  }
-
-  def getThumbnailRows : List[List[ImageData]] = {
-    val rows = model.data.images.foldLeft(List(List().asInstanceOf[List[ImageData]])) { case (a,b) => 
+  def getThumbnailRows : List[List[Image]] = {
+    val rows = album.images.foldLeft(List(List().asInstanceOf[List[Image]])) { case (a,b) => 
       if (a.head.size < 4) (b :: a.head) :: a.tail else List(b) :: a
     }
 

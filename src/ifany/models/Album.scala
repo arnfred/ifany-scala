@@ -4,32 +4,82 @@ import org.joda.time.DateTime
 import scala.io.Source
 import java.io.FileNotFoundException
 import net.liftweb.json._
+import java.io.File
 
-case class AlbumData(title : String,
-                     description : String,
-                     url : String,
-                     galleries : List[String],
-                     images : List[ImageData])
+case class Image(file : String,
+                 description : String,
+                 datetime : Option[DateTime],
+                 banner : Boolean,
+                 cover : Boolean,
+                 size : List[Int]) {
 
-case class ImageData(file : String,
-                     description : String,
-                     datetime : DateTime,
-                     iso : String,
-                     focallength : String,
-                     f_stop : String,
-                     size : List[Int],
-                     model : String,
-                     exposure : String)
+  def url(size : String, albumURL : String) : String = size match {
+    case "t" => Ifany.photoDir + albumURL + "/" + file + "_150x150.jpg"
+    case "s" => Ifany.photoDir + albumURL + "/" + file + "_400x300.jpg"
+    case "m" => Ifany.photoDir + albumURL + "/" + file + "_600x450.jpg"
+    case "l" => Ifany.photoDir + albumURL + "/" + file + "_800x600.jpg"
+    case "o" => Ifany.photoDir + albumURL + "/" + file + ".jpg"
+  }
+}
 
-case class AlbumModel(url : String) {
+case class Album(title : String,
+                 description : String,
+                 url : String,
+                 galleries : List[String],
+                 images : List[Image]) {
 
-    implicit val formats    = DefaultFormats
-    val album_conf : String = "resources/photos/" + url + "/album.json"
+  implicit val formats    = DefaultFormats
+  def json : String = Serialization.write(this)
+
+  def datetime : (DateTime, DateTime) = {
+
+    // Take all images that have a date associated and sort them
+    val sorted_dates = {
+      for (i <- images; dt <- i.datetime) yield i.datetime.get
+    } sortBy(_.getMillis)
+
+    // Return the first and last date
+    sorted_dates.size match {
+      case 0 => throw InternalError("Album '" + url + "' has no date information associated with any pictures")
+      case 1 => (sorted_dates.head, sorted_dates.head)
+      case n => (sorted_dates.head, sorted_dates.last)
+    }
+  }
+}
+
+
+object Album {
+
+  implicit val formats    = DefaultFormats
+
+  // Based on an url we return an album
+  def get(url : String, jsonPath : String = "album.json") : Album = {
+
+    // Location of album data file
+    val json_path : String = "resources" + Ifany.photoDir + url + "/" + jsonPath
+
+    // Load JSON
     val json : String       = try {
-      Source.fromFile(album_conf).getLines.mkString("\n")
+      Source.fromFile(json_path).getLines.mkString("\n")
     } catch {
       case e : FileNotFoundException => throw new AlbumNotFound(url)
     }
-    val data : AlbumData    = Serialization.read[AlbumData](json)
 
+    // Parse JSON as Album and return result
+    val album = try {
+      Serialization.read[Album](json)
+    } catch {
+      case e : Throwable => throw new InternalError("Couldn't read json from '" + url + "':\n" + json)
+    }
+
+    return album
+  }
+
+  // Returns all albums in the photo dir
+  def getAll : List[Album] = {
+    val root = new File("resources" + Ifany.photoDir)
+    for (f <- (root).listFiles if f.isDirectory) yield {
+      get(f.getName)
+    }
+  } toList
 }
