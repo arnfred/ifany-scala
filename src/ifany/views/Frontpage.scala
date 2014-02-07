@@ -36,7 +36,6 @@ case class FrontpageView(frontpage : Frontpage) extends View {
 
     // If we have no covers, just use any image in landscape format (width > height)
     else {
-      println("No covers in '" + gallery.name)
       val landscapes = {
         for (a <- gallery.albums; i <- a.images if i.size(0) > i.size( 1 )) yield {
           Cover(i, a.title, a.url)
