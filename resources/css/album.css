@@ -48,11 +48,11 @@ span.laquo {
 	font-size: 3em;
 	display:block;
 }
-div.prev span.nav, div.prev span.laquo {
+div.next span.nav, div.next span.laquo {
 	float:right;
 	margin-left:0.2em;
 }
-div.next span.laquo {
+div.prev span.laquo {
 	float:left;
 	margin-right:0.2em;
 }

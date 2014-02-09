@@ -79,7 +79,7 @@ object Frontpage {
     }) toList
 
     // Sort the list and return
-    galleries.sortBy(g => g.albums.map(_.datetime._2).last.getMillis)
+    galleries.sortBy(g => g.albums.map(_.datetime._2).last.getMillis).reverse
 
   }
 

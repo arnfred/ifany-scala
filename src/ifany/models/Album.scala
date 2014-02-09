@@ -8,7 +8,7 @@ import java.io.File
 
 case class Image(file : String,
                  description : String,
-                 datetime : Option[DateTime],
+                 datetime : Option[String],
                  banner : Boolean,
                  cover : Boolean,
                  size : List[Int]) {
@@ -34,8 +34,8 @@ case class Album(title : String,
   def datetime : (DateTime, DateTime) = {
 
     // Take all images that have a date associated and sort them
-    val sorted_dates = {
-      for (i <- images; dt <- i.datetime) yield i.datetime.get
+    val sorted_dates : List[DateTime] = {
+      for (i <- images; dt <- i.datetime) yield new DateTime(i.datetime.get)
     } sortBy(_.getMillis)
 
     // Return the first and last date

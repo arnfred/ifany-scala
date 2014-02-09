@@ -22,7 +22,8 @@ trait View {
 
     // Get a list of all dates
     val dates : List[DateTime] = {
-      (for (i <- images; dt <- i.datetime) yield dt).sortBy(_.getMillis)
+      val unsorted = for (i <- images; dt <- i.datetime) yield new DateTime(dt)
+      unsorted.sortBy(_.getMillis)
     }
 
     // Get the day
