@@ -45,6 +45,38 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 
 	//////////////////////////////////////////////
 	//                                          //
+	//                  Update                  //
+	//                                          //
+	//////////////////////////////////////////////
+
+    case req @ Path(Seg("update" :: Nil)) => {
+        
+      try {
+        val frontpage : Frontpage = Frontpage.update()
+        val view = FrontpageView(frontpage)
+        val output = FrontpageTemplate(view).toString
+        req.respond(HtmlContent ~> ResponseString(output))
+
+      } catch {
+
+        case InternalError(msg) => {
+          println("* INTERNAL ERROR * : " + msg)
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString("An error occured"))
+        }
+        case AlbumNotFound(url) => {
+          println("* ALBUM NOT FOUND * : " + url)
+          req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
+        }
+        case error : Throwable => {
+          println("* UNKNOWN ERROR * : " + error.toString)
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
+        }
+      }
+
+    }
+
+	//////////////////////////////////////////////
+	//                                          //
 	//                  Album                   //
 	//                                          //
 	//////////////////////////////////////////////
