@@ -40,9 +40,3 @@ resolvers ++= Seq(
 mainClass in (Compile, run) := Some("ifany.Main")
 //mainClass in (Compile, run) := Some("paper.Main")
 
-// The sources to be watched
-// watchSources <+= baseDirectory map { _ / "paper" }
-// watchSources <+= baseDirectory map { _ / "web" }
-// watchSources <+= baseDirectory map { _ / "paper/Linking" }
-// watchSources <+= baseDirectory map { _ / "paper/Loading" }
-// watchSources <+= baseDirectory map { _ / "paper/Parsing" }
