@@ -39,4 +39,3 @@ resolvers ++= Seq(
 // The main class
 mainClass in (Compile, run) := Some("ifany.Main")
 //mainClass in (Compile, run) := Some("paper.Main")
-
