@@ -18,7 +18,6 @@ case class Image(file : String,
     case "s" => Ifany.photoDir + albumURL + "/" + file + "_400x300.jpg"
     case "m" => Ifany.photoDir + albumURL + "/" + file + "_600x450.jpg"
     case "l" => Ifany.photoDir + albumURL + "/" + file + "_800x600.jpg"
-    case "o" => Ifany.photoDir + albumURL + "/" + file + ".jpg"
   }
 }
 

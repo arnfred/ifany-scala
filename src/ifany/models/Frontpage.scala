@@ -25,7 +25,7 @@ object Frontpage {
   var data : Option[Frontpage]  = None
 
   // Update data
-  def update(jsonPath : String = "galleries.json") : Frontpage = {
+  def update(jsonPath : String = "galleries.json", nbCovers : Int = 20) : Frontpage = {
 
     // Get all albums
     val albums = Album.getAll
@@ -33,8 +33,8 @@ object Frontpage {
     // Get galleries
     val galleries = getGalleries(albums, "resources" + Ifany.photoDir + jsonPath)
 
-    // Get covers
-    val covers = for (a <- albums; i <- a.images if i.cover) yield {
+    // Get covers sort them and take the 20 first
+    val covers = for (a <- albums; i <- a.images if i.banner) yield {
       Cover(i, a.title, a.url)
     }
 
