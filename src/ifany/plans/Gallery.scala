@@ -52,7 +52,8 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
     case req @ Path(Seg("update" :: Nil)) => {
         
       try {
-        val frontpage : Frontpage = Frontpage.update()
+        val frontpage : Frontpage = Frontpage.update
+        val nav : Navigation = Navigation.update
         val view = FrontpageView(frontpage)
         val output = FrontpageTemplate(view).toString
         req.respond(HtmlContent ~> ResponseString(output))

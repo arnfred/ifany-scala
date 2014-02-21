@@ -25,6 +25,7 @@ case class Album(title : String,
                  description : String,
                  url : String,
                  galleries : List[String],
+                 public : Option[String],
                  images : List[Image]) {
 
   implicit val formats    = DefaultFormats
