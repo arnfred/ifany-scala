@@ -25,7 +25,7 @@ case class Album(title : String,
                  description : String,
                  url : String,
                  galleries : List[String],
-                 public : Option[String],
+                 public : Option[Boolean],
                  images : List[Image]) {
 
   implicit val formats    = DefaultFormats
@@ -44,6 +44,11 @@ case class Album(title : String,
       case 1 => (sorted_dates.head, sorted_dates.head)
       case n => (sorted_dates.head, sorted_dates.last)
     }
+  }
+
+  def isPublic : Boolean = public match {
+    case None => true
+    case Some(b) => b
   }
 }
 

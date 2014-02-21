@@ -53,7 +53,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         
       try {
         val frontpage : Frontpage = Frontpage.update()
-        val nav : Navigation = Navigation.update()
+        val nav : Map[String, Navigation] = Navigation.update
         val view = FrontpageView(frontpage)
         val output = FrontpageTemplate(view).toString
         req.respond(HtmlContent ~> ResponseString(output))

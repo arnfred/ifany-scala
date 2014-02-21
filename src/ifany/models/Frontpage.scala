@@ -28,7 +28,7 @@ object Frontpage {
   def update(jsonPath : String = "galleries.json", nbCovers : Int = 20) : Frontpage = {
 
     // Get all albums
-    val albums = Album.getAll
+    val albums = for (a <- Album.getAll if a.isPublic) yield a
 
     // Get galleries
     val galleries = getGalleries(albums, "resources" + Ifany.photoDir + jsonPath)
