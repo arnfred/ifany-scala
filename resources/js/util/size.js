@@ -42,8 +42,8 @@ define(function() {
 	}
 
 	size.getImageSize = function(img) {
-		var h = size.getHeight() + 20; // 20 is arbitrary margin
-		var w = size.getWidth() + 40; // 40 is arbitrary margin as well
+		var h = size.getHeight() + 10; // 20 is arbitrary margin
+		var w = size.getWidth() + 20; // 40 is arbitrary margin as well
 		var o = (img.size[0] > img.size[1]) ? "h" : "v";
 		var r = img.size[1] / img.size[0];
 		var maxH = 600;
@@ -51,15 +51,15 @@ define(function() {
 		var result = {};
 
 		if ((o == "v" && h > 1500 && w > 1500/r) || (o == "h" && w > 2000 && h > 2000*r)) {
-			maxH = 960;
-			maxW = 1280;
+			maxH = 1500;
+			maxW = 2000;
 		} 
 		else if ((o == "v" && h > 1200 && w > 1200/r) || (o == "h" && w > 1600 && h > 1600*r)) {
-			maxH = 960;
-			maxW = 1280;
+			maxH = 1200;
+			maxW = 1600;
 		} 
 		else if ((o == "v" && h > 960 && w > 960/r) || (o == "h" && w > 1280 && h > 1280*r)) {
-			maxH = 960;
+			maxH = 980;
 			maxW = 1280;
 		} 
 		else if ((o == "v" && h > 768 && w > 768/r) || (o == "h" && w > 1024 && h > 1024*r)) {
