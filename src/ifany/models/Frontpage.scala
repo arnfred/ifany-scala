@@ -74,7 +74,7 @@ object Frontpage {
 
     // Create a list of galleries
     val galleries = (for ((k, as) <- grouped; g <- jsonGalleries.get(k)) yield {
-      Gallery(g.name, Gallery.url(g.name), g.description, as)
+      Gallery(g.name, g.description, as)
     }) toList
 
     // Sort the list and return

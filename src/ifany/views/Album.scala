@@ -7,8 +7,7 @@ case class AlbumView(album : Album, nav : Navigation) extends View {
   def getDescription : String = album.description
   def getURL = album.url
 
-  def getNextAlbum : Option[NavElem] = nav.next
-  def getPrevAlbum : Option[NavElem] = nav.prev
+  def getNav : Navigation = nav
 
   def getDateString : String = getDateString(album.images, true)
 

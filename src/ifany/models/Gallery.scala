@@ -2,7 +2,7 @@ package ifany
 
 import scala.util.Random.shuffle
 
-case class Gallery(name : String, url : Option[String], description : String, albums : List[Album]) {
+case class Gallery(name : String, description : String, albums : List[Album]) {
 
   def getCover : Cover = {
     val covers = for (a <- albums; i <- a.images if i.cover) yield {
@@ -20,6 +20,8 @@ case class Gallery(name : String, url : Option[String], description : String, al
       shuffle(landscapes).head
     }
   }
+
+  val url : String = Gallery.url(name)
 }
 
 object Gallery {
@@ -27,11 +29,17 @@ object Gallery {
   def get(galleryURL : String) : Gallery = {
     try {
       val frontpage : Frontpage = Frontpage.get()
-      frontpage.galleries.find(g => g.url == Some(galleryURL)).get
+      frontpage.galleries.find(g => g.url == galleryURL).get
     } catch {
       case (error : java.util.NoSuchElementException) => throw GalleryNotFound(galleryURL)
     }
   }
 
-  def url(name : String) : Option[String] = Some(name.replace(" ", "-").toLowerCase)
+  def getOption(galleryURL : String) : Option[Gallery] = try {
+    Some(get(galleryURL))
+  } catch {
+    case GalleryNotFound(url) => None
+  }
+
+  def url(name : String) : String = name.replace(" ", "-").toLowerCase
 }

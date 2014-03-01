@@ -6,7 +6,10 @@ import java.io.FileNotFoundException
 import net.liftweb.json._
 import java.io.File
 
-case class Navigation(next : Option[NavElem], prev : Option[NavElem])
+case class Navigation(next : Option[NavElem], 
+                      prev : Option[NavElem], 
+                      gallery : Option[NavElem])
+
 case class NavElem(url : String, title : String)
 
 object Navigation {
@@ -33,9 +36,9 @@ object Navigation {
 
 
   // Returns Navigation from cache if available and exists
-  def get(url : String) : Navigation = data match {
-    case None       => update.getOrElse(url, Navigation(None, None))
-    case Some(d)    => d.getOrElse(url, Navigation(None, None))
+  def get(albumURL : String, galleryURL : Option[String] = None) : Navigation = data match {
+    case None       => update.getOrElse(albumURL, Navigation(None, None, None))
+    case Some(d)    => d.getOrElse(albumURL, Navigation(None, None, None))
   }
 
 
@@ -55,14 +58,17 @@ object Navigation {
 
   // Constructs a pair of String -> Navigation based on elements
   private def getNavPair(prev : Option[Album], current : Album, next : Option[Album]) : (String, Navigation) = {
-    var navPrev = for (p <- prev) yield {
-      val gURL : String = Gallery.url(p.mainGalleryName).get
+    val navPrev = for (p <- prev) yield {
+      val gURL : String = { for (g <- p.getGallery) yield Gallery.url(g) } getOrElse("")
       NavElem(gURL + "/" + p.url, p.title)
     }
-    var navNext = for (n <- next) yield {
-      val gURL : String = Gallery.url(n.mainGalleryName).get
+    val navNext = for (n <- next) yield {
+      val gURL : String = { for (g <- n.getGallery) yield Gallery.url(g) } getOrElse("")
       NavElem(gURL + "/" + n.url, n.title)
     }
-    (current.url -> Navigation(navNext, navPrev))
+    val navGal = for (g <- current.getGallery) yield {
+      NavElem(Gallery.url(g), g)
+    }
+    (current.url -> Navigation(navNext, navPrev, navGal))
   }
 }

@@ -7,7 +7,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
   implicit val v = view
 
   override def toString : String = Base(
-    Template(navigation(view.getNextAlbum, view.getPrevAlbum) + overlay + album), 
+    Template(navigation(view.getNav) + overlay + album), 
     Some(javascript)
   )
 
@@ -15,37 +15,50 @@ case class AlbumTemplate(view : AlbumView) extends Template {
     <script type="text/javascript">data = ${ view.getJson }</script>
   """)
 
-  def navigation(next : Option[NavElem], prev : Option[NavElem]) : Template = Template(fast"""
+  def navigation(nav : Navigation) : Template = {
+    println(nav)
+    val prevPhone = for (p <- nav.prev) yield getLink("Older", "/" + p.url + "/", "&laquo;")
+    val nextPhone = for (n <- nav.next) yield getLink("Newer", "/" + n.url + "/", "&raquo;")
+    val homePhone = for (h <- nav.gallery) yield getHomeLink("Gallery", h.url)
+    val prev = for (p <- nav.prev) yield getLink(p.title, "/" + p.url + "/", "&laquo;")
+    val next = for (n <- nav.next) yield getLink(n.title, "/" + n.url + "/", "&raquo;")
+    val home = for (h <- nav.gallery) yield getHomeLink(h.title, h.url)
+    Template(fast"""
 
-    <div class="row-fluid visible-phone">
-        <div class="span4 offset1 album-nav prev">
-          ${ if (prev != None) getLink("Older", "/" + prev.get.url + "/", "&laquo;") else "" }
-        </div>
-        <div class="span2 home album-nav">
-          <a href="/"><span class="nav">Home</span></a>
-        </div>
-        <div class="span4 album-nav next">
-          ${ if (next != None) getLink("Newer", "/" + next.get.url + "/", "&raquo;") else "" }
-        </div>
-    </div>
+      <div class="row-fluid visible-phone navigation">
+          <div class="album-nav prev span4 offset1">
+            ${ prevPhone.getOrElse("")  }
+          </div>
+          <div class="home album-nav span2">
+            ${ homePhone.getOrElse(getHomeLink("Home", "/")) }
+          </div>
+          <div class="album-nav next span4">
+            ${ nextPhone.getOrElse("") }
+          </div>
+      </div>
 
-    <div class="row-fluid hidden-phone">
-        <div class="span4 offset1 album-nav prev">
-          ${ if (prev != None) getLink(prev.get.title, "/" + prev.get.url + "/", "&laquo;") else "" }
-        </div>
-        <div class="span2 home album-nav">
-          <a href="/"><span class="nav">Home</span></a>
-        </div>
-        <div class="span4 album-nav next">
-          ${ if (next != None) getLink(next.get.title, "/" + next.get.url + "/", "&raquo;") else "" }
-        </div>
-    </div>
+      <div class="row-fluid hidden-phone navigation">
+          <div class="album-nav prev span4 offset1">
+            ${ prev.getOrElse("")  }
+          </div>
+          <div class="home album-nav span2">
+            ${ home.getOrElse(getHomeLink("Home", "/")) }
+          </div>
+          <div class="album-nav next span4">
+            ${ next.getOrElse("") }
+          </div>
+      </div>
+    """)
+  }
+
+  def getHomeLink(text : String, url : String) : Template = Template(fast"""
+    <a href="/$url/"><span class="nav home">$text</span></a>
   """)
 
   def getLink(text : String, url : String, sign : String) : Template = Template(fast"""
     <a href="$url" alt="$text">
       <span class="laquo">$sign</span>
-      <span class="nav">$text</span>
+      <span class="nav other">$text</span>
     </a>
   """)
 

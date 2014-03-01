@@ -79,7 +79,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 
 	//////////////////////////////////////////////
 	//                                          //
-	//                  Album                   //
+	//                 Gallery                  //
 	//                                          //
 	//////////////////////////////////////////////
 
@@ -100,7 +100,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         }
         case GalleryNotFound(url) => {
           println("* GALLERY NOT FOUND * : " + url)
-          req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
+          req.respond(NotFound ~> HtmlContent ~> ResponseString("Gallery not found: " + url))
         }
         case error : Throwable => {
           println("* UNKNOWN ERROR * : " + error.toString)
@@ -142,10 +142,6 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         }
       }
     }
-
-
-
   }
-
 }
 

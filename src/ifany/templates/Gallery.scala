@@ -38,7 +38,7 @@ case class GalleryTemplate(view : GalleryView) extends Template {
   def gallery : Template = Template {
     (for (album <- view.gallery.albums) yield fast"""
       <div class="row-fluid album">
-        <a href="/${ view.gallery.url.get }/${ album.url }/">
+        <a href="/${ view.gallery.url }/${ album.url }/">
           <div class="span3 offset1 album-info">
             <h3 class="album-title">${ album.title }</h3>
             <p class="album-date">${ view.getAlbumDateString(album) }</p>

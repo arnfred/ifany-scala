@@ -51,10 +51,11 @@ case class Album(title : String,
     case Some(b) => b
   }
 
-  def mainGalleryName : String = galleries.size match {
-    case 0 => "album"
-    case 1 => "album"
-    case n => galleries.drop(1).head
+  def getGallery : Option[String] = galleries match {
+    case Nil => None
+    case "all" :: Nil => None
+    case g :: Nil => Some(g)
+    case "all" :: g :: rest => Some(g)
   }
 }
 
