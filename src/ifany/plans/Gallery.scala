@@ -76,13 +76,46 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 
     }
 
+
 	//////////////////////////////////////////////
 	//                                          //
 	//                  Album                   //
 	//                                          //
 	//////////////////////////////////////////////
 
-    case req @ Path(Seg(albumURL :: whatever)) => {
+    case req @ Path(Seg(galleryURL :: Nil)) => {
+
+      // Piece together the album data
+      try {
+        val gallery = Gallery.get(galleryURL)
+        val view = GalleryView(gallery)
+        val output = GalleryTemplate(view).toString
+        req.respond(HtmlContent ~> ResponseString(output))
+
+      // Respond to errors that might occur
+      } catch {
+        case InternalError(msg) => {
+          println("* INTERNAL ERROR * : " + msg)
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString("An error occured"))
+        }
+        case GalleryNotFound(url) => {
+          println("* GALLERY NOT FOUND * : " + url)
+          req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
+        }
+        case error : Throwable => {
+          println("* UNKNOWN ERROR * : " + error.toString)
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
+        }
+      }
+    }
+
+	//////////////////////////////////////////////
+	//                                          //
+	//                  Album                   //
+	//                                          //
+	//////////////////////////////////////////////
+
+    case req @ Path(Seg(galleryURL :: albumURL :: whatever)) => {
 
       // Piece together the album data
       try {

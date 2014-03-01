@@ -14,7 +14,6 @@ case class Frontpage(galleries : List[Gallery],
 
 case class Cover(image : Image, albumTitle : String, albumURL : String)
 
-case class Gallery(name : String, description : String, albums : List[Album])
 
 
 object Frontpage {
@@ -33,7 +32,7 @@ object Frontpage {
     // Get galleries
     val galleries = getGalleries(albums, "resources" + Ifany.photoDir + jsonPath)
 
-    // Get covers sort them and take the 20 first
+    // Get covers
     val covers = for (a <- albums; i <- a.images if i.banner) yield {
       Cover(i, a.title, a.url)
     }
@@ -75,7 +74,7 @@ object Frontpage {
 
     // Create a list of galleries
     val galleries = (for ((k, as) <- grouped; g <- jsonGalleries.get(k)) yield {
-      Gallery(g.name, g.description, as)
+      Gallery(g.name, Gallery.url(g.name), g.description, as)
     }) toList
 
     // Sort the list and return

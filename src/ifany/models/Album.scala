@@ -50,6 +50,12 @@ case class Album(title : String,
     case None => true
     case Some(b) => b
   }
+
+  def mainGalleryName : String = galleries.size match {
+    case 0 => "album"
+    case 1 => "album"
+    case n => galleries.drop(1).head
+  }
 }
 
 

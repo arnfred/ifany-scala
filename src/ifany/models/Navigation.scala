@@ -55,8 +55,14 @@ object Navigation {
 
   // Constructs a pair of String -> Navigation based on elements
   private def getNavPair(prev : Option[Album], current : Album, next : Option[Album]) : (String, Navigation) = {
-    var navPrev = for (p <- prev) yield NavElem(p.url, p.title)
-    var navNext = for (n <- next) yield NavElem(n.url, n.title)
+    var navPrev = for (p <- prev) yield {
+      val gURL : String = Gallery.url(p.mainGalleryName).get
+      NavElem(gURL + "/" + p.url, p.title)
+    }
+    var navNext = for (n <- next) yield {
+      val gURL : String = Gallery.url(n.mainGalleryName).get
+      NavElem(gURL + "/" + n.url, n.title)
+    }
     (current.url -> Navigation(navNext, navPrev))
   }
 }

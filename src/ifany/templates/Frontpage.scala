@@ -65,8 +65,8 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
 
   def galleryAlbums(g : Gallery) : Template = Template {
     (for (album <- g.albums) yield fast"""
-      <div class="row-fluid album">
-        <a href="/${ album.url }/">
+      <div class="row-fluid album album-hidden">
+        <a href="/${ g.url.get }/${ album.url }/">
           <div class="span3 offset1 album-info">
             <h3 class="album-title">${ album.title }</h3>
             <p class="album-date">${ view.getAlbumDateString(album) }</p>

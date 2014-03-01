@@ -16,7 +16,17 @@ div.category:hover {
 	background-color:#eaeaea;
 	cursor:pointer;
 }
+h1#gallery-title {
+	font-size: 4em;
+}
 
+p#gallery-desc {
+	margin-top:0.5em;
+}
+img#gallery-cover {
+	background-position:center;
+	height:300px;
+	width:100%; } 
 div.category {
 	padding: 1em 0;
 	margin: 2.5em 0 1.5em 0;
@@ -41,6 +51,10 @@ div.album a:hover{
 	color:#222;
 }
 
+div.album-hidden {
+	display:none;
+}
+
 
 p.cat-meta, p.album-meta {
 	font-style:italic;
@@ -53,10 +67,6 @@ p.cat-date {
 
 p.album-date {
 	margin-bottom:0;
-}
-
-div.album {
-	display:none;
 }
 
 div.album-info {
