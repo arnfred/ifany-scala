@@ -16,7 +16,6 @@ case class AlbumTemplate(view : AlbumView) extends Template {
   """)
 
   def navigation(nav : Navigation) : Template = {
-    println(nav)
     val prevPhone = for (p <- nav.prev) yield getLink("Older", "/" + p.url + "/", "&laquo;")
     val nextPhone = for (n <- nav.next) yield getLink("Newer", "/" + n.url + "/", "&raquo;")
     val homePhone = for (h <- nav.gallery) yield getHomeLink("Gallery", h.url)

@@ -5,7 +5,7 @@ import scala.util.Random.shuffle
 import scala.math.abs
 import org.joda.time.DateTime
 
-case class GalleryView(gallery : Gallery) extends View {
+case class GalleryView(gallery : Gallery, nav : Navigation) extends View {
 
   // Used to fetch the right css and javascript
   val name = "frontpage"
@@ -13,6 +13,8 @@ case class GalleryView(gallery : Gallery) extends View {
   def getTitle : String = gallery.name
 
   def getDescription = gallery.description
+
+  def getNav : Navigation = nav
 
   // Find a cover image for the gallery
   val cover : Cover = gallery.getCover

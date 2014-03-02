@@ -49,7 +49,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
               <img src="${ cover.image.url("s", cover.albumURL) }" class="frame"/>
           </div>
 
-          <div class="span7" class="cat-info">
+          <div class="span7 cat-info">
               <h2 class="cat-title">${ g.name }</h2>
               <p class="cat-date">${ view.getGalleryDateString(g) }.</p>
               <p class="cat-meta">This gallery contains 

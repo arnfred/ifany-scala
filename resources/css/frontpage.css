@@ -1,9 +1,13 @@
 /* Css for frontpage */
 
-
 /* About text */
 p#about-text {
 	margin-top:3em;
+}
+
+/* Adjust max-width */
+#image, .album-images, .cat-info {
+	max-width:800px;
 }
 
 /* Separator */
@@ -26,7 +30,9 @@ p#gallery-desc {
 img#gallery-cover {
 	background-position:center;
 	height:300px;
-	width:100%; } 
+	width:100%; 
+	background-repeat-x:no-repeat;
+} 
 div.category {
 	padding: 1em 0;
 	margin: 2.5em 0 1.5em 0;

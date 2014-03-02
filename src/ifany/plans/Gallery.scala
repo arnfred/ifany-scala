@@ -88,7 +88,8 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
       // Piece together the album data
       try {
         val gallery = Gallery.get(galleryURL)
-        val view = GalleryView(gallery)
+        val nav : Navigation = Navigation.getGallery(galleryURL)
+        val view = GalleryView(gallery, nav)
         val output = GalleryTemplate(view).toString
         req.respond(HtmlContent ~> ResponseString(output))
 
@@ -120,7 +121,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
       // Piece together the album data
       try {
         val album : Album = Album.get(albumURL)
-        val nav : Navigation = Navigation.get(albumURL)
+        val nav : Navigation = Navigation.getAlbum(albumURL)
         val view = AlbumView(album, nav)
         val output = AlbumTemplate(view).toString
         req.respond(HtmlContent ~> ResponseString(output))

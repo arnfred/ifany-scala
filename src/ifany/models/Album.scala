@@ -56,6 +56,7 @@ case class Album(title : String,
     case "all" :: Nil => None
     case g :: Nil => Some(g)
     case "all" :: g :: rest => Some(g)
+    case otherwise => None
   }
 }
 

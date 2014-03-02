@@ -14,50 +14,73 @@ case class NavElem(url : String, title : String)
 
 object Navigation {
 
-  var data : Option[Map[String, Navigation]] = None
+  var albumData : Option[Map[String, Navigation]] = None
+  var galleryData : Option[Map[String, Navigation]] = None
 
   def update : Map[String, Navigation] = {
 
     println("updating")
 
-    // Get all directories in resources/photos folder
-    val albums : List[Album] = Album.getAll
+    val galleries : List[Gallery] = Frontpage.get().galleries
+    val albums : List[Album] = for (g <- galleries; a <- g.albums) yield a
 
     // get album order
     val albums_sorted : List[Album] = albums.sortBy(_.datetime._2.getMillis)
 
     // Build list of Navigation elements
-    val nav : Map[String, Navigation] = scan(albums_sorted, None)
+    val navGalleries : Map[String, Navigation] = scan(galleries, None, galleryNav)
+    val navAlbums : Map[String, Navigation] = scan(albums_sorted, None, albumNav)
+
 
     // Update data and return
-    data = Some(nav)
-    nav
+    albumData = Some(navAlbums)
+    galleryData = Some(navGalleries)
+    navAlbums ++ navGalleries
+  }
+
+  // Returns Navigation from cache if available and exists
+  def getGallery(galleryURL : String) : Navigation = galleryData match {
+    case None       => update.getOrElse(galleryURL, Navigation(None, None, None))
+    case Some(d)    => d.getOrElse(galleryURL, Navigation(None, None, None))
   }
 
 
   // Returns Navigation from cache if available and exists
-  def get(albumURL : String, galleryURL : Option[String] = None) : Navigation = data match {
+  def getAlbum(albumURL : String) : Navigation = albumData match {
     case None       => update.getOrElse(albumURL, Navigation(None, None, None))
     case Some(d)    => d.getOrElse(albumURL, Navigation(None, None, None))
   }
 
-
   // Now for each album find the two neighbors. We build map tail recursively
-  private def scan(albums : List[Album], 
-           prev : Option[Album]) : Map[String, Navigation] = albums match {
+  private def scan[A](galleries : List[A], 
+                      prev : Option[A],
+                      getNavPair : (Option[A], A, Option[A]) => (String, Navigation))
+                        : Map[String, Navigation] = galleries match {
 
     // In case we have two or more items left
     case current::next::rest =>
-      scan(next::rest, Some(current)) + getNavPair(prev, current, Some(next))
+      scan(next::rest, Some(current), getNavPair) + getNavPair(prev, current, Some(next))
 
     // In case the current item is the last
     case current::Nil => 
       Map(getNavPair(prev, current, None))
   }
 
+  // Constructs a pair of String -> Navigation based on elements
+  private def galleryNav(prev : Option[Gallery], current : Gallery, next : Option[Gallery]) : (String, Navigation) = {
+    val navPrev = for (p <- prev) yield {
+      NavElem(p.url, p.name)
+    }
+    val navNext = for (n <- next) yield {
+      NavElem(n.url, n.name)
+    }
+    val navGal = Some(NavElem("/", "Home"))
+
+    (current.url -> Navigation(navNext, navPrev, navGal))
+  }
 
   // Constructs a pair of String -> Navigation based on elements
-  private def getNavPair(prev : Option[Album], current : Album, next : Option[Album]) : (String, Navigation) = {
+  private def albumNav(prev : Option[Album], current : Album, next : Option[Album]) : (String, Navigation) = {
     val navPrev = for (p <- prev) yield {
       val gURL : String = { for (g <- p.getGallery) yield Gallery.url(g) } getOrElse("")
       NavElem(gURL + "/" + p.url, p.title)

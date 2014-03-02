@@ -6,7 +6,53 @@ case class GalleryTemplate(view : GalleryView) extends Template {
   import com.dongxiguo.fastring.Fastring.Implicits._
   implicit val v = view
 
-  override def toString : String = Base(Template(header + gallery))
+  override def toString : String = Base(Template(navigation(view.getNav) + header + gallery))
+
+  def navigation(nav : Navigation) : Template = {
+    val prevPhone = for (p <- nav.prev) yield getLink("Older", "/" + p.url + "/", "&laquo;")
+    val nextPhone = for (n <- nav.next) yield getLink("Newer", "/" + n.url + "/", "&raquo;")
+    val prev = for (p <- nav.prev) yield getLink(p.title, "/" + p.url + "/", "&laquo;")
+    val next = for (n <- nav.next) yield getLink(n.title, "/" + n.url + "/", "&raquo;")
+    val t = Template(fast"""
+
+      <div class="row-fluid visible-phone navigation">
+          <div class="album-nav prev span4 offset1">
+            ${ prevPhone.getOrElse("")  }
+          </div>
+          <div class="home album-nav span2">
+            <a href="/"><span class="nav home">Home</span></a>
+          </div>
+          <div class="album-nav next span4">
+            ${ nextPhone.getOrElse("") }
+          </div>
+      </div>
+
+      <div class="row-fluid hidden-phone navigation">
+          <div class="album-nav prev span4 offset1">
+            ${ prev.getOrElse("")  }
+          </div>
+          <div class="home album-nav span2">
+            <a href="/"><span class="nav home">Home</span></a>
+          </div>
+          <div class="album-nav next span4">
+            ${ next.getOrElse("") }
+          </div>
+      </div>
+    """)
+    if (prev != None || next != None) t
+    else Template("")
+  }
+
+  def getHomeLink(text : String, url : String) : Template = Template(fast"""
+    <a href="/$url/"><span class="nav home">$text</span></a>
+  """)
+
+  def getLink(text : String, url : String, sign : String) : Template = Template(fast"""
+    <a href="$url" alt="$text">
+      <span class="laquo">$sign</span>
+      <span class="nav other">$text</span>
+    </a>
+  """)
 
   def header : Template = Template {
     val albumNum : Int = view.gallery.albums.size
