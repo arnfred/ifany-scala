@@ -8,8 +8,17 @@ case class AlbumTemplate(view : AlbumView) extends Template {
 
   override def toString : String = Base(
     Template(navigation(view.getNav) + overlay + album), 
-    Some(javascript)
+    Some(Template(javascript + nextprev))
   )
+
+  def nextprev : Template = {
+    val next = for (n <- view.getNav.next) yield n.url
+    val prev = for (p <- view.getNav.prev) yield p.url
+    Template(fast"""
+      <link rel="next" href="${ next.getOrElse("/") }"/>
+      <link rel="prev" href="${ prev.getOrElse("/") }"/>
+    """)
+  }
 
   def javascript : Template = Template(fast"""
     <script type="text/javascript">data = ${ view.getJson }</script>

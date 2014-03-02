@@ -6,7 +6,19 @@ case class GalleryTemplate(view : GalleryView) extends Template {
   import com.dongxiguo.fastring.Fastring.Implicits._
   implicit val v = view
 
-  override def toString : String = Base(Template(navigation(view.getNav) + header + gallery))
+  override def toString : String = Base(
+    Template(navigation(view.getNav) + header + gallery),
+    Some(nextprev)
+  )
+
+  def nextprev : Template = {
+    val next = for (n <- view.getNav.next) yield n.url
+    val prev = for (p <- view.getNav.prev) yield p.url
+    Template(fast"""
+      <link rel="next" href="${ next.getOrElse("/") }"/>
+      <link rel="prev" href="${ prev.getOrElse("/") }"/>
+    """)
+  }
 
   def navigation(nav : Navigation) : Template = {
     val prevPhone = for (p <- nav.prev) yield getLink("Older", "/" + p.url + "/", "&laquo;")

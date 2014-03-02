@@ -28,9 +28,8 @@ object Navigation {
     val albums_sorted : List[Album] = albums.sortBy(_.datetime._2.getMillis)
 
     // Build list of Navigation elements
-    val navGalleries : Map[String, Navigation] = scan(galleries, None, galleryNav)
+    val navGalleries : Map[String, Navigation] = scan(galleries.reverse, None, galleryNav)
     val navAlbums : Map[String, Navigation] = scan(albums_sorted, None, albumNav)
-
 
     // Update data and return
     albumData = Some(navAlbums)
