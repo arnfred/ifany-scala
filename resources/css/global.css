@@ -16,22 +16,6 @@ br.clear {
 	clear:both;
 }
 
-/* Image behavior */
-img.frame {
-	padding:1px;
-	/* border: thin solid grey; */
-	max-width:100%;
-}
-div.span3.img {
-	width:22.7%;
-	margin-left:3%;
-	margin-right:0;
-	float:left;
-}
-div.span3.img:first-child {
-	margin-left:0;
-}
-
 /* Header behavior */
 h1#header {
 	font-size: 7em;
