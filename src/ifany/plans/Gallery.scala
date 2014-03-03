@@ -19,7 +19,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 	//////////////////////////////////////////////
     case req @ Path(Seg(Nil)) => {
 
-      //try {
+      try {
         val frontpage : Frontpage = Frontpage.get()
         val view = FrontpageView(frontpage)
         val output = FrontpageTemplate(view).toString
@@ -73,7 +73,6 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
           req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
         }
       }
-
     }
 
 

@@ -41,6 +41,7 @@ h4#subheader {
 
 /* Text behavior */
 body {
+	font-family: "Helvetica Neue", Geneva, Arial, Helvetica, Verdana, sans-serif;
 	color: #222;
 	background-color:#fafafa;
 }
