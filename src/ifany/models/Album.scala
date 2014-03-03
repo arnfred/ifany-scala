@@ -58,6 +58,11 @@ case class Album(title : String,
     case "all" :: g :: rest => Some(g)
     case otherwise => None
   }
+
+  def getURL : String = getGallery match {
+    case None => "album/" + url
+    case Some(gURL) => gURL + "/" + url
+  }
 }
 
 

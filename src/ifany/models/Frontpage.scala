@@ -34,7 +34,7 @@ object Frontpage {
 
     // Get covers
     val covers = for (a <- albums; i <- a.images if i.banner) yield {
-      Cover(i, a.title, a.url)
+      Cover(i, a.title, a.getURL)
     }
 
     // Get frontpage
