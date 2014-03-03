@@ -31,7 +31,7 @@ case class Album(title : String,
   implicit val formats    = DefaultFormats
   def json : String = Serialization.write(this)
 
-  def datetime : (DateTime, DateTime) = {
+  val datetime : (DateTime, DateTime) = {
 
     // Take all images that have a date associated and sort them
     val sorted_dates : List[DateTime] = {
@@ -46,12 +46,12 @@ case class Album(title : String,
     }
   }
 
-  def isPublic : Boolean = public match {
+  val isPublic : Boolean = public match {
     case None => true
     case Some(b) => b
   }
 
-  def getGallery : Option[String] = galleries match {
+  val getGallery : Option[String] = galleries match {
     case Nil => None
     case "all" :: Nil => None
     case g :: Nil => Some(g)
@@ -59,9 +59,9 @@ case class Album(title : String,
     case otherwise => None
   }
 
-  def getURL : String = getGallery match {
+  val path : String = getGallery match {
     case None => "album/" + url
-    case Some(gURL) => gURL + "/" + url
+    case Some(gURL) => Gallery.url(gURL) + "/" + url
   }
 }
 

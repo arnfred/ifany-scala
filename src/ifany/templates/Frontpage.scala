@@ -27,8 +27,8 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
         </div>
 
         <div class="span7" id="image">
-            <img src="${ view.cover.image.url("l", view.cover.albumURL) }" class="frame"/>
-            <p>From the album "<a href="${ view.cover.albumURL }/" >${ view.cover.albumTitle }</a>"</p>
+            <img src="${ view.cover.image.url("l", view.cover.album.url) }" class="frame"/>
+            <p>From the album "<a href="${ view.cover.album.path }/" >${ view.cover.album.title }</a>"</p>
         </div>
     </div>
   """)
@@ -46,7 +46,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
     fast"""
       <div class="row-fluid category">
           <div class="span3 offset1 cat-image">
-              <img src="${ cover.image.url("s", cover.albumURL) }" class="frame"/>
+              <img src="${ cover.image.url("s", cover.album.url) }" class="frame"/>
           </div>
 
           <div class="span7 cat-info">

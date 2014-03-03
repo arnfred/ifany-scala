@@ -12,7 +12,7 @@ import java.io.FileNotFoundException
 case class Frontpage(galleries : List[Gallery],
                      covers : List[Cover])
 
-case class Cover(image : Image, albumTitle : String, albumURL : String)
+case class Cover(image : Image, album : Album)
 
 
 
@@ -34,7 +34,7 @@ object Frontpage {
 
     // Get covers
     val covers = for (a <- albums; i <- a.images if i.banner) yield {
-      Cover(i, a.title, a.getURL)
+      Cover(i, a)
     }
 
     // Get frontpage

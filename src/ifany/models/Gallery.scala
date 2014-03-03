@@ -4,9 +4,9 @@ import scala.util.Random.shuffle
 
 case class Gallery(name : String, description : String, albums : List[Album]) {
 
-  def getCover : Cover = {
+  def cover : Cover = {
     val covers = for (a <- albums; i <- a.images if i.cover) yield {
-      Cover(i, a.title, a.url)
+      Cover(i, a)
     }
     if (covers.size > 0) shuffle(covers).head
 
@@ -14,14 +14,14 @@ case class Gallery(name : String, description : String, albums : List[Album]) {
     else {
       val landscapes = {
         for (a <- albums; i <- a.images if i.size(0) > i.size( 1 )) yield {
-          Cover(i, a.title, a.url)
+          Cover(i, a)
         }
       }
       shuffle(landscapes).head
     }
   }
 
-  val url : String = Gallery.url(name)
+  def url : String = Gallery.url(name)
 }
 
 object Gallery {

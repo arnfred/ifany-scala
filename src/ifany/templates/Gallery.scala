@@ -84,8 +84,8 @@ case class GalleryTemplate(view : GalleryView) extends Template {
 
         </div>
         <div class="span7" id="image">
-            <img style="background-image:url('${ view.cover.image.url("l", view.cover.albumURL) }')" id="gallery-cover"/>
-            <p>From the album "<a href="${ view.cover.albumURL }/" >${ view.cover.albumTitle }</a>"</p>
+            <img style="background-image:url('${ view.cover.image.url("l", view.cover.album.url) }')" id="gallery-cover"/>
+            <p>From the album "<a href="${ view.cover.album.url }/" >${ view.cover.album.title }</a>"</p>
         </div>
 
     </div>

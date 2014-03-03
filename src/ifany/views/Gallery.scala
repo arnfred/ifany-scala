@@ -17,7 +17,7 @@ case class GalleryView(gallery : Gallery, nav : Navigation) extends View {
   def getNav : Navigation = nav
 
   // Find a cover image for the gallery
-  val cover : Cover = gallery.getCover
+  val cover : Cover = gallery.cover
 
   // The amount of images in an album
   def getAlbumSize(album : Album) : Int = album.images.size

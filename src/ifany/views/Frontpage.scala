@@ -30,7 +30,7 @@ case class FrontpageView(frontpage : Frontpage) extends View {
   // Find a cover image for the gallery
   def getGalleryCover(gallery : Gallery) : Cover = {
     val covers = for (a <- gallery.albums; i <- a.images if i.cover) yield {
-      Cover(i, a.title, a.url)
+      Cover(i, a)
     }
     if (covers.size > 0) shuffle(covers).head
 
@@ -38,7 +38,7 @@ case class FrontpageView(frontpage : Frontpage) extends View {
     else {
       val landscapes = {
         for (a <- gallery.albums; i <- a.images if i.size(0) > i.size( 1 )) yield {
-          Cover(i, a.title, a.url)
+          Cover(i, a)
         }
       }
       shuffle(landscapes).head
