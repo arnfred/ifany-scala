@@ -87,7 +87,10 @@ object Album {
     val album = try {
       Serialization.read[Album](json)
     } catch {
-      case e : Throwable => throw new InternalError("Couldn't read json from '" + url + "':\n" + json)
+      case e : Throwable => {
+        println(e)
+        throw new InternalError("Couldn't read json from '" + url + "':\n" + json)
+      }
     }
 
     return album
