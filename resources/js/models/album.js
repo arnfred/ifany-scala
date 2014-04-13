@@ -1,10 +1,10 @@
-define(["radio", 
+define(["radio",
 		"views/album",
 		"util/cache",
 		"lib/history",
 		"lib/underscore",
 		//"lib/hammer.min",
-	], 
+	],
 	function(radio,
 		albumView,
 		cache,
@@ -45,7 +45,7 @@ define(["radio",
 	// Subscribe to the event that we click a thumbnail
 	album.events = function() {
 
-		$("img.frame").each(function (index, im) { 
+		$("img.frame").each(function (index, im) {
 			$(im).click(function () { createOverlay($(im).attr("id")) });
 		})
 
@@ -54,7 +54,7 @@ define(["radio",
 		$(window).resize(lazy_resize)
 
 		// Broadcast overlay key events
-		$(window).keydown(function(e){ 
+		$(window).keydown(function(e){
 			if (album.overlayActive) { overlayKeypress(e.keyCode); }
 		});
 
@@ -72,7 +72,7 @@ define(["radio",
 		var hammer_options = { transform: true };
 		//Hammer(overlay_img, hammer_options).on("dragleft", function() { goNext(); });
 		//Hammer(overlay_img, hammer_options).on("dragright", function() { goPrev(); });
-		
+
 		// Change in browser history
 		history.Adapter.bind(window, 'statechange', respondHistory)
 	}
@@ -105,8 +105,8 @@ define(["radio",
 	//////////////////////////////////////////////
 
 	var getURLParts = function() {
-		var parts = document.URL.split(album.url + "/")
-		return [parts[0] + album.url + "/", parts[1]]
+		var parts = document.URL.split("/" + album.url + "/")
+		return [parts[0] + "/" + album.url + "/", parts[1]]
 	}
 
 	var openOverlayIfNecessary = function() {
@@ -203,7 +203,7 @@ define(["radio",
 			else {
 				closeOverlay();
 			}
-		} 
+		}
 	}
 
 

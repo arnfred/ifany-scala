@@ -88,7 +88,6 @@ object Album {
       Serialization.read[Album](json)
     } catch {
       case e : Throwable => {
-        println(e)
         throw new InternalError("Couldn't read json from '" + url + "':\n" + json)
       }
     }

@@ -15,9 +15,8 @@ scalacOptions ++= Seq("-unchecked", "-Ywarn-dead-code", "-deprecation")
 libraryDependencies  ++= Seq(
             // other dependencies here
             // pick and choose:
-			"net.databinder" %% "unfiltered-netty-server" % "0.6.7",
-			//"net.databinder" %% "unfiltered-spec" % "0.6.7" % "test",
-			"net.databinder" %% "unfiltered-filter" % "0.6.7",
+			"net.databinder" %% "unfiltered-netty-server" % "0.7.1",
+			"net.databinder" %% "unfiltered-filter" % "0.7.1",
 			"net.databinder" %% "unfiltered-json" % "0.6.7",
 			"net.databinder.dispatch" %% "dispatch-core" % "0.9.5",
 			"com.dongxiguo" %% "fastring" % "0.2.1",
