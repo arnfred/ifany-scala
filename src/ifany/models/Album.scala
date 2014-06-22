@@ -13,11 +13,19 @@ case class Image(file : String,
                  cover : Boolean,
                  size : List[Int]) {
 
-  def url(size : String, albumURL : String) : String = size match {
-    case "t" => Ifany.photoDir + albumURL + "/" + file + "_150x150.jpg"
-    case "s" => Ifany.photoDir + albumURL + "/" + file + "_400x300.jpg"
-    case "m" => Ifany.photoDir + albumURL + "/" + file + "_600x450.jpg"
-    case "l" => Ifany.photoDir + albumURL + "/" + file + "_800x600.jpg"
+  def url(size : String, albumURL : String) : String = {
+    val sizes : Map[String, String] = (Map.empty +
+      ("t" -> "150x150") + ("s" -> "400x300") + 
+      ("m" -> "600x450") + ("l" -> "800x600") +
+      ("150" -> "150x150") + ("400" -> "400x300") +
+      ("600" -> "600x450") + ("800" -> "800x600") +
+      ("1024" -> "1024x768") + ("1280" -> "1280x980") +
+      ("1600" -> "1600x1200") + ("2000" -> "2000x1500"))
+    try {
+      Ifany.photoDir + albumURL + "/" + file + "_" + sizes(size) + ".jpg"
+    } catch {
+        case _ : Exception => throw InternalError("Image with size '" + size + "' doesn't exist")
+    }
   }
 }
 

@@ -4,9 +4,11 @@ import dispatch._
 import unfiltered.request._
 import unfiltered.response._
 import unfiltered.netty._
-import net.liftweb.json.JsonDSL._
 import scala.concurrent._
 import ExecutionContext.Implicits.global
+import java.io.BufferedInputStream
+import java.io.FileInputStream
+import scala.Stream
 
 object GalleryPlan extends async.Plan with ServerErrorResponse {
 
@@ -75,6 +77,42 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
       }
     }
 
+
+	//////////////////////////////////////////////
+	//                                          //
+	//                  cover                   //
+	//                                          //
+	//////////////////////////////////////////////
+
+    case req @ Path(Seg("cover" :: str :: size :: Nil)) => {
+        
+      try {
+        val frontpage : Frontpage = Frontpage.get()
+        val covers : List[Cover] = frontpage.covers
+        val n : Int = str.map(_+0).reduce({ (a,b) => a*(b+1) % covers.length }) % covers.length
+        val img : Image = covers(n).image
+        val album : Album = covers(n).album
+        val path : String = "resources" + img.url(size, album.url)
+        val bis = new BufferedInputStream(new FileInputStream(path))
+        val data = Stream.continually(bis.read).takeWhile(-1 !=).map(_.toByte).toArray
+        req.respond(Ok ~> ContentType("image/jpg") ~> 
+                          ContentLength(data.length.toString) ~>
+                          ResponseBytes(data))
+      } catch {
+        case InternalError(msg) => {
+          println("* INTERNAL ERROR * : " + msg)
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString(msg))
+        }
+        case AlbumNotFound(url) => {
+          println("* ALBUM NOT FOUND * : " + url)
+          req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
+        }
+        case error : Throwable => {
+          println("* UNKNOWN ERROR * : " + error.toString)
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
+        }
+      }
+    }
 
 	//////////////////////////////////////////////
 	//                                          //
