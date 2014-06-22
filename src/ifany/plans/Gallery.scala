@@ -89,7 +89,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
       try {
         val frontpage : Frontpage = Frontpage.get()
         val covers : List[Cover] = frontpage.covers
-        val n : Int = str.map(_+0).reduce({ (a,b) => a*(b+1) % covers.length }) % covers.length
+        val n : Int = str.map(_+0).reduce({ (a,b) => (a + 1000003 * (b + 1)) % covers.length }) % covers.length
         val img : Image = covers(n).image
         val album : Album = covers(n).album
         val path : String = "resources" + img.url(size, album.url)
