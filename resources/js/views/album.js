@@ -23,7 +23,7 @@ define(["jquery", "radio", "util/size", "util/cache"],
 
 		// Overlay change
 		radio("overlay:set").subscribe(overlayChange);
-	
+
 		// Overlay close
 		radio("overlay:close").subscribe(overlayClose);
 
@@ -39,7 +39,7 @@ define(["jquery", "radio", "util/size", "util/cache"],
 
 	album.init = function() {
 
-		// Toggle events 
+		// Toggle events
 		album.events();
 	}
 
@@ -103,6 +103,6 @@ define(["jquery", "radio", "util/size", "util/cache"],
 	//					Return					//
 	//											//
 	//////////////////////////////////////////////
-	
+
 	return album
 });

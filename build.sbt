@@ -23,7 +23,8 @@ libraryDependencies  ++= Seq(
 			"org.mongodb" %% "casbah" % "2.5.0",
 			"com.novus" %% "salat" % "1.9.2",
 			"joda-time" % "joda-time" % "2.2",
-			"org.joda" % "joda-convert" % "1.2"
+			"org.joda" % "joda-convert" % "1.2",
+			"com.sksamuel.scrimage" %% "scrimage-core" % "1.4.1"
 )
 
 resolvers ++= Seq(
@@ -37,4 +38,3 @@ resolvers ++= Seq(
 
 // The main class
 mainClass in (Compile, run) := Some("ifany.Main")
-//mainClass in (Compile, run) := Some("paper.Main")

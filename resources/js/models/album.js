@@ -105,8 +105,10 @@ define(["radio",
 	//////////////////////////////////////////////
 
 	var getURLParts = function() {
-		var parts = document.URL.split("/" + album.url + "/")
-		return [parts[0] + "/" + album.url + "/", parts[1]]
+        var reversed = document.URL.split("/").reverse().join("/");
+        var parts = _.map(reversed.split("/" + album.url + "/"),
+                          function(p) { return p.split("/").reverse().join("/"); })
+		return [parts[1] + "/" + album.url + "/", parts[0]]
 	}
 
 	var openOverlayIfNecessary = function() {
