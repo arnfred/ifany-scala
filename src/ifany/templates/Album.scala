@@ -27,10 +27,8 @@ case class AlbumTemplate(view : AlbumView) extends Template {
   def navigation(nav : Navigation) : Template = {
     val prevPhone = for (p <- nav.prev) yield getLink("Older", "/" + p.url + "/", "&laquo;")
     val nextPhone = for (n <- nav.next) yield getLink("Newer", "/" + n.url + "/", "&raquo;")
-    val homePhone = for (h <- nav.gallery) yield getHomeLink("Gallery", h.url)
     val prev = for (p <- nav.prev) yield getLink(p.title, "/" + p.url + "/", "&laquo;")
     val next = for (n <- nav.next) yield getLink(n.title, "/" + n.url + "/", "&raquo;")
-    val home = for (h <- nav.gallery) yield getHomeLink(h.title, h.url)
     Template(fast"""
 
       <div class="row-fluid visible-phone navigation">
@@ -38,7 +36,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
             ${ prevPhone.getOrElse("")  }
           </div>
           <div class="home album-nav span2">
-            ${ homePhone.getOrElse(getHomeLink("Home", "/")) }
+            ${ getHomeLink("Home", "/") }
           </div>
           <div class="album-nav next span4">
             ${ nextPhone.getOrElse("") }
@@ -50,7 +48,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
             ${ prev.getOrElse("")  }
           </div>
           <div class="home album-nav span2">
-            ${ home.getOrElse(getHomeLink("Home", "/")) }
+            ${ getHomeLink("Home", "/") }
           </div>
           <div class="album-nav next span4">
             ${ next.getOrElse("") }
