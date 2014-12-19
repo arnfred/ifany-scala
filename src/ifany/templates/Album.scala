@@ -36,7 +36,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
             ${ prevPhone.getOrElse("")  }
           </div>
           <div class="home album-nav span2">
-            ${ getHomeLink("Home", "/") }
+            ${ getHomeLink("Home", "") }
           </div>
           <div class="album-nav next span4">
             ${ nextPhone.getOrElse("") }
@@ -48,7 +48,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
             ${ prev.getOrElse("")  }
           </div>
           <div class="home album-nav span2">
-            ${ getHomeLink("Home", "/") }
+            ${ getHomeLink("Home", "") }
           </div>
           <div class="album-nav next span4">
             ${ next.getOrElse("") }
@@ -58,7 +58,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
   }
 
   def getHomeLink(text : String, url : String) : Template = Template(fast"""
-    <a href="/$url/"><span class="nav home">$text</span></a>
+    <a href="/$url"><span class="nav home">$text</span></a>
   """)
 
   def getLink(text : String, url : String, sign : String) : Template = Template(fast"""
