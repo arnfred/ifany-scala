@@ -22,6 +22,7 @@ div.album-row {
 div.img img {
 	cursor:pointer;
 	float:right;
+	width:100%;
 }
 div.img img:hover {
 	background-color:#aaa;
@@ -43,9 +44,14 @@ div#overlay {
 	display:none;
 }
 
+div.overlay-nav {
+  padding:0;
+}
+
 div#overlay-img img {
 	display:inline-block;
 	max-height: 100%;
+	max-width: 100%;
 	border:thin solid #666;
 }
 div.overlay-nav {
@@ -60,6 +66,7 @@ div#overlay-prev, div#overlay-next, div#overlay-img {
 div#overlay-prev, div#overlay-next {
 	width:100%;
 }
+/*
 div#oprev, div#onext {
 	min-width:8.3%;
 	float:left;
@@ -68,6 +75,7 @@ div.overlay-img {
 	min-width:83%
 	float:left;
 }
+*/
 div#overlay-prev span, div#overlay-next span, div#overlay-img div {
 	display:table-cell;
 	vertical-align:middle;

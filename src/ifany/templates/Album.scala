@@ -31,26 +31,26 @@ case class AlbumTemplate(view : AlbumView) extends Template {
     val next = for (n <- nav.next) yield getLink(n.title, "/" + n.url + "/", "&raquo;")
     Template(fast"""
 
-      <div class="row-fluid visible-phone navigation">
-          <div class="album-nav prev span4 offset1">
+      <div class="row visible-xs-block navigation">
+          <div class="album-nav prev col-xs-5 col-sm-offset-1">
             ${ prevPhone.getOrElse("")  }
           </div>
-          <div class="home album-nav span2">
+          <div class="home album-nav col-xs-2 col-sm-2">
             ${ getHomeLink("Home", "") }
           </div>
-          <div class="album-nav next span4">
+          <div class="album-nav next col-xs-5">
             ${ nextPhone.getOrElse("") }
           </div>
       </div>
 
-      <div class="row-fluid hidden-phone navigation">
-          <div class="album-nav prev span4 offset1">
+      <div class="row hidden-xs navigation">
+          <div class="album-nav prev col-xs-4 col-sm-offset-1">
             ${ prev.getOrElse("")  }
           </div>
-          <div class="home album-nav span2">
+          <div class="home album-nav col-sm-2">
             ${ getHomeLink("Home", "") }
           </div>
-          <div class="album-nav next span4">
+          <div class="album-nav next col-xs-4">
             ${ next.getOrElse("") }
           </div>
       </div>
@@ -69,19 +69,19 @@ case class AlbumTemplate(view : AlbumView) extends Template {
   """)
 
   def overlay : Template = Template(fast"""
-  <div class="row-fluid overlay" id="overlay">
-      <div class="span1 overlay-prev overlay-nav hidden-phone">
+  <div class="overlay" id="overlay">
+      <div class="col-xs-1 overlay-prev overlay-nav">
         <div id="overlay-prev">
           <span class="laquo">&laquo;</span>
         </div>
       </div>
-      <div class="span10 overlay-img" id="overlay-img">
+      <div class="col-xs-10 overlay-img" id="overlay-img">
           <div>
             <img alt="Overlay image"/>
             <span id="caption">Sample Caption</span>
           </div>
       </div>
-      <div class="span1 overlay-next overlay-nav hidden-phone">
+      <div class="col-xs-1 overlay-next overlay-nav">
         <div id="overlay-next">
           <span class="laquo">&raquo;</span>
         </div>
@@ -90,15 +90,15 @@ case class AlbumTemplate(view : AlbumView) extends Template {
   """)
 
   def album : Template = Template(fast"""
-    <div class="row-fluid album top">
-        <div class="span3 offset1 album-info">
+    <div class="row album top">
+        <div class="col-sm-3 col-sm-offset-1 album-info">
             <h2 class="album-title">${ view.getTitle }</h2>
             <p class="album-date">${ view.getDateString }</p>
             <p class="album-desc">${ view.getDescription }</p>
             <br class="clear" />
         </div>
 
-	    <div class="span7 album-images">
+	    <div class="col-sm-7 album-images">
             ${ thumbnails }
         </div>
     </div>
@@ -106,7 +106,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
 
   def thumbnails : Template = Template({
     for (row <- view.getThumbnailRows) yield fast"""
-      <div class="row-fluid album-row">
+      <div class="row album-row">
         ${ thumbnailRow(row) }
       </div>
     """}.mkString
@@ -114,7 +114,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
 
   def thumbnailRow(row : List[Image]) : Template = Template({
     for (thumb <- row) yield fast"""
-      <div class="span3 img">
+      <div class="col-xs-3 img">
           <img src="${ thumb.url("t", view.getURL) }" id="${ thumb.file }" class="frame"/>
       </div>
     """}.mkString

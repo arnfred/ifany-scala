@@ -17,7 +17,6 @@ case class Base(body : Template, header : Option[Template] = None) extends Templ
       <meta name="description" content="Photos by Jonas Toft Arnfred">
       <link rel="icon" type="image/png" href="/img/favicon.png"/>
       <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css"/>
-      <link rel="stylesheet" type="text/css" href="/css/bootstrap-responsive.min.css"/>
       <link rel="stylesheet" type="text/css" href="/css/global.css"/>
       <link rel="stylesheet" type="text/css" href="/css/${ view.name }.css"/>
 
@@ -29,12 +28,14 @@ case class Base(body : Template, header : Option[Template] = None) extends Templ
     </head>
     <body>
 
-      $body
+      <div class="container-fluid">
+        $body
 
-      <div class="row-fluid">
-        <div class="span7 offset4" id="credits">
-          <p>Design, code and photos by <a href="mailto:jonas@ifany.org"
-            alt="jonas@ifany.org">Jonas Arnfred</a><p>
+        <div class="row">
+          <div class="span7 offset4" id="credits">
+            <p>Design, code and photos by <a href="mailto:jonas@ifany.org"
+              alt="jonas@ifany.org">Jonas Arnfred</a><p>
+          </div>
         </div>
       </div>
       <!-- Piwik -->

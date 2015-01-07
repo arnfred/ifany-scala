@@ -19,6 +19,7 @@ br.clear {
 /* Header behavior */
 h1#header {
 	font-size: 7em;
+	font-weight:bold;
 	line-height: 1.5em;
 	margin-left: -0.06em;
 }
@@ -77,7 +78,7 @@ div.span2.album-nav {
 }
 div.navigation {
 	margin-top:1em;
-	display:table;
+	display:block;
 }
 
 div.album-nav a {
@@ -96,7 +97,8 @@ div.album-nav a:hover {
 }
 span.laquo {
 	font-size: 3em;
-	margin-top:-0.05em;
+	margin-top:-0.55em;
+	height:1em;
 }
 div.home {
 	text-align:center;

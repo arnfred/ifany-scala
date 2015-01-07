@@ -89,11 +89,12 @@ define(["jquery", "radio", "util/size", "util/cache"],
 	var resizeOverlay = function() {
 		window.scrollTo(0, 1);
 		var captionHeight = $("#caption").height()
-		var ratio = $("div#overlay-img img").width() / $("div#overlay-img").height();
+		var ratio = $("div#overlay-img img").width() / $("div#overlay-img img").height();
 		var height = size.getHeight() - captionHeight - 4;
+        var max_height = (size.getWidth()*0.70)/ratio;
+        console.debug("ratio: " + ratio + ", height: " + height + ", max_height: " + max_height);
+        if (height > max_height) height = max_height;
 		$("div#overlay-img div").css("height", height + "px");
-		var w = $("#overlay-img img").width();
-		var p = ($("#overlay-img div").width() - w) / 2.0;
 	}
 
 
