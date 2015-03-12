@@ -50,10 +50,15 @@ div.overlay-nav {
 
 div#overlay-img img {
 	display:inline-block;
-	max-height: 100%;
 	max-width: 100%;
 	border:thin solid #666;
+	width:auto;
+	padding:0;
 }
+div#overlay-img {
+	padding:0;
+}
+
 div.overlay-nav {
 	height:100%;
 }
