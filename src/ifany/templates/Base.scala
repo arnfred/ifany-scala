@@ -32,7 +32,7 @@ case class Base(body : Template, header : Option[Template] = None) extends Templ
         $body
 
         <div class="row">
-          <div class="span7 offset4" id="credits">
+          <div class="col-sm-7 col-sm-offset-4" id="credits">
             <p>Design, code and photos by <a href="mailto:jonas@ifany.org"
               alt="jonas@ifany.org">Jonas Arnfred</a><p>
           </div>

@@ -27,26 +27,26 @@ case class GalleryTemplate(view : GalleryView) extends Template {
     val next = for (n <- nav.next) yield getLink(n.title, "/" + n.url + "/", "&raquo;")
     val t = Template(fast"""
 
-      <div class="row-fluid visible-phone navigation">
-          <div class="album-nav prev span4 offset1">
+      <div class="row visible-xs-block navigation">
+          <div class="album-nav prev col-xs-5 col-sm-offset-1">
             ${ prevPhone.getOrElse("")  }
           </div>
-          <div class="home album-nav span2">
-            <a href="/"><span class="nav home">Home</span></a>
+          <div class="home album-nav col-xs-2 col-sm-2">
+            ${ getHomeLink("Home", "") }
           </div>
-          <div class="album-nav next span4">
+          <div class="album-nav next col-xs-5">
             ${ nextPhone.getOrElse("") }
           </div>
       </div>
 
-      <div class="row-fluid hidden-phone navigation">
-          <div class="album-nav prev span4 offset1">
+      <div class="row hidden-xs navigation">
+          <div class="album-nav prev col-xs-4 col-sm-offset-1">
             ${ prev.getOrElse("")  }
           </div>
-          <div class="home album-nav span2">
-            <a href="/"><span class="nav home">Home</span></a>
+          <div class="home album-nav col-sm-2">
+            ${ getHomeLink("Home", "") }
           </div>
-          <div class="album-nav next span4">
+          <div class="album-nav next col-xs-4">
             ${ next.getOrElse("") }
           </div>
       </div>
@@ -70,8 +70,8 @@ case class GalleryTemplate(view : GalleryView) extends Template {
     val albumNum : Int = view.gallery.albums.size
     val imagesNum : Int = view.getSize
     fast"""
-    <div class="row-fluid top topmost">
-        <div class="span3 offset1" id="about">
+    <div class="row top topmost">
+        <div class="col-sm-3 col-sm-offset-1" id="about">
           <h1 id="gallery-name"><span>${ view.getTitle }</span></h1>
 
             <p class="cat-date">${ view.getDateString }.</p>
@@ -83,7 +83,7 @@ case class GalleryTemplate(view : GalleryView) extends Template {
             <p id="gallery-desc">${ view.getDescription }</p>
 
         </div>
-        <div class="span7" id="image">
+        <div class="col-sm-7" id="image">
             <img style="background-image:url('${ view.cover.image.url("l", view.cover.album.url) }')" id="gallery-cover"/>
             <p>From the album "<a href="${ view.cover.album.url }/" >${ view.cover.album.title }</a>"</p>
         </div>
@@ -95,9 +95,9 @@ case class GalleryTemplate(view : GalleryView) extends Template {
 
   def gallery : Template = Template {
     (for (album <- view.gallery.albums) yield fast"""
-      <div class="row-fluid album">
+      <div class="row album">
         <a href="/${ view.gallery.url }/${ album.url }/">
-          <div class="span3 offset1 album-info">
+          <div class="col-sm-3 col-sm-offset-1 album-info hidden-xs">
             <h3 class="album-title">${ album.title }</h3>
             <p class="album-date">${ view.getAlbumDateString(album) }</p>
             <p class="album-meta">
@@ -105,13 +105,20 @@ case class GalleryTemplate(view : GalleryView) extends Template {
               ${ if (view.getAlbumSize(album) == 1) "Image" else "Images" } 
             </p>
           </div>
+          <div class="col-sm-3 col-sm-offset-1 visible-xs">
+            <h3 class="album-title">${ album.title }</h3>
+            <p class="album-date album-date-small">${ view.getAlbumDateString(album) }.
+            <span class="album-meta"><span class="num">${ view.getAlbumSize(album) }</span> 
+              ${ if (view.getAlbumSize(album) == 1) "Image" else "Images" } 
+            </span></p>
+          </div>
 
-          <div class="span7 album-images">
-            <div class="row-fluid">
+          <div class="col-sm-7 album-images">
+            <div class="row">
               ${ albumThumbnails(album) }
             </div>
           </div>
-          <div class="span1 album-arrow hidden-phone">
+          <div class="col-sm-1 album-arrow hidden-xs">
             <p>&raquo;</p>
           </div>
         </a>
@@ -120,10 +127,16 @@ case class GalleryTemplate(view : GalleryView) extends Template {
   }
 
   def albumThumbnails(album : Album) : Template = Template {
-    (for (image <- view.getAlbumImages(album, 4)) yield fast"""
-      <div class="span3 img">
+    val images = view.getAlbumImages(album, 4)
+    val first = (for (image <- images.take(3)) yield fast"""
+      <div class="col-xs-4 col-sm-3 img">
         <img src="${ image.url("t", album.url) }" class="frame"/>
       </div>
     """).mkString
+    val last = fast"""
+      <div class="col-sm-3 hidden-xs img">
+        <img src="${ images.last.url("t", album.url) }" class="frame" href="/img/loader.gif"/>
+      </div>"""
+    first + last
   }
 }
