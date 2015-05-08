@@ -64,7 +64,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
   }
 
   def galleryAlbums(g : Gallery) : Template = Template {
-    (for (album <- g.albums) yield fast"""
+    (for (album <- g.albums.reverse) yield fast"""
       <div class="row album album-hidden">
         <a href="/${ g.url }/${ album.url }/">
           <div class="col-sm-3 col-sm-offset-1 album-info hidden-xs">
