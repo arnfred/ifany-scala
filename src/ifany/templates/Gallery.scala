@@ -56,7 +56,7 @@ case class GalleryTemplate(view : GalleryView) extends Template {
   }
 
   def getHomeLink(text : String, url : String) : Template = Template(fast"""
-    <a href="/$url/"><span class="nav home">$text</span></a>
+    <a href="/"><span class="nav home">$text</span></a>
   """)
 
   def getLink(text : String, url : String, sign : String) : Template = Template(fast"""
