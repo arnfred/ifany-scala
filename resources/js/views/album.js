@@ -97,6 +97,7 @@ define(["jquery", "radio", "util/size", "util/cache"],
 			var max_height = Math.min(this.width/ratio, div_width/ratio);
 			if (height > max_height) height = max_height;
 			$("#overlay-img img").css("height", height + "px");
+			$("#overlay-img img").css("max-width","100%");
 		});
 	};
 
