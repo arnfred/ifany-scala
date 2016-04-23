@@ -7,7 +7,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
   implicit val v = view
 
   override def toString : String = Base(
-    Template(navigation(view.getNav) + overlay + album),
+    Template(navigation(view.getNav) + overlay + album + navigation(view.getNav)),
     Some(Template(javascript + nextprev))
   )
 
@@ -93,15 +93,13 @@ case class AlbumTemplate(view : AlbumView) extends Template {
     <div class="row album top">
         <div class="col-sm-4 col-sm-offset-4 album-info">
           <h2 class="album-title">${ view.getTitle }</h2>
-        </div>
-        <div class="col-sm-4 col-sm-offset-4">
           <p class="album-galleries">${ view.getGalleries }</p>
           <p class="album-desc">${ view.getDescription }</p>
           <p class="album-date">${ view.getDateString }</p>
           <br class="clear" />
         </div>
 
-        <div class="col-xs-12 col-sm-10 album-images col-sm-offset-1">
+        <div class="album-images">
             ${ thumbnails }
         </div>
     </div>
@@ -112,30 +110,24 @@ case class AlbumTemplate(view : AlbumView) extends Template {
       case CoverRow(image) => coverRow(image)
       case t: TwoImageRow => twoImageRow(t)
     }
-    Template(rows.mkString("\n"))
+    val startDiv = "<div class=\"col-xs-12 col-sm-10 col-sm-offset-1 album-row img\">"
+    val endDiv = "</div>"
+    Template(rows.mkString(startDiv, s"$startDiv\n$endDiv", endDiv))
   }
 
   def coverRow(image: Image): Template = Template(fast"""
-      <div class="row album-row cover-row">
-        <div class="col-xs-12 img">
-          <span class="img-container" style="width:100%">
-            <img src="${ image.url("l", view.getURL) }" id="${ image.file }"/>
-          </span>
-        </div>
-      </div>
+      <span class="img-container" style="width:100%">
+        <img src="${ image.url("l", view.getURL) }" id="${ image.file }"/>
+      </span>
     """)
 
   def twoImageRow(row: TwoImageRow): Template = Template(fast"""
-      <div class="row album-row dual-row">
-        <div class="col-xs-12 img">
-          <span class="img-container" style="width:${row.leftRatio*100}%">
-            <img src="${ row.left.url("l", view.getURL) }"  id="${ row.left.file }"/>
-          </span>
-          <span class="img-container" style="width:${row.rightRatio*100}%">
-            <img src="${ row.right.url("l", view.getURL) }" id="${ row.right.file }"/>
-          </span>
-        </div>
-      </div>
+      <span class="img-container" style="width:${row.leftRatio*100}%">
+        <img src="${ row.left.url("l", view.getURL) }"  id="${ row.left.file }"/>
+      </span>
+      <span class="img-container" style="width:${row.rightRatio*100}%">
+        <img src="${ row.right.url("l", view.getURL) }" id="${ row.right.file }"/>
+      </span>
     """)
 
 }

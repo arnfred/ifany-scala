@@ -1,10 +1,10 @@
 /* Album info */
-div.album-images {
-  margin-top:2em;
+div.album-info {
+  margin-bottom:2em;
 }
 h2.album-title {
-	line-height: 1.2em;
-	margin-bottom: 0.2em;
+  line-height: 1.2em;
+  margin-bottom: 0.2em;
 }
 p.album-galleries {
   font-style:italic;
@@ -24,13 +24,10 @@ p.album-desc {
 
 /* Thumbnails */
 div.album-row {
-	margin-bottom:3px;
+  margin-bottom:3px;
 }
 div.img img {
-	width:100%;
-}
-div.img img:hover {
-	background-color:#aaa;
+  width:100%;
 }
 span.img-container {
   display: inline-block;
