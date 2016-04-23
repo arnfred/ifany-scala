@@ -87,7 +87,7 @@ define(["jquery", "radio", "util/size", "util/cache"],
 
 
 	var resizeOverlay = function() {
-		window.scrollTo(0, 1);
+		//window.scrollTo(0, 1);
 		var captionHeight = $("#caption").height();
 		var img = $("#overlay-img img");
 		$("<img/>").attr("src", img.attr("src")).load(function() {

@@ -45,7 +45,7 @@ define(["radio",
 	// Subscribe to the event that we click a thumbnail
 	album.events = function() {
 
-		$("img.frame").each(function (index, im) {
+		$("span.img-container").each(function (index, im) {
 			$(im).click(function () { createOverlay($(im).attr("id")) });
 		})
 

@@ -8,7 +8,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
 
   override def toString : String = Base(
     Template(navigation(view.getNav) + overlay + album + navigation(view.getNav)),
-    Some(Template(javascript + nextprev))
+    Some(Template(responsiveStyles(view) + javascript + nextprev))
   )
 
   def nextprev : Template = {
@@ -107,27 +107,79 @@ case class AlbumTemplate(view : AlbumView) extends Template {
 
   def thumbnails : Template = {
     val rows = for (row <- view.getRows(view.album.images)) yield row match {
-      case CoverRow(image) => coverRow(image)
+      case c@ CoverRow(image) => coverRow(c)
       case t: TwoImageRow => twoImageRow(t)
     }
     val startDiv = "<div class=\"col-xs-12 col-sm-10 col-sm-offset-1 album-row img\">"
     val endDiv = "</div>"
-    Template(rows.mkString(startDiv, s"$startDiv\n$endDiv", endDiv))
+    Template(rows.mkString(startDiv, s"$endDiv\n$startDiv", endDiv))
   }
 
-  def coverRow(image: Image): Template = Template(fast"""
-      <span class="img-container" style="width:100%">
-        <img src="${ image.url("l", view.getURL) }" id="${ image.file }"/>
+
+  def coverRow(row: CoverRow): Template = Template(fast"""
+    <div class="img-box" style="width:100%">
+      <span class="img-container" role="img" id="${ row.image.file }">
+        <span class="inner" style="padding-top: ${ row.image.ratio*100 }%;">
+        </span>
       </span>
+    </div>
     """)
 
   def twoImageRow(row: TwoImageRow): Template = Template(fast"""
-      <span class="img-container" style="width:${row.leftRatio*100}%">
-        <img src="${ row.left.url("l", view.getURL) }"  id="${ row.left.file }"/>
+    <div class="img-box" style="width:${row.leftRatio*100}%">
+      <span class="img-container" role="img" id="${ row.left.file }">
+        <span class="inner" style="padding-top: ${ row.left.ratio*100 }%;">
+        </span>
       </span>
-      <span class="img-container" style="width:${row.rightRatio*100}%">
-        <img src="${ row.right.url("l", view.getURL) }" id="${ row.right.file }"/>
+    </div>
+    <div class="img-box" style="width:${row.rightRatio*100}%">
+      <span class="img-container" role="img" id="${ row.right.file }">
+        <span class="inner" style="padding-top: ${ row.right.ratio*100 }%;">
+        </span>
       </span>
+    </div>
     """)
 
+  def responsiveStyles(view: AlbumView): String = {
+    val normalSizes: Map[String, String] = Map(
+      "400" -> "400",
+      "600" -> "400",
+      "800" -> "400",
+      "1200" -> "600",
+      "1600" -> "800",
+      "3200" -> "1600",
+      "4000" -> "2000")
+    val coverSizes: Map[String, String] = Map(
+      "400" -> "400",
+      "600" -> "600",
+      "800" -> "800",
+      "1200" -> "1280",
+      "1600" -> "1600",
+      "3200" -> "2000",
+      "4000" -> "2000")
+
+    def style(min: Option[String], max: Option[String]): String = {
+      val size = max.getOrElse(min.get)
+      val maxWidth = max.map(m => s"and (max-width: ${m}px)").getOrElse("")
+      val minWidth = min.map(m => s"and (min-width: ${m}px)").getOrElse("")
+      val covers: Set[String] = view.album.images.filter(_.cover).map(_.file).toSet ++ Set(view.album.images.last.file)
+      val css = for (image <- view.album.images) yield covers.contains(image.file) match {
+        case true => s"#${image.file} { background-image: url(${ image.url(coverSizes(size), view.getURL) }); }"
+        case false => s"#${image.file} { background-image: url(${ image.url(normalSizes(size), view.getURL) }); }"
+      }
+      css.mkString(s"\n\t\t@media only screen $minWidth $maxWidth {\n\t\t\t", "\n\t\t\t", "\n\t\t}")
+    }
+
+    val styles = List(
+      style(None, Some("400")),
+      style(Some("400"), Some("600")),
+      style(Some("600"), Some("800")),
+      style(Some("800"), Some("1200")),
+      style(Some("1200"), Some("1600")),
+      style(Some("1600"), Some("3200")),
+      style(Some("3200"), Some("4000")),
+      style(Some("4000"), None))
+
+    styles.mkString("<style>", "\n", "</style>")
+  }
 }

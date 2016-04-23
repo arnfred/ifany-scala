@@ -3,12 +3,12 @@ div.album-info {
   margin-bottom:2em;
 }
 h2.album-title {
-  line-height: 1.2em;
-  margin-bottom: 0.2em;
+  line-height: 1.1em;
+  margin-bottom: 0.1em;
 }
 p.album-galleries {
   font-style:italic;
-  margin-bottom:0.3em;
+  margin-bottom:0.2em;
 }
 p.album-date {
   font-style:italic;
@@ -22,17 +22,32 @@ p.album-desc {
 }
 
 
-/* Thumbnails */
+/* Images */
 div.album-row {
   margin-bottom:3px;
 }
 div.img img {
   width:100%;
 }
-span.img-container {
+div.img-box {
   display: inline-block;
   float:left;
-  padding-right:3.5px;
+  padding-right:3px;
+}
+span.img-container {
+  width:100%;
+  display: inline-block;
+  vertical-align: middle;
+  font: 0/0 serif;
+  text-shadow: none;
+  color: transparent;
+  background-size: 100%;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+}
+span.img-container .inner {
+    display: block;
+    height: 0;
 }
 
 
