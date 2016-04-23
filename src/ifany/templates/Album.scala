@@ -115,7 +115,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
   def coverRow(image: Image, tag: String = ""): Template = Template(fast"""
     <div class="col-xs-12 col-sm-10 $tag col-sm-offset-1 album-row img">
       <div class="img-box" style="width:100%">
-        <span class="img-container" role="img" id="${ image.file }">
+        <span class="img-container" role="img" id="${ image.id }">
           <span class="inner" style="padding-top: ${ image.ratio*100 }%;">
           </span>
         </span>
@@ -167,8 +167,8 @@ case class AlbumTemplate(view : AlbumView) extends Template {
       val minWidth = min.map(m => s"and (min-width: ${m}px)").getOrElse("")
       val covers: Set[String] = view.album.images.filter(_.cover).map(_.file).toSet ++ Set(view.album.images.last.file)
       val css = for (image <- view.album.images) yield covers.contains(image.file) match {
-        case true => s"#${image.file} { background-image: url(${ image.url(coverSizes(size), view.getURL) }); }"
-        case false => s"#${image.file} { background-image: url(${ image.url(normalSizes(size), view.getURL) }); }"
+        case true => s"#${image.id} { background-image: url(${ image.url(coverSizes(size), view.getURL) }); }"
+        case false => s"#${image.id} { background-image: url(${ image.url(normalSizes(size), view.getURL) }); }"
       }
       css.mkString(s"\n\t\t@media only screen $minWidth $maxWidth {\n\t\t\t", "\n\t\t\t", "\n\t\t}")
     }

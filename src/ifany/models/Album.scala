@@ -17,6 +17,7 @@ case class Image(file : String,
                  cover : Boolean,
                  size : List[Int]) {
 
+  def id: String = file.replace(".","-")
 
   def orientation: Orientation = if (size(0) < size(1)) Portrait else Landscape
 
