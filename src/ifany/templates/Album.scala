@@ -129,13 +129,13 @@ case class AlbumTemplate(view : AlbumView) extends Template {
 
     <div class="col-xs-12 hidden-xs col-sm-10 col-sm-offset-1 album-row img">
       <div class="img-box" style="width:${row.leftRatio*100}%">
-        <span class="img-container" role="img" id="${ row.left.file }">
+        <span class="img-container" role="img" id="${ row.left.id }">
           <span class="inner" style="padding-top: ${ row.left.ratio*100 }%;">
           </span>
         </span>
       </div>
       <div class="img-box" style="width:${row.rightRatio*100}%">
-        <span class="img-container" role="img" id="${ row.right.file }">
+        <span class="img-container" role="img" id="${ row.right.id }">
           <span class="inner" style="padding-top: ${ row.right.ratio*100 }%;">
           </span>
         </span>
