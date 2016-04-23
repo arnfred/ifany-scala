@@ -99,44 +99,47 @@ case class AlbumTemplate(view : AlbumView) extends Template {
           <br class="clear" />
         </div>
 
-        <div class="album-images">
-            ${ thumbnails }
-        </div>
+        ${ thumbnails }
     </div>
   """)
 
   def thumbnails : Template = {
     val rows = for (row <- view.getRows(view.album.images)) yield row match {
-      case c@ CoverRow(image) => coverRow(c)
+      case CoverRow(image) => coverRow(image)
       case t: TwoImageRow => twoImageRow(t)
     }
-    val startDiv = "<div class=\"col-xs-12 col-sm-10 col-sm-offset-1 album-row img\">"
-    val endDiv = "</div>"
-    Template(rows.mkString(startDiv, s"$endDiv\n$startDiv", endDiv))
+    Template(rows.mkString("\n"))
   }
 
 
-  def coverRow(row: CoverRow): Template = Template(fast"""
-    <div class="img-box" style="width:100%">
-      <span class="img-container" role="img" id="${ row.image.file }">
-        <span class="inner" style="padding-top: ${ row.image.ratio*100 }%;">
+  def coverRow(image: Image, tag: String = ""): Template = Template(fast"""
+    <div class="col-xs-12 col-sm-10 $tag col-sm-offset-1 album-row img">
+      <div class="img-box" style="width:100%">
+        <span class="img-container" role="img" id="${ image.file }">
+          <span class="inner" style="padding-top: ${ image.ratio*100 }%;">
+          </span>
         </span>
-      </span>
+      </div>
     </div>
     """)
 
   def twoImageRow(row: TwoImageRow): Template = Template(fast"""
-    <div class="img-box" style="width:${row.leftRatio*100}%">
-      <span class="img-container" role="img" id="${ row.left.file }">
-        <span class="inner" style="padding-top: ${ row.left.ratio*100 }%;">
+    ${coverRow(row.left, "visible-xs-block")}
+    ${coverRow(row.right, "visible-xs-block")}
+
+    <div class="col-xs-12 hidden-xs col-sm-10 col-sm-offset-1 album-row img">
+      <div class="img-box" style="width:${row.leftRatio*100}%">
+        <span class="img-container" role="img" id="${ row.left.file }">
+          <span class="inner" style="padding-top: ${ row.left.ratio*100 }%;">
+          </span>
         </span>
-      </span>
-    </div>
-    <div class="img-box" style="width:${row.rightRatio*100}%">
-      <span class="img-container" role="img" id="${ row.right.file }">
-        <span class="inner" style="padding-top: ${ row.right.ratio*100 }%;">
+      </div>
+      <div class="img-box" style="width:${row.rightRatio*100}%">
+        <span class="img-container" role="img" id="${ row.right.file }">
+          <span class="inner" style="padding-top: ${ row.right.ratio*100 }%;">
+          </span>
         </span>
-      </span>
+      </div>
     </div>
     """)
 

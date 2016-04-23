@@ -7,16 +7,10 @@ abstract class TwoImageRow extends Row {
   val (leftRatio: Double, rightRatio: Double) = {
     val (w1, h1) = (left.size(0), left.size(1))
     val (w2, h2) = (right.size(0), right.size(1))
-    println(s"im1: ($w1, $h1), im2: ($w2, $h2)")
     val s2 = (h1*w1 + h1*w2) / (h1*w2 + h2*w1).toDouble
     val s1 = s2*h2/h1.toDouble
-    //val s2 = (w1+w2) / w2.toDouble * h1 / (h1 + h2).toDouble
-    //val s1 = s2*w2*h2 / (w1 * h1).toDouble
     val r1 = s1*w1 / (w1+w2).toDouble
     val r2 = s2*w2 / (w1+w2).toDouble
-    println(s"s1: $s1, s2: $s2")
-    println(s"r1: $r1, r2: $r2")
-    println(s"h1: ${s1*h1}, h2: ${s2*h2}")
     (r1, r2)
   }
 }

@@ -26,6 +26,9 @@ p.album-desc {
 div.album-row {
   margin-bottom:3px;
 }
+div.cover-row {
+  padding-right:0px;
+}
 div.img img {
   width:100%;
 }

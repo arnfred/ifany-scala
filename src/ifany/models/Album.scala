@@ -20,11 +20,7 @@ case class Image(file : String,
 
   def orientation: Orientation = if (size(0) < size(1)) Portrait else Landscape
 
-  def ratio: Double = {
-    val r = size(1) / size(0).toDouble
-    println(s"size: (${size(0)}, ${size(1)}). Ratio: $r")
-    r
-  }
+  def ratio: Double = size(1) / size(0).toDouble
 
   def url(size : String, albumURL : String) : String = {
     val sizes : Map[String, String] = (Map.empty +
