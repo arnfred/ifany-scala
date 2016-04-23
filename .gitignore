@@ -1,0 +1,7 @@
+target
+project/boot
+project/target
+project/plugins/target
+**/*~
+**/*.swp
+resources/photos

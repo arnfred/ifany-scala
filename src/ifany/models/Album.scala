@@ -6,12 +6,19 @@ import java.io.FileNotFoundException
 import net.liftweb.json._
 import java.io.File
 
+sealed trait Orientation
+case object Landscape extends Orientation
+case object Portrait extends Orientation
+
 case class Image(file : String,
                  description : String,
                  datetime : Option[String],
                  banner : Boolean,
                  cover : Boolean,
                  size : List[Int]) {
+
+
+  def orientation: Orientation = if (size(0) < size(1)) Portrait else Landscape
 
   def url(size : String, albumURL : String) : String = {
     val sizes : Map[String, String] = (Map.empty +

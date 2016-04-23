@@ -1,13 +1,13 @@
 package ifany
 
+import com.dongxiguo.fastring.Fastring.Implicits._
+
 case class AlbumTemplate(view : AlbumView) extends Template {
 
-  // Implicit conversion 
-  import com.dongxiguo.fastring.Fastring.Implicits._
   implicit val v = view
 
   override def toString : String = Base(
-    Template(navigation(view.getNav) + overlay + album), 
+    Template(navigation(view.getNav) + overlay + album),
     Some(Template(javascript + nextprev))
   )
 
@@ -91,32 +91,51 @@ case class AlbumTemplate(view : AlbumView) extends Template {
 
   def album : Template = Template(fast"""
     <div class="row album top">
-        <div class="col-sm-3 col-sm-offset-1 album-info">
-            <h2 class="album-title">${ view.getTitle }</h2>
-            <p class="album-date">${ view.getDateString }</p>
-            <p class="album-desc">${ view.getDescription }</p>
-            <br class="clear" />
+        <div class="col-sm-4 col-sm-offset-4 album-info">
+          <h2 class="album-title">${ view.getTitle }</h2>
+        </div>
+        <div class="col-sm-4 col-sm-offset-4">
+          <p class="album-galleries">${ view.getGalleries }</p>
+          <p class="album-desc">${ view.getDescription }</p>
+          <p class="album-date">${ view.getDateString }</p>
+          <br class="clear" />
         </div>
 
-	    <div class="col-sm-7 album-images">
+        <div class="col-xs-12 col-sm-10 album-images col-sm-offset-1">
             ${ thumbnails }
         </div>
     </div>
   """)
 
-  def thumbnails : Template = Template({
-    for (row <- view.getThumbnailRows) yield fast"""
-      <div class="row album-row">
-        ${ thumbnailRow(row) }
-      </div>
-    """}.mkString
-  )
+  def thumbnails : Template = {
+    val rows = for (row <- view.getRows(view.album.images)) yield row match {
+      case CoverRow(image) => coverRow(image)
+      case t: TwoImageRow => twoImageRow(t)
+    }
+    Template(rows.mkString("\n"))
+  }
 
-  def thumbnailRow(row : List[Image]) : Template = Template({
-    for (thumb <- row) yield fast"""
-      <div class="col-xs-3 img">
-          <img src="${ thumb.url("t", view.getURL) }" id="${ thumb.file }" class="frame"/>
+  def coverRow(image: Image): Template = Template(fast"""
+      <div class="row album-row cover-row">
+        <div class="col-xs-12 img">
+          <span class="img-container" style="width:100%">
+            <img src="${ image.url("l", view.getURL) }" id="${ image.file }"/>
+          </span>
+        </div>
       </div>
-    """}.mkString
-  )
+    """)
+
+  def twoImageRow(row: TwoImageRow): Template = Template(fast"""
+      <div class="row album-row dual-row">
+        <div class="col-xs-12 img">
+          <span class="img-container" style="width:${row.leftRatio*100}%">
+            <img src="${ row.left.url("l", view.getURL) }"  id="${ row.left.file }"/>
+          </span>
+          <span class="img-container" style="width:${row.rightRatio*100}%">
+            <img src="${ row.right.url("l", view.getURL) }" id="${ row.right.file }"/>
+          </span>
+        </div>
+      </div>
+    """)
+
 }
