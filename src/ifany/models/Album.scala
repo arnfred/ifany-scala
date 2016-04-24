@@ -6,10 +6,6 @@ import java.io.FileNotFoundException
 import net.liftweb.json._
 import java.io.File
 
-sealed trait Orientation
-case object Landscape extends Orientation
-case object Portrait extends Orientation
-
 case class Image(file : String,
                  description : String,
                  datetime : Option[String],
@@ -18,8 +14,6 @@ case class Image(file : String,
                  size : List[Int]) {
 
   def id: String = file.replace(".","-")
-
-  def orientation: Orientation = if (size(0) < size(1)) Portrait else Landscape
 
   def ratio: Double = size(1) / size(0).toDouble
 

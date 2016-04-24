@@ -106,7 +106,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
   def thumbnails : Template = {
     val rows = for (row <- view.getRows(view.album.images)) yield row match {
       case CoverRow(image) => coverRow(image)
-      case t: TwoImageRow => twoImageRow(t)
+      case t: DualRow => twoImageRow(t)
     }
     Template(rows.mkString("\n"))
   }
@@ -123,7 +123,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
     </div>
     """)
 
-  def twoImageRow(row: TwoImageRow): Template = Template(fast"""
+  def twoImageRow(row: DualRow): Template = Template(fast"""
     ${coverRow(row.left, "visible-xs-block")}
     ${coverRow(row.right, "visible-xs-block")}
 
