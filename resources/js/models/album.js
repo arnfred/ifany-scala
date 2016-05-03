@@ -46,7 +46,7 @@ define(["radio",
 	album.events = function() {
 
 		$("span.img-container").each(function (index, im) {
-			$(im).click(function () { createOverlay($(im).attr("id")) });
+			$(im).click(function () { createOverlay($(im).attr("id").substring(2)) });
 		})
 
 		// Broadcast resize event
@@ -217,37 +217,37 @@ define(["radio",
 		album.overlayActive = false;
 
 		// Update url
-		updateHistory(null)
+		updateHistory(null);
 
 		// Broadcast close event
 		radio("overlay:close").broadcast();
-	}
+	};
 
 
 
 
 	var getNextImg = function(name) {
-		var index = album.names.indexOf(name)
-		var last_index = album.names.length - 1
-		return (index == -1 || index == last_index) ? undefined : album.names[index+1]
-	}
+		var index = album.names.indexOf(name);
+		var last_index = album.names.length - 1;
+		return (index === -1 || index === last_index) ? undefined : album.names[index+1];
+	};
 
 	var getPrevImg = function(name) {
-		var index = album.names.indexOf(name)
-		return (index == -1 || index == 0) ? undefined : album.names[index-1]
-	}
+		var index = album.names.indexOf(name);
+		return (index === -1 || index === 0) ? undefined : album.names[index-1];
+	};
 
 	var cacheImages = function() {
 		if (album.overlayActive) {
-			var next = getNextImg(album.current_name)
-			var nextnext = getNextImg(next)
-			var prev = getPrevImg(album.current_name)
-			cache.save(album.images[album.current_name], album.url)
-			if (next != undefined) cache.save(album.images[next], album.url)
-			if (nextnext != undefined) cache.save(album.images[nextnext], album.url)
-			if (prev != undefined) cache.save(album.images[prev], album.url)
+			var next = getNextImg(album.current_name);
+			var nextnext = getNextImg(next);
+			var prev = getPrevImg(album.current_name);
+			cache.save(album.images[album.current_name], album.url);
+			if (next !== undefined) cache.save(album.images[next], album.url);
+			if (nextnext !== undefined) cache.save(album.images[nextnext], album.url);
+			if (prev !== undefined) cache.save(album.images[prev], album.url);
 		}
-	}
+	};
 
 
 	//////////////////////////////////////////////
@@ -256,5 +256,5 @@ define(["radio",
 	//											//
 	//////////////////////////////////////////////
 	album.init();
-	return album
+	return album;
 });

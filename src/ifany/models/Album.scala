@@ -13,7 +13,7 @@ case class Image(file : String,
                  cover : Boolean,
                  size : List[Int]) {
 
-  def id: String = file.replace(".","-").replace("_","-").replace("#","-")
+  def id: String = "id" ++ file.replace(".","-").replace("#","-")
 
   def ratio: Double = size(1) / size(0).toDouble
 
