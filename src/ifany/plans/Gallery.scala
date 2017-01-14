@@ -9,6 +9,7 @@ import ExecutionContext.Implicits.global
 import java.io.BufferedInputStream
 import java.io.FileInputStream
 import scala.Stream
+import scala.util.Random
 
 object GalleryPlan extends async.Plan with ServerErrorResponse {
 
@@ -98,6 +99,40 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         req.respond(Ok ~> ContentType("image/jpg") ~> 
                           ContentLength(data.length.toString) ~>
                           ResponseBytes(data))
+      } catch {
+        case InternalError(msg) => {
+          println("* INTERNAL ERROR * : " + msg)
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString(msg))
+        }
+        case AlbumNotFound(url) => {
+          println("* ALBUM NOT FOUND * : " + url)
+          req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
+        }
+        case error : Throwable => {
+          println("* UNKNOWN ERROR * : " + error.toString)
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
+        }
+      }
+    }
+
+	//////////////////////////////////////////////
+	//                                          //
+	//                  cover                   //
+	//                                          //
+	//////////////////////////////////////////////
+
+    case req @ Path(Seg("covers" :: Nil)) => {
+        
+      try {
+        val frontpage : Frontpage = Frontpage.get()
+        val images : List[Image] = Random.shuffle(frontpage.covers.map(_.makeImage)).toList
+        val title : String = "Cover Images"
+        val desc : String = "A meta-album of cover images from all the albums"
+        val album : Album = Album(title, desc, "", List(), None, images)
+        val nav : Navigation = Navigation(None, None, None)
+        val view = AlbumView(album, nav)
+        val output = AlbumTemplate(view).toString
+        req.respond(HtmlContent ~> ResponseString(output))
       } catch {
         case InternalError(msg) => {
           println("* INTERNAL ERROR * : " + msg)

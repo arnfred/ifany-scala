@@ -13,11 +13,12 @@ case class Image(file : String,
                  cover : Boolean,
                  size : List[Int]) {
 
-  def id: String = "id" ++ file.replace(".","-").replace("#","-")
+  def id: String = "id" ++ file.replace(".","-").replace("#","-").replace("/","-")
 
   def ratio: Double = size(1) / size(0).toDouble
 
   def url(size : String, albumURL : String) : String = {
+    val album : String = if (albumURL.length == 0) "" else albumURL + "/" 
     val sizes : Map[String, String] = (Map.empty +
       ("t" -> "150x150") + ("s" -> "400x300") + 
       ("m" -> "600x450") + ("l" -> "800x600") +
@@ -26,7 +27,7 @@ case class Image(file : String,
       ("1024" -> "1024x768") + ("1280" -> "1280x980") +
       ("1600" -> "1600x1200") + ("2000" -> "2000x1500"))
     try {
-      Ifany.photoDir + albumURL + "/" + file + "_" + sizes(size) + ".jpg"
+      Ifany.photoDir + album + file + "_" + sizes(size) + ".jpg"
     } catch {
         case _ : Exception => throw InternalError("Image with size '" + size + "' doesn't exist")
     }

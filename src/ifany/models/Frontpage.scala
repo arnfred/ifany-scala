@@ -12,7 +12,11 @@ import java.io.FileNotFoundException
 case class Frontpage(galleries : List[Gallery],
                      covers : List[Cover])
 
-case class Cover(image : Image, album : Album)
+case class Cover(image : Image, album : Album) {
+  def makeImage: Image = image.copy(
+    description = image.description + " (from " + album.title + ")",
+    file = album.url + "/" + image.file)
+}
 
 
 

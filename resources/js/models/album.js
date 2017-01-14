@@ -74,7 +74,7 @@ define(["radio",
 		//Hammer(overlay_img, hammer_options).on("dragright", function() { goPrev(); });
 
 		// Change in browser history
-		history.Adapter.bind(window, 'statechange', respondHistory)
+		//history.Adapter.bind(window, 'statechange', respondHistory)
 	}
 
 	//////////////////////////////////////////////
