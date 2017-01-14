@@ -117,7 +117,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 
 	//////////////////////////////////////////////
 	//                                          //
-	//                  cover                   //
+	//                  covers                  //
 	//                                          //
 	//////////////////////////////////////////////
 
@@ -149,6 +149,44 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
       }
     }
 
+
+	//////////////////////////////////////////////
+	//                                          //
+	//                  all                     //
+	//                                          //
+	//////////////////////////////////////////////
+
+    case req @ Path(Seg("all" :: Nil)) => {
+        
+      try {
+        val frontpage : Frontpage = Frontpage.get()
+        val images = for {
+          gallery <- frontpage.galleries
+          album <- gallery.albums
+          image <- album.images
+        } yield image.copy(file = album.url + "/" + image.file)
+        val title : String = "All Images"
+        val desc : String = "A meta-album of all images in random order"
+        val album : Album = Album(title, desc, "", List(), None, Random.shuffle(images).toList)
+        val nav : Navigation = Navigation(None, None, None)
+        val view = AlbumView(album, nav)
+        val output = AlbumTemplate(view).toString
+        req.respond(HtmlContent ~> ResponseString(output))
+      } catch {
+        case InternalError(msg) => {
+          println("* INTERNAL ERROR * : " + msg)
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString(msg))
+        }
+        case AlbumNotFound(url) => {
+          println("* ALBUM NOT FOUND * : " + url)
+          req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
+        }
+        case error : Throwable => {
+          println("* UNKNOWN ERROR * : " + error.toString)
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
+        }
+      }
+    }
 	//////////////////////////////////////////////
 	//                                          //
 	//                 Gallery                  //
