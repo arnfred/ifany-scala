@@ -14,9 +14,8 @@ case class DualRow(left: Image, right: Image) extends Row {
   }
 }
 
-case class AlbumView(album : Album, nav : Navigation) extends View {
+case class AlbumView(album : Album, nav : Navigation, name : String = "album", cssname: String = "album") extends View {
 
-  val name = "album"
   def getTitle : String = album.title
   def getDescription : String = album.description
   def getURL = album.url

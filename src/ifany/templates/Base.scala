@@ -18,9 +18,8 @@ case class Base(body : Template, header : Option[Template] = None) extends Templ
       <link rel="icon" type="image/png" href="/img/favicon.png"/>
       <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css"/>
       <link rel="stylesheet" type="text/css" href="/css/global.css"/>
-      <link rel="stylesheet" type="text/css" href="/css/${ view.name }.css"/>
 
-      ${ if (header != None) header.get else "" }
+      ${ header.getOrElse("") }
 
       <!-- css3-mediaqueries.js for IE less than 9 -->
       <!-- [if lt IE 9]>

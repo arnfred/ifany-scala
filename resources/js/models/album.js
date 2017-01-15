@@ -2,15 +2,13 @@ define(["radio",
 		"views/album",
 		"util/cache",
 		"lib/history",
-		"lib/underscore",
-		//"lib/hammer.min",
+		"lib/underscore"
 	],
 	function(radio,
 		albumView,
 		cache,
 		history,
 		_
-		//Hammer
 	) {
 
 	//////////////////////////////////////////////
@@ -46,12 +44,12 @@ define(["radio",
 	album.events = function() {
 
 		$("span.img-container").each(function (index, im) {
-			$(im).click(function () { createOverlay($(im).attr("id").substring(2)) });
-		})
+			$(im).click(function () { createOverlay($(im).attr("id").substring(2)); });
+		});
 
 		// Broadcast resize event
 		lazy_resize = _.debounce(function() { radio("window:resize").broadcast(); }, 300);
-		$(window).resize(lazy_resize)
+		$(window).resize(lazy_resize);
 
 		// Broadcast overlay key events
 		$(window).keydown(function(e){
@@ -61,21 +59,11 @@ define(["radio",
 		// Broadcast arrow click event
 		$("#overlay-prev").click(function() { goPrev(); });
 		$("#overlay-next").click(function() { goNext(); });
-		$("#overlay-img").click(function() { closeOverlay() });
+		$("#overlay-img").click(function() { closeOverlay(); });
 
 		// On resize, recache
 		radio("window:resize").subscribe(cacheImages);
-
-		// On swipe
-		var overlay_img = document.getElementById('overlay-img');
-		var credits = document.getElementById('credits');
-		var hammer_options = { transform: true };
-		//Hammer(overlay_img, hammer_options).on("dragleft", function() { goNext(); });
-		//Hammer(overlay_img, hammer_options).on("dragright", function() { goPrev(); });
-
-		// Change in browser history
-		//history.Adapter.bind(window, 'statechange', respondHistory)
-	}
+	};
 
 	//////////////////////////////////////////////
 	//											//
@@ -91,11 +79,11 @@ define(["radio",
 		// Get data
 		album.images = _.indexBy(data.images, "file");
 		album.names = _.pluck(data.images, "file");
-		album.url = data.url
+		album.url = data.url;
 		album.title = document.title;
 		album.events();
 		openOverlayIfNecessary();
-	}
+	};
 
 
 	//////////////////////////////////////////////
@@ -107,17 +95,17 @@ define(["radio",
 	var getURLParts = function() {
         var reversed = document.URL.split("/").reverse().join("/");
         var parts = _.map(reversed.split("/" + album.url + "/"),
-                          function(p) { return p.split("/").reverse().join("/"); })
-		return [parts[1] + "/" + album.url + "/", parts[0]]
-	}
+                          function(p) { return p.split("/").reverse().join("/"); });
+		return [parts[1] + "/" + album.url + "/", parts[0]];
+	};
 
 	var openOverlayIfNecessary = function() {
 		// Check if we have to open up an overlay directly
 		name = getURLParts()[1];
-		if (name != "" && album.images[name] != undefined) {
-			createOverlay(name)
+		if (name !== "" && album.images[name] !== undefined) {
+			createOverlay(name);
 		}
-	}
+	};
 
 	var createOverlay = function(name) {
 
@@ -129,7 +117,7 @@ define(["radio",
 		album.overlayActive = true;
 
 		// Exit if array doesn't contain an object
-		if (album.images[name] == undefined) { closeOverlay(); return }
+		if (album.images[name] === undefined) { closeOverlay(); return; }
 
 		// Get image and prev and next names
 		var img = album.images[name];
@@ -140,8 +128,8 @@ define(["radio",
 		cacheImages();
 
 		// Broadcast
-		radio("overlay:set").broadcast(img, (prev != undefined), (next != undefined));
-	}
+		radio("overlay:set").broadcast(img, (prev !== undefined), (next !== undefined));
+	};
 
 
 	var overlayKeypress = function(keyCode) {
@@ -154,25 +142,25 @@ define(["radio",
 
 		// Close overlay
 		else if (keyCode == 27) closeOverlay();
-	}
+	};
 
 
 	var goNext = function() {
-		if (album.overlayActive == false) return
+		if (album.overlayActive === false) return;
 		var next_name = getNextImg(album.current_name);
-		if (next_name != undefined) {
+		if (next_name !== undefined) {
 			createOverlay(next_name);
 		}
-	}
+	};
 
 
 	var goPrev = function() {
-		if (album.overlayActive == false) return
+		if (album.overlayActive === false) return;
 		var prev_name = getPrevImg(album.current_name);
-		if (prev_name != undefined) {
+		if (prev_name !== undefined) {
 			createOverlay(prev_name);
 		}
-	}
+	};
 
 
 	// Updates the url to reflect the overlay we are going to
@@ -180,17 +168,17 @@ define(["radio",
 
 		// Generate new url string
 		var parts = getURLParts();
-		var new_url = (name == null) ? parts[0] : parts[0] + name;
+		var new_url = (name === null) ? parts[0] : parts[0] + name;
 
 		// Check if we are already at expected state
 		if (parts[1] == name) return;
 
 		// Find image caption and create new title
-		var title = (name == null) ? album.title : album.title + " : " + album.images[name].description;
+		var title = (name === null) ? album.title : album.title + " : " + album.images[name].description;
 
 		// Change state to new url string
 		history.pushState({ 'state_index' : history.getCurrentIndex(), 'name' : name }, title, new_url);
-	}
+	};
 
 
 	// Update page when we change browser history
@@ -199,14 +187,14 @@ define(["radio",
 		var state_data = history.getState().data;
 		// If the state index has 1 added to it, then it's an internal state change
 		if (state_data.state_index != (History.getCurrentIndex() - 1)) {
-			if (state_data.name != null) {
+			if (state_data.name !== null) {
 				createOverlay(state_data.name);
 			}
 			else {
 				closeOverlay();
 			}
 		}
-	}
+	};
 
 
 	// Updates the url and sets overlayActive to false

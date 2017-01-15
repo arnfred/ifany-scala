@@ -6,7 +6,9 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
   import com.dongxiguo.fastring.Fastring.Implicits._
   implicit val v = view
 
-  override def toString : String = Base(Template(header + galleries))
+  val css: String = fast"""<link rel="stylesheet" type="text/css" href="/css/frontpage.css"/>"""
+
+  override def toString : String = Base(Template(header + galleries), Some(Template(css)))
 
   def header : Template = Template(fast"""
     <div class="row top topmost">

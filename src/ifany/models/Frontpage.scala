@@ -15,7 +15,9 @@ case class Frontpage(galleries : List[Gallery],
 case class Cover(image : Image, album : Album) {
   def makeImage: Image = image.copy(
     description = image.description + " (from " + album.title + ")",
-    file = album.url + "/" + image.file)
+    file = album.url + "/" + image.file,
+    banner = false,
+    cover = false)
 }
 
 

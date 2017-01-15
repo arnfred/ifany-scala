@@ -6,9 +6,11 @@ case class GalleryTemplate(view : GalleryView) extends Template {
   import com.dongxiguo.fastring.Fastring.Implicits._
   implicit val v = view
 
+  val css: String = fast"""<link rel="stylesheet" type="text/css" href="/css/gallery.css"/>"""
+
   override def toString : String = Base(
     Template(navigation(view.getNav) + header + gallery),
-    Some(nextprev)
+    Some(Template(css + nextprev))
   )
 
   def nextprev : Template = {

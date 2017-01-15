@@ -2,14 +2,14 @@ package ifany
 
 import com.dongxiguo.fastring.Fastring.Implicits._
 
-case class AlbumTemplate(view : AlbumView) extends Template {
+case class MetaAlbumTemplate(view : AlbumView) extends Template {
 
   implicit val v = view
 
   val css: String = fast"""<link rel="stylesheet" type="text/css" href="/css/album.css"/>"""
 
   override def toString : String = Base(
-    Template(navigation(view.getNav) + overlay + album + navigation(view.getNav)),
+    Template(navigation(view.getNav) + album + navigation(view.getNav)),
     Some(Template(css + responsiveStyles(view) + javascript + nextprev))
   )
 
@@ -70,27 +70,6 @@ case class AlbumTemplate(view : AlbumView) extends Template {
     </a>
   """)
 
-  def overlay : Template = Template(fast"""
-  <div class="overlay" id="overlay">
-      <div class="col-xs-1 overlay-prev overlay-nav">
-        <div id="overlay-prev">
-          <span class="laquo">&laquo;</span>
-        </div>
-      </div>
-      <div class="col-xs-10 overlay-img" id="overlay-img">
-          <div>
-            <img alt="Overlay image"/>
-            <span id="caption">Sample Caption</span>
-          </div>
-      </div>
-      <div class="col-xs-1 overlay-next overlay-nav">
-        <div id="overlay-next">
-          <span class="laquo">&raquo;</span>
-        </div>
-      </div>
-  </div>
-  """)
-
   def album : Template = Template(fast"""
     <div class="row album top">
         <div class="col-sm-4 col-sm-offset-4 album-info">
@@ -101,18 +80,38 @@ case class AlbumTemplate(view : AlbumView) extends Template {
           <br class="clear" />
         </div>
 
-        ${ thumbnails }
+        ${ images }
     </div>
   """)
 
-  def thumbnails : Template = {
+  def images : Template = {
     val rows = for (row <- view.getRows(view.album.images)) yield row match {
       case CoverRow(image) => coverRow(image)
       case t: DualRow => twoImageRow(t)
     }
-    Template(rows.mkString("\n"))
+    val pages = rows.grouped(100).toList.zipWithIndex.map { case (row, index) =>
+      fast"""<div id="page-${index + 1}" class="page">${ row.mkString("\n") }</div>""".toString
+    }
+    val nav: String = pageNav(pages)
+    Template(nav + pages.mkString("\n") + nav)
   }
 
+  def pageNav(pages: List[String]): String = {
+    if (pages.length == 1) return ""
+    val navElems = for (i <- 1 to pages.length) yield {
+      fast"""\n<span class="pageNavElem pageNav-$i" data-page="$i">
+        <a href="#$i">$i</a>
+      </span>"""
+    }
+    fast"""
+    <div class="col-sm-10 col-sm-offset-1 col-xs-12 nav-row">
+      <div class="pageNav">
+        <span class="pageNav-prev"><a href="javascript:;">prev</a></span>
+        ${ navElems.mkString("\n") }
+        <span class="pageNav-next"><a href="javascript:;">next</a></span>
+      </div>
+    </div>\n"""
+  }
 
   def coverRow(image: Image, tag: String = ""): Template = Template(fast"""
     <div class="col-xs-12 col-sm-10 $tag col-sm-offset-1 album-row img">

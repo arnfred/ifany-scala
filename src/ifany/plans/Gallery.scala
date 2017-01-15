@@ -53,7 +53,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 	//////////////////////////////////////////////
 
     case req @ Path(Seg("update" :: Nil)) => {
-        
+
       try {
         val frontpage : Frontpage = Frontpage.update()
         val nav : Map[String, Navigation] = Navigation.update
@@ -86,7 +86,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 	//////////////////////////////////////////////
 
     case req @ Path(Seg("cover" :: str :: size :: Nil)) => {
-        
+
       try {
         val frontpage : Frontpage = Frontpage.get()
         val covers : List[Cover] = frontpage.covers
@@ -122,7 +122,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 	//////////////////////////////////////////////
 
     case req @ Path(Seg("covers" :: Nil)) => {
-        
+
       try {
         val frontpage : Frontpage = Frontpage.get()
         val images : List[Image] = Random.shuffle(frontpage.covers.map(_.makeImage)).toList
@@ -130,8 +130,8 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         val desc : String = "A meta-album of cover images from all the albums"
         val album : Album = Album(title, desc, "", List(), None, images)
         val nav : Navigation = Navigation(None, None, None)
-        val view = AlbumView(album, nav)
-        val output = AlbumTemplate(view).toString
+        val view = AlbumView(album, nav, "metaAlbum")
+        val output = MetaAlbumTemplate(view).toString
         req.respond(HtmlContent ~> ResponseString(output))
       } catch {
         case InternalError(msg) => {
@@ -157,7 +157,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 	//////////////////////////////////////////////
 
     case req @ Path(Seg("all" :: Nil)) => {
-        
+
       try {
         val frontpage : Frontpage = Frontpage.get()
         val images = for {
@@ -166,11 +166,11 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
           image <- album.images
         } yield image.copy(file = album.url + "/" + image.file)
         val title : String = "All Images"
-        val desc : String = "A meta-album of all images in random order"
-        val album : Album = Album(title, desc, "", List(), None, Random.shuffle(images).toList)
+        val desc : String = "A meta-album of all images in some sort of order (not sure which)"
+        val album : Album = Album(title, desc, "", List(), None, images.sortBy(_.datetime).toList)
         val nav : Navigation = Navigation(None, None, None)
-        val view = AlbumView(album, nav)
-        val output = AlbumTemplate(view).toString
+        val view = AlbumView(album, nav, "metaAlbum")
+        val output = MetaAlbumTemplate(view).toString
         req.respond(HtmlContent ~> ResponseString(output))
       } catch {
         case InternalError(msg) => {
@@ -187,6 +187,45 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         }
       }
     }
+
+	//////////////////////////////////////////////
+	//                                          //
+	//                random                    //
+	//                                          //
+	//////////////////////////////////////////////
+
+    case req @ Path(Seg("random" :: Nil)) => {
+
+      try {
+        val frontpage : Frontpage = Frontpage.get()
+        val images = for {
+          gallery <- frontpage.galleries
+          album <- gallery.albums
+          image <- album.images
+        } yield image.copy(file = album.url + "/" + image.file)
+        val title : String = "All Images"
+        val desc : String = "A meta-album of all images in random order"
+        val album : Album = Album(title, desc, "", List(), None, Random.shuffle(images).toList)
+        val nav : Navigation = Navigation(None, None, None)
+        val view = AlbumView(album, nav, "metaAlbum")
+        val output = MetaAlbumTemplate(view).toString
+        req.respond(HtmlContent ~> ResponseString(output))
+      } catch {
+        case InternalError(msg) => {
+          println("* INTERNAL ERROR * : " + msg)
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString(msg))
+        }
+        case AlbumNotFound(url) => {
+          println("* ALBUM NOT FOUND * : " + url)
+          req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
+        }
+        case error : Throwable => {
+          println("* UNKNOWN ERROR * : " + error.toString)
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
+        }
+      }
+    }
+
 	//////////////////////////////////////////////
 	//                                          //
 	//                 Gallery                  //

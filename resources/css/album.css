@@ -121,6 +121,36 @@ span#caption {
 	display:inline-block;
 }
 
+/* Page Logic */
+
+.page {
+  display:none;
+}
+.pageNav {
+  text-align: center;
+  margin-bottom: 0.5em;
+}
+
+.pageNavElem {
+  margin: 0.2em;
+}
+
+.pageNavElem.current a {
+  cursor: default;
+}
+
+.pageNavElem.dimmed {
+  opacity: 0.4;
+}
+
+.pageNav .disabled {
+  visibility:hidden;
+}
+
+.pageNavElem.current a:hover {
+  text-decoration: none;
+}
+
 /* Credits */
 
 div#credits p {
