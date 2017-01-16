@@ -42,8 +42,8 @@ define(function() {
 	}
 
 	size.getImageSize = function(img) {
-		var h = size.getHeight() + 10; // 20 is arbitrary margin
-		var w = size.getWidth() + 20; // 40 is arbitrary margin as well
+		var h = size.getHeight() + 20; // 20 is arbitrary negative margin
+		var w = size.getWidth() + 40; // 40 is arbitrary negative margin as well
 		var o = (img.size[0] > img.size[1]) ? "h" : "v";
 		var r = img.size[1] / img.size[0];
 		var maxH = 600;
