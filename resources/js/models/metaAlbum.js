@@ -54,6 +54,8 @@ define(["radio",
 			});
 		});
 
+		$(".image-link").click(function(e) { e.stopPropagation(); console.debug("here"); });
+
 		$(".pageNav-next").click(function() { radio("page:next").broadcast(); });
 		$(".pageNav-prev").click(function() { radio("page:prev").broadcast(); });
 
@@ -87,8 +89,8 @@ define(["radio",
 		albumView.init();
 
 		// Get data
-		album.images = _.indexBy(data.images, function(im) { return im.file.replace("/","-"); });
-		album.names = _.map(data.images, function(im) { return im.file.replace("/","-"); });
+		album.images = _.indexBy(data.images, function(im) { return im.file.replace("/","--"); });
+		album.names = _.map(data.images, function(im) { return im.file.replace("/","--"); });
 		album.url = data.url;
 		album.title = document.title;
 		album.events();

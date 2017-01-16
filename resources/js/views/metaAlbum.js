@@ -117,9 +117,10 @@ define(["jquery", "radio", "util/size", "util/cache", "lib/history"],
 
 	var overlayUpdate = function(img) {
 		var dom_img = cache.load(img);
+		var album = img.file.split("/")[0];
 		$("#overlay-img img").remove();
 		$("#overlay-img div").prepend(dom_img);
-		$("#caption").html(img.description);
+		$("#caption").html(img.description + " [<a target=\"_blank\" href=\"/photos/" + album + "\" class=\"image-link\" onClick=\"arguments[0].stopPropagation()\">Album</a>]");
 		$("#overlay-img img").attr("alt",img.description);
 	};
 
