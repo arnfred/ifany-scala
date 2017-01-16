@@ -32,8 +32,6 @@ define(["radio",
 	album.title = null;
 	album.overlayActive = false;
 
-
-
 	//////////////////////////////////////////////
 	//											//
 	//				   Events					//

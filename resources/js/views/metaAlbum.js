@@ -23,6 +23,10 @@ define(["jquery", "radio", "util/size", "util/cache", "lib/history"],
 		radio("page:change").subscribe(goToPage);
 		radio("page:next").subscribe(nextPage);
 		radio("page:prev").subscribe(prevPage);
+		radio("overlay:set").subscribe(overlayChange);
+		radio("overlay:close").subscribe(overlayClose);
+		radio("window:resize").subscribe(resizeOverlay);
+
 
 	};
 
@@ -75,14 +79,65 @@ define(["jquery", "radio", "util/size", "util/cache", "lib/history"],
 	// Updates the url to reflect the overlay we are going to
 	var updateURL = function(page) {
 
-		var base = document.URL.split("#")[0]
+		var base = document.URL.split("#")[0];
 		var new_url = (page === 1) ? base : base + "#" + page;
-		document.URL = new_url;
+		history.replaceState({}, document.title, new_url);
 	};
 
 	var getURLPage = function() { 
-		return document.URL.split("#")[1]
-	}
+		return document.URL.split("#")[1];
+	};
+
+	// When we change image
+	var overlayChange = function(img, hasPrev, hasNext) {
+		navArrowUpdate(hasPrev, hasNext);
+		overlayUpdate(img);
+		$("#overlay").fadeIn();
+		$("body").css("overflow-y", "hidden");
+		resizeOverlay();
+	};
+
+
+	var overlayClose = function() {
+		$("body").css("overflow-y", "auto");
+		$("#overlay").fadeOut();
+	};
+
+
+	var navArrowUpdate = function(hasPrev, hasNext) {
+		// Make sure we hide or show previous arrow
+		if (hasPrev) $("#overlay-prev").fadeIn(300);
+		else $("#overlay-prev").hide();
+
+		// Make sure we hide or show next arrow
+		if (hasNext) $("#overlay-next").fadeIn(300);
+		else $("#overlay-next").hide();
+	};
+
+
+	var overlayUpdate = function(img) {
+		var dom_img = cache.load(img);
+		$("#overlay-img img").remove();
+		$("#overlay-img div").prepend(dom_img);
+		$("#caption").html(img.description);
+		$("#overlay-img img").attr("alt",img.description);
+	};
+
+
+	var resizeOverlay = function() {
+		//window.scrollTo(0, 1);
+		var captionHeight = $("#caption").height();
+		var img = $("#overlay-img img");
+		$("<img/>").attr("src", img.attr("src")).load(function() {
+			var ratio = this.width / this.height;
+			var height = size.getHeight() - captionHeight - 4;
+			var div_width = Math.min(size.getWidth() - 50, size.getWidth()*0.83);
+			var max_height = Math.min(this.width/ratio, div_width/ratio);
+			if (height > max_height) height = max_height;
+			$("#overlay-img img").css("height", height + "px");
+			$("#overlay-img img").css("max-width","100%");
+		});
+	};
 
 
 	//////////////////////////////////////////////

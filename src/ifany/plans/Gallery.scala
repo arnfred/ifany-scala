@@ -121,7 +121,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 	//                                          //
 	//////////////////////////////////////////////
 
-    case req @ Path(Seg("covers" :: Nil)) => {
+    case req @ Path(Seg("covers" :: _)) => {
 
       try {
         val frontpage : Frontpage = Frontpage.get()
@@ -156,7 +156,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 	//                                          //
 	//////////////////////////////////////////////
 
-    case req @ Path(Seg("all" :: Nil)) => {
+    case req @ Path(Seg("all" :: _)) => {
 
       try {
         val frontpage : Frontpage = Frontpage.get()
@@ -194,7 +194,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 	//                                          //
 	//////////////////////////////////////////////
 
-    case req @ Path(Seg("random" :: Nil)) => {
+    case req @ Path(Seg("random" :: _)) => {
 
       try {
         val frontpage : Frontpage = Frontpage.get()

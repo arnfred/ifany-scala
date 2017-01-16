@@ -9,7 +9,7 @@ case class MetaAlbumTemplate(view : AlbumView) extends Template {
   val css: String = fast"""<link rel="stylesheet" type="text/css" href="/css/album.css"/>"""
 
   override def toString : String = Base(
-    Template(navigation(view.getNav) + album + navigation(view.getNav)),
+    Template(navigation(view.getNav) + overlay + album + navigation(view.getNav)),
     Some(Template(css + responsiveStyles(view) + javascript + nextprev))
   )
 
@@ -68,6 +68,27 @@ case class MetaAlbumTemplate(view : AlbumView) extends Template {
       <span class="laquo">$sign</span>
       <span class="nav other">$text</span>
     </a>
+  """)
+
+  def overlay : Template = Template(fast"""
+  <div class="overlay" id="overlay">
+      <div class="col-xs-1 overlay-prev overlay-nav">
+        <div id="overlay-prev">
+          <span class="laquo">&laquo;</span>
+        </div>
+      </div>
+      <div class="col-xs-10 overlay-img" id="overlay-img">
+          <div>
+            <img alt="Overlay image"/>
+            <span id="caption">Sample Caption</span>
+          </div>
+      </div>
+      <div class="col-xs-1 overlay-next overlay-nav">
+        <div id="overlay-next">
+          <span class="laquo">&raquo;</span>
+        </div>
+      </div>
+  </div>
   """)
 
   def album : Template = Template(fast"""
