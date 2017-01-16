@@ -59,10 +59,18 @@ define(["jquery", "radio", "util/size", "util/cache", "lib/history"],
 		var maxPages = $(".page").length;
 		if (index === currentPage || index <= 0 || index > maxPages) { return; }
 		else {
-			$(".page").hide();
+
+			if ($(".page").is(":visible")) {
+				$(".page").fadeOut(400, function() {
+					$("#page-" + index).fadeIn(600);
+				});
+			} else {
+				$("#page-" + index).fadeIn(600);
+			}
+
+
 			$(".pageNavElem").addClass("dimmed").removeClass("current");
 			$(".pageNav-" + index).addClass("current").removeClass("dimmed");
-			$("#page-" + index).show();
 
 			$(".pageNav-prev, .pageNav-next").removeClass("disabled");
 			if (index === 1) { $(".pageNav-prev").addClass("disabled"); }
@@ -70,6 +78,7 @@ define(["jquery", "radio", "util/size", "util/cache", "lib/history"],
 
 			updateURL(index);
 			currentPage = index;
+			$("body").scrollTop(0);
 		}
 	};
 
