@@ -127,7 +127,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         val frontpage : Frontpage = Frontpage.get()
         val images : List[Image] = Random.shuffle(frontpage.covers.map(_.makeImage)).toList
         val title : String = "Cover Images"
-        val desc : String = "A meta-album of cover images from all the albums"
+        val desc : String = """For each album I take I note the photos that I particularly like and add them to the list of covers. These images are used for the cover image on <a href="/">the frontpage</a>. They are also my usual go to images when I want new prints on my walls"""
         val album : Album = Album(title, desc, "", List(), None, images)
         val nav : Navigation = Navigation(None, None, None)
         val view = AlbumView(album, nav, "metaAlbum")
@@ -166,7 +166,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
           image <- album.images
         } yield image.copy(file = album.url + "/" + image.file)
         val title : String = "All Images"
-        val desc : String = "A meta-album of all images in some sort of order (not sure which)"
+        val desc : String = """A long list of all the images published on <a href="/">ifany.org</a> in rough chronological order according to the image metadata."""
         val album : Album = Album(title, desc, "", List(), None, images.sortBy(_.datetime).toList)
         val nav : Navigation = Navigation(None, None, None)
         val view = AlbumView(album, nav, "metaAlbum")
@@ -204,7 +204,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
           image <- album.images
         } yield image.copy(file = album.url + "/" + image.file)
         val title : String = "All Images"
-        val desc : String = "A meta-album of all images in random order"
+        val desc : String = """Every single image on <a href="/">ifany.org</a> in random order. I flicking through random images the other day and thought it would be neat with a way to scroll through random moments and memories from my past. I suspect this will mostly be useful for my own nostalgic cravings, but still..."""
         val album : Album = Album(title, desc, "", List(), None, Random.shuffle(images).toList)
         val nav : Navigation = Navigation(None, None, None)
         val view = AlbumView(album, nav, "metaAlbum")

@@ -112,3 +112,6 @@ div.prev span.laquo {
 	float:left;
 	margin-right:0.2em;
 }
+p#my-name {
+	float:right;
+}

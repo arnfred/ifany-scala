@@ -25,6 +25,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
             use the photos for whatever you want. Inquiries are welcome at <a
                 href="mailto:jonas@ifany.org"
                 alt="jonas@ifany.org">jonas@ifany.org</a>.</p>
+                <p id="my-name"><a href="http://www.dynkarken.com">Jonas Toft Arnfred</a></p>
 
         </div>
 
