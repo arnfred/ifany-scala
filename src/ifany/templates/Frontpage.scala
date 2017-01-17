@@ -22,7 +22,9 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
                 href="http://creativecommons.org/licenses/by-sa/3.0/" alt="Creative
                 Commons CC-BY-SA">CC-BY-SA</a>) which means that as long as you
             credit me and keep any deriviative work under the same license, you can
-            use the photos for whatever you want. Inquiries are welcome at <a
+            use the photos for whatever you want. Check out the meta albums of <a href="/all">all</a>, 
+            <a href="/random">random</a> and <a href="/covers">cover</a> photos. 
+            Inquiries and fawning fan mail are all welcome at <a
                 href="mailto:jonas@ifany.org"
                 alt="jonas@ifany.org">jonas@ifany.org</a>.</p>
                 <p id="my-name"><a href="http://www.dynkarken.com">Jonas Toft Arnfred</a></p>
