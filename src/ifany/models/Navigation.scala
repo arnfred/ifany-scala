@@ -81,8 +81,8 @@ object Navigation {
   // Constructs a pair of String -> Navigation based on elements
   private def albumNav(prev : Option[Album], current : Album, next : Option[Album]) : (String, Navigation) = {
     val navPrev = for (p <- prev) yield {
-      val gURL : String = { for (g <- p.getGallery) yield Gallery.url(g) } getOrElse("")
-      NavElem(gURL + "/" + p.url, p.title)
+      val gURL : String = { for (g <- p.getGallery) yield Gallery.url(g) + "/" } getOrElse("")
+      NavElem(gURL + p.url, p.title)
     }
     val navNext = for (n <- next) yield {
       val gURL : String = { for (g <- n.getGallery) yield Gallery.url(g) } getOrElse("")

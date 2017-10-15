@@ -65,10 +65,8 @@ case class Album(title : String,
   }
 
   val getGallery : Option[String] = galleries match {
-    case Nil => None
-    case "all" :: Nil => None
-    case g :: Nil => Some(g)
-    case "all" :: g :: rest => Some(g)
+    case "all" :: rest => rest.headOption
+    case g :: _ => Some(g)
     case otherwise => None
   }
 
