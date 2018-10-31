@@ -1,8 +1,6 @@
 package ifany
 
-case class InternalError(msg : String) extends Exception {
-  override def toString : String = "Internal Error: " + msg
-}
+case class InternalError(val message : String) extends Exception
 case class AlbumNotFound(url : String) extends Exception {
   override def toString : String = "Album not found: " + url
 }

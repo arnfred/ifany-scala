@@ -30,16 +30,19 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 
       } catch {
 
-        case InternalError(msg) => {
+        case error @ InternalError(msg) => {
           println("* INTERNAL ERROR * : " + msg)
+          error.printStackTrace()
           req.respond(InternalServerError ~> HtmlContent ~> ResponseString("An error occured"))
         }
-        case AlbumNotFound(url) => {
+        case error @ AlbumNotFound(url) => {
           println("* ALBUM NOT FOUND * : " + url)
+          error.printStackTrace()
           req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
         }
         case error : Throwable => {
           println("* UNKNOWN ERROR * : " + error.toString)
+          error.printStackTrace()
           req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
         }
       }
@@ -93,7 +96,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         val n : Int = str.map(_+0).reduce({ (a,b) => (a + 1000003 * (b + 1)) % covers.length }) % covers.length
         val img : Image = covers(n).image
         val album : Album = covers(n).album
-        val path : String = "resources" + img.url(size, album.url)
+        val path : String = img.url(size, album.url)
         val bis = new BufferedInputStream(new FileInputStream(path))
         val data = Stream.continually(bis.read).takeWhile(-1 !=).map(_.toByte).toArray
         req.respond(Ok ~> ContentType("image/jpg") ~> 
