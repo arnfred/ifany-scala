@@ -92,7 +92,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 
       try {
         val frontpage : Frontpage = Frontpage.get()
-        val covers : List[Cover] = frontpage.covers
+        val covers : Seq[Cover] = frontpage.covers
         val n : Int = str.map(_+0).reduce({ (a,b) => (a + 1000003 * (b + 1)) % covers.length }) % covers.length
         val img : Image = covers(n).image
         val album : Album = covers(n).album
@@ -128,10 +128,10 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 
       try {
         val frontpage : Frontpage = Frontpage.get()
-        val images : List[Image] = Random.shuffle(frontpage.covers.map(_.makeImage)).toList
+        val images : Seq[Image] = Random.shuffle(frontpage.covers.map(_.makeImage)).toSeq
         val title : String = "Cover Images"
         val desc : String = """For each album I take I note the photos that I particularly like and add them to the list of covers. These images are used for the cover image on <a href="/">the frontpage</a>. They are also my usual go to images when I want new prints on my walls."""
-        val album : Album = Album(title, desc, "", List(), None, images)
+        val album : Album = Album(title, desc, "", Seq(), None, images)
         val nav : Navigation = Navigation(None, None, None)
         val view = AlbumView(album, nav, "metaAlbum")
         val output = MetaAlbumTemplate(view).toString
@@ -170,7 +170,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         } yield image.copy(file = album.url + "/" + image.file)
         val title : String = "All Images"
         val desc : String = """A long list of all the images published on <a href="/">ifany.org</a> in rough chronological order according to the image metadata."""
-        val album : Album = Album(title, desc, "", List(), None, images.sortBy(_.datetime).toList)
+        val album : Album = Album(title, desc, "", Seq(), None, images.sortBy(_.datetime).toSeq)
         val nav : Navigation = Navigation(None, None, None)
         val view = AlbumView(album, nav, "metaAlbum")
         val output = MetaAlbumTemplate(view).toString
@@ -208,7 +208,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         } yield image.copy(file = album.url + "/" + image.file)
         val title : String = "All Images"
         val desc : String = """Every single image on <a href="/">ifany.org</a> in random order (in fact they'll be re-randomised every time you reload). I was browsing through random images the other day and thought it would be neat with a way to scroll through random moments and memories from my past. I suspect this will mostly be useful for my own nostalgic cravings, but still... here you go."""
-        val album : Album = Album(title, desc, "", List(), None, Random.shuffle(images).toList)
+        val album : Album = Album(title, desc, "", Seq(), None, Random.shuffle(images).toSeq)
         val nav : Navigation = Navigation(None, None, None)
         val view = AlbumView(album, nav, "metaAlbum")
         val output = MetaAlbumTemplate(view).toString
@@ -291,6 +291,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         }
         case error : Throwable => {
           println("* UNKNOWN ERROR * : " + error.toString)
+          println(error.getStackTrace.mkString("\n"))
           req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
         }
       }

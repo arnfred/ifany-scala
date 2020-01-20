@@ -21,11 +21,11 @@ object Navigation {
 
     println("updating")
 
-    val galleries : List[Gallery] = Frontpage.get().galleries
-    val albums : List[Album] = for (g <- galleries; a <- g.albums) yield a
+    val galleries : Seq[Gallery] = Frontpage.get().galleries
+    val albums : Seq[Album] = for (g <- galleries; a <- g.albums) yield a
 
     // get album order
-    val albums_sorted : List[Album] = albums.sortBy(_.datetime._2.getMillis)
+    val albums_sorted : Seq[Album] = albums.sortBy(_.datetime._2.getMillis)
 
     // Build list of Navigation elements
     val navGalleries : Map[String, Navigation] = scan(galleries.reverse, None, galleryNav)
@@ -51,17 +51,17 @@ object Navigation {
   }
 
   // Now for each album find the two neighbors. We build map tail recursively
-  private def scan[A](galleries : List[A], 
+  private def scan[A](galleries : Seq[A], 
                       prev : Option[A],
                       getNavPair : (Option[A], A, Option[A]) => (String, Navigation))
                         : Map[String, Navigation] = galleries match {
 
     // In case we have two or more items left
-    case current::next::rest =>
-      scan(next::rest, Some(current), getNavPair) + getNavPair(prev, current, Some(next))
+    case current +: next +: rest =>
+      scan(next +:rest, Some(current), getNavPair) + getNavPair(prev, current, Some(next))
 
     // In case the current item is the last
-    case current::Nil => 
+    case current +: Nil => 
       Map(getNavPair(prev, current, None))
   }
 
@@ -81,15 +81,15 @@ object Navigation {
   // Constructs a pair of String -> Navigation based on elements
   private def albumNav(prev : Option[Album], current : Album, next : Option[Album]) : (String, Navigation) = {
     val navPrev = for (p <- prev) yield {
-      val gURL : String = { for (g <- p.getGallery) yield Gallery.url(g) + "/" } getOrElse("")
+      val gURL : String = { for (g <- p.getGallery) yield Gallery.get(g).url + "/" } getOrElse("")
       NavElem(gURL + p.url, p.title)
     }
     val navNext = for (n <- next) yield {
-      val gURL : String = { for (g <- n.getGallery) yield Gallery.url(g) } getOrElse("")
+      val gURL : String = { for (g <- n.getGallery) yield Gallery.get(g).url } getOrElse("")
       NavElem(gURL + "/" + n.url, n.title)
     }
     val navGal = for (g <- current.getGallery) yield {
-      NavElem(Gallery.url(g), g)
+      NavElem(Gallery.get(g).url, g)
     }
     (current.url -> Navigation(navNext, navPrev, navGal))
   }

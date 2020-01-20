@@ -22,7 +22,9 @@ libraryDependencies  ++= Seq(
     "com.novus" %% "salat" % "1.9.2",
     "joda-time" % "joda-time" % "2.2",
     "org.joda" % "joda-convert" % "1.2",
-    "com.sksamuel.scrimage" %% "scrimage-core" % "1.4.1"
+    "com.sksamuel.scrimage" %% "scrimage-core" % "1.4.1",
+    "com.github.seratch" %% "awscala-dynamodb" % "0.8.+",
+    "com.github.seratch" %% "awscala-s3" % "0.8.+"
     )
 
 resolvers ++= Seq(

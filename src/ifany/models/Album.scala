@@ -3,15 +3,17 @@ package ifany
 import org.joda.time.DateTime 
 import scala.io.Source
 import java.io.FileNotFoundException
+import scala.collection.JavaConverters._
 import net.liftweb.json._
 import java.io.File
+import awscala._, dynamodbv2._
 
 case class Image(file : String,
                  description : String,
                  datetime : Option[String],
                  banner : Boolean,
                  cover : Boolean,
-                 size : List[Int]) {
+                 size : Seq[Int]) {
 
   def id: String = "id" ++ file.replace(".","-").replace("#","-").replace("/","--")
 
@@ -37,9 +39,9 @@ case class Image(file : String,
 case class Album(title : String,
                  description : String,
                  url : String,
-                 galleries : List[String],
+                 galleries : Seq[String],
                  public : Option[Boolean],
-                 images : List[Image]) {
+                 images : Seq[Image]) {
 
   implicit val formats    = DefaultFormats
   def json : String = Serialization.write(this)
@@ -47,7 +49,7 @@ case class Album(title : String,
   val datetime : (DateTime, DateTime) = {
 
     // Take all images that have a date associated and sort them
-    val sorted_dates : List[DateTime] = {
+    val sorted_dates : Seq[DateTime] = {
       for (i <- images; dt <- i.datetime) yield new DateTime(i.datetime.get)
     } sortBy(_.getMillis)
 
@@ -59,10 +61,7 @@ case class Album(title : String,
     }
   }
 
-  val isPublic : Boolean = public match {
-    case None => true
-    case Some(b) => b
-  }
+  val isPublic : Boolean = public.getOrElse(true)
 
   val getGallery : Option[String] = galleries match {
     case "all" :: rest => rest.headOption
@@ -72,45 +71,60 @@ case class Album(title : String,
 
   val path : String = getGallery match {
     case None => "album/" + url
-    case Some(gURL) => Gallery.url(gURL) + "/" + url
+    case Some(gURL) => gURL + "/" + url
   }
 }
 
 
 object Album {
 
+  implicit val dynamoDB = DynamoDB.at(Region.EU_WEST_1)
+  val albumTable = sys.env("ALBUMS_TABLE")
+  val table: Table = dynamoDB.table(albumTable).get
+  // Should be a map
+  var albums: Option[Map[String, Album]] = None
+
   implicit val formats    = DefaultFormats
 
-  // Based on an url we return an album
-  def get(url : String, jsonPath : String = "album.json") : Album = {
+  // Look up album in map
+  def get(id: String): Album = getAll.get(id) match {
+    case Some(a) => a
+    case None => throw new AlbumNotFound(id)
+  }
 
-    // Location of album data file
-    val json_path : String = "resources" + Ifany.photoDir + url + "/" + jsonPath
+  private def albumFromItem(item: Item): Album = {
+    val attributes: Map[String, AttributeValue] = item.attributes.map { case Attribute(k, v) => (k, v) }.toMap
+    Album(
+      title = attributes("title").s.get,
+      description = attributes("description").s.get,
+      url = attributes("url").s.get,
+      galleries = attributes("galleries").l.map(av => AttributeValue(av).s.get),
+      public = attributes("public").bl,
+      images = attributes("images").l.map(av => imageFromAttributeValue(AttributeValue(av)))
+    )
+  }
 
-    // Load JSON
-    val json : String       = try {
-      Source.fromFile(json_path).getLines.mkString("\n")
-    } catch {
-      case e : FileNotFoundException => throw new AlbumNotFound(url)
-    }
-
-    // Parse JSON as Album and return result
-    val album = try {
-      Serialization.read[Album](json)
-    } catch {
-      case e : Throwable => {
-        throw new InternalError("Couldn't read json from '" + url + "':\n" + json)
-      }
-    }
-
-    return album
+  private def imageFromAttributeValue(value: AttributeValue): Image = {
+    val attributes: scala.collection.Map[String, AttributeValue] = value.m.get.asScala.mapValues(AttributeValue(_))
+    val im = Image(
+      file = attributes("file").s.get,
+      description = attributes("description").s.get,
+      datetime = attributes("datetime").s,
+      banner = attributes("banner").bl.get,
+      cover = attributes("cover").bl.get,
+      size = attributes("size").l.map(s => AttributeValue(s).n.get.toInt)
+    )
+    im
   }
 
   // Returns all albums in the photo dir
-  def getAll : List[Album] = {
-    val root = new File("resources" + Ifany.photoDir)
-    for (f <- (root).listFiles if f.isDirectory) yield {
-      get(f.getName)
-    }
-  } toList
+  def getAll: Map[String, Album] = albums.getOrElse {
+    albums = Some(table.scan(filter = Seq(), limit = 99999).map(albumFromItem(_)).map(a => (a.url, a)).toMap)
+    albums.get
+  }
+
+  def updateAll: Map[String, Album] = {
+    albums = None
+    getAll
+  }
 }

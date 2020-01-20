@@ -175,7 +175,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
       css.mkString(s"\n\t\t@media only screen $minWidth $maxWidth {\n\t\t\t", "\n\t\t\t", "\n\t\t}")
     }
 
-    val styles = List(
+    val styles = Seq(
       style(None, Some("400")),
       style(Some("400"), Some("600")),
       style(Some("600"), Some("800")),

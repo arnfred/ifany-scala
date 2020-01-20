@@ -14,7 +14,7 @@ case class FrontpageView(frontpage : Frontpage) extends View {
   val cover : Cover = shuffle(frontpage.covers).head
 
   // Return all galleries
-  def getGalleries : List[Gallery] = frontpage.galleries
+  def getGalleries : Seq[Gallery] = frontpage.galleries
 
 
   // The amount of images in an album

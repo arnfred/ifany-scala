@@ -18,10 +18,10 @@ trait View {
   }
 
 
-  def getDateString(images : List[Image], withDay : Boolean) : String = {
+  def getDateString(images : Seq[Image], withDay : Boolean) : String = {
 
     // Get a list of all dates
-    val dates : List[DateTime] = {
+    val dates : Seq[DateTime] = {
       val unsorted = for (i <- images; dt <- i.datetime) yield new DateTime(dt)
       unsorted.sortBy(_.getMillis)
     }

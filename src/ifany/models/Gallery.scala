@@ -1,8 +1,9 @@
 package ifany
 
 import scala.util.Random.shuffle
+import awscala._, dynamodbv2._
 
-case class Gallery(name : String, description : String, albums : List[Album]) {
+case class Gallery(name : String, description : String, url: String, albums : Seq[Album]) {
 
   def cover : Cover = {
     val covers = for (a <- albums; i <- a.images if i.cover) yield {
@@ -20,18 +21,55 @@ case class Gallery(name : String, description : String, albums : List[Album]) {
       shuffle(landscapes).head
     }
   }
-
-  def url : String = Gallery.url(name)
 }
 
 object Gallery {
 
-  def get(galleryURL : String) : Gallery = {
+  implicit val dynamoDB = DynamoDB.at(Region.EU_WEST_1)
+  val galleryTable = sys.env("GALLERIES_TABLE")
+  val table: Table = dynamoDB.table(galleryTable).get
+  var galleries: Option[Seq[Gallery]] = None
+
+  def getAllGalleries: Seq[Gallery] = galleries.getOrElse {
+    // Get all albums
+    val albums = for ((k,a) <- Album.updateAll if a.isPublic) yield a
+    // Group albums by gallery
+    val grouped: Map[String, Seq[Album]] = { 
+      for (a <- albums; g <- a.galleries) yield (g -> a)
+    } groupBy { // Returns type of Seq[String, Array[(String, Album)]]
+      case (k,v) => k
+    } map { // Simplify touple to Album
+      case (k,v) => (k, v.map(_._2).toSeq)
+    } map { // Sort all lists of albums by date
+      case (k,v) => (k, v.sortBy(_.datetime._2.getMillis))
+    }
+    val gals = table.scan(filter = Seq(), limit = 99999).map(galleryFromItem(_, grouped))
+    val galsWithAlbums = gals.filter(_.albums.size > 0)
+    galleries = Some(galsWithAlbums)
+    galleries.get
+  }
+  
+  def updateGalleries: Seq[Gallery] = {
+    galleries = None
+    getAllGalleries
+  }
+
+
+  private def galleryFromItem(item: Item, albumMap: Map[String, Seq[Album]]): Gallery = {
+    val attributes: Map[String, AttributeValue] = item.attributes.map { case Attribute(k, v) => (k, v) }.toMap
+    Gallery(
+      name = attributes("name").s.get,
+      description = attributes("description").s.get,
+      url = attributes("url").s.get,
+      albums = albumMap.getOrElse(attributes("url").s.get, Seq.empty)
+    )
+  }
+
+  def get(url : String) : Gallery = {
     try {
-      val frontpage : Frontpage = Frontpage.get()
-      frontpage.galleries.find(g => g.url == galleryURL).get
+      getAllGalleries.find(g => g.url == url).get
     } catch {
-      case (error : java.util.NoSuchElementException) => throw GalleryNotFound(galleryURL)
+      case (error : java.util.NoSuchElementException) => throw GalleryNotFound(url)
     }
   }
 
@@ -40,6 +78,4 @@ object Gallery {
   } catch {
     case GalleryNotFound(url) => None
   }
-
-  def url(name : String) : String = name.replace(" ", "-").toLowerCase
 }

@@ -26,17 +26,17 @@ case class AlbumView(album : Album, nav : Navigation, name : String = "album", c
 
   def getGalleries: String = {
     val galleries = album.galleries.filter(_!="all")
-    val links = galleries map { g => s"""<a href="/${Gallery.url(g)}" alt="Go to Gallery: $g">$g</a>""" }
+    val links = galleries map { g => s"""<a href="/${Gallery.get(g).url}" alt="Go to Gallery: $g">$g</a>""" }
     links.mkString(", ")
   }
 
   def getJson : String = album.json
 
-  def getRows(images: List[Image], rows: List[Row] = List.empty): List[Row] = images match {
+  def getRows(images: Seq[Image], rows: Seq[Row] = Seq.empty): Seq[Row] = images match {
     case Nil => rows.reverse
-    case image :: Nil => (CoverRow(image) :: rows).reverse
-    case image :: rest if (image.cover) => getRows(rest, CoverRow(image) :: rows)
-    case image1 :: image2 :: rest if (image2.cover) => getRows(image1 :: rest, CoverRow(image2) :: rows)
-    case image1 :: image2 :: rest => getRows(rest, DualRow(image1, image2) :: rows)
+    case image +: Nil => (CoverRow(image) +: rows).reverse
+    case image +: rest if (image.cover) => getRows(rest, CoverRow(image) +: rows)
+    case image1 +: image2 +: rest if (image2.cover) => getRows(image1 +: rest, CoverRow(image2) +: rows)
+    case image1 +: image2 +: rest => getRows(rest, DualRow(image1, image2) +: rows)
   }
 }
