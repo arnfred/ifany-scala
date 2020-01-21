@@ -10,6 +10,7 @@ import java.io.BufferedInputStream
 import java.io.FileInputStream
 import scala.Stream
 import scala.util.Random
+import awscala._, s3._
 
 object GalleryPlan extends async.Plan with ServerErrorResponse {
 
@@ -76,6 +77,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         }
         case error : Throwable => {
           println("* UNKNOWN ERROR * : " + error.toString)
+          error.printStackTrace()
           req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
         }
       }
@@ -147,11 +149,40 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         }
         case error : Throwable => {
           println("* UNKNOWN ERROR * : " + error.toString)
+          error.printStackTrace()
           req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
         }
       }
     }
 
+	//////////////////////////////////////////////
+	//                                          //
+	//                photos                    //
+	//                                          //
+	//////////////////////////////////////////////
+
+    case req @ Path(Seg("photos" :: album :: filename :: Nil)) => {
+
+      try {
+        val s3Photo = S3Photo(album, filename)
+        println(s3Photo)
+        req.respond(s3Photo)
+      } catch {
+        case InternalError(msg) => {
+          println("* INTERNAL ERROR * : " + msg)
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString(msg))
+        }
+        case AlbumNotFound(url) => {
+          println("* ALBUM NOT FOUND * : " + url)
+          req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
+        }
+        case error : Throwable => {
+          println("* UNKNOWN ERROR * : " + error.toString)
+          error.printStackTrace()
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
+        }
+      }
+    }
 
 	//////////////////////////////////////////////
 	//                                          //
@@ -186,6 +217,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         }
         case error : Throwable => {
           println("* UNKNOWN ERROR * : " + error.toString)
+          error.printStackTrace()
           req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
         }
       }
@@ -224,6 +256,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         }
         case error : Throwable => {
           println("* UNKNOWN ERROR * : " + error.toString)
+          error.printStackTrace()
           req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
         }
       }
@@ -257,6 +290,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         }
         case error : Throwable => {
           println("* UNKNOWN ERROR * : " + error.toString)
+          error.printStackTrace()
           req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
         }
       }
@@ -291,7 +325,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         }
         case error : Throwable => {
           println("* UNKNOWN ERROR * : " + error.toString)
-          println(error.getStackTrace.mkString("\n"))
+          error.printStackTrace()
           req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
         }
       }

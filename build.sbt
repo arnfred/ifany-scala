@@ -24,7 +24,8 @@ libraryDependencies  ++= Seq(
     "org.joda" % "joda-convert" % "1.2",
     "com.sksamuel.scrimage" %% "scrimage-core" % "1.4.1",
     "com.github.seratch" %% "awscala-dynamodb" % "0.8.+",
-    "com.github.seratch" %% "awscala-s3" % "0.8.+"
+    "com.github.seratch" %% "awscala-s3" % "0.8.+",
+    "com.sun.activation" % "javax.activation" % "1.2.0"
     )
 
 resolvers ++= Seq(
