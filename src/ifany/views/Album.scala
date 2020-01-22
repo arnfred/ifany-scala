@@ -4,13 +4,13 @@ sealed trait Row
 case class CoverRow(image: Image) extends Row
 case class DualRow(left: Image, right: Image) extends Row {
   val (leftRatio: Double, rightRatio: Double) = {
-    val (w1, h1) = (left.size(0), left.size(1))
-    val (w2, h2) = (right.size(0), right.size(1))
-    val s2 = (h1*w1 + h1*w2) / (h1*w2 + h2*w1).toDouble
-    val s1 = s2*h2/h1.toDouble
-    val r1 = s1*w1 / (w1+w2).toDouble
-    val r2 = s2*w2 / (w1+w2).toDouble
-    (r1, r2)
+    val (x1, y1) = (left.size(0).toDouble, left.size(1).toDouble)
+    val (x2, y2) = (right.size(0).toDouble, right.size(1).toDouble)
+    val r2 = 1.0 // Can be any number. It's just a ratio
+    val r1 = y2/y1 // Relationship between heights
+    val p1 = r1*x1 / (x1 * r1 + x2 * r2) // Percentage of image 1 width to entire width
+    val p2 = r2*x2 / (x1 * r1 + x2 * r2) // Percentage of image 2 width to entire width
+    (p1, p2)
   }
 }
 

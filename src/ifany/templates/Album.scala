@@ -130,17 +130,17 @@ case class AlbumTemplate(view : AlbumView) extends Template {
     ${coverRow(row.right, "visible-xs-block")}
 
     <div class="col-xs-12 hidden-xs col-sm-10 col-sm-offset-1 album-row img">
-      <div class="img-box" style="width:${row.leftRatio*100}%">
-        <span class="img-container" role="img" id="${ row.left.id }">
-          <span class="inner" style="padding-top: ${ row.left.ratio*100 }%;">
+      <div class="frame-box">
+        <div class="img-box left" style="width:${row.leftRatio*100}%;">
+          <span class="img-container" role="img" id="${ row.left.id }">
+            <span class="inner" style="padding-top: ${ row.left.ratio*100 }%;"></span>
           </span>
-        </span>
-      </div>
-      <div class="img-box" style="width:${row.rightRatio*100}%">
-        <span class="img-container" role="img" id="${ row.right.id }">
-          <span class="inner" style="padding-top: ${ row.right.ratio*100 }%;">
+        </div>
+        <div class="img-box right" style="width:${row.rightRatio*100}%">
+          <span class="img-container" role="img" id="${ row.right.id }">
+            <span class="inner" style="padding-top: ${ row.right.ratio*100 }%;"></span>
           </span>
-        </span>
+        </div>
       </div>
     </div>
     """)

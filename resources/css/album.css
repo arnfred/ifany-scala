@@ -32,11 +32,20 @@ div.cover-row {
 div.img img {
   width:100%;
 }
+div.frame-box {
+  padding-left:0.3rem;
+}
 div.img-box {
   display: inline-block;
   float:left;
-  padding-right:3px;
 }
+div.img-box.left {
+  margin-left:-0.3rem;
+}
+div.img-box.right {
+  margin-left:0.3rem;
+}
+
 span.img-container {
   width:100%;
   display: inline-block;
