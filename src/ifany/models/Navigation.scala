@@ -19,9 +19,7 @@ object Navigation {
 
   def update : Map[String, Navigation] = {
 
-    println("updating")
-
-    val galleries : Seq[Gallery] = Frontpage.get().galleries
+    val galleries : Seq[Gallery] = Gallery.getAllGalleries
     val albums : Seq[Album] = for (g <- galleries; a <- g.albums) yield a
 
     // get album order
@@ -81,12 +79,12 @@ object Navigation {
   // Constructs a pair of String -> Navigation based on elements
   private def albumNav(prev : Option[Album], current : Album, next : Option[Album]) : (String, Navigation) = {
     val navPrev = for (p <- prev) yield {
-      val gURL : String = { for (g <- p.getGallery) yield Gallery.get(g).url + "/" } getOrElse("")
-      NavElem(gURL + p.url, p.title)
+      val gURL : String = { for (g <- p.getGallery) yield Gallery.get(g).url } getOrElse("album")
+      NavElem(s"$gURL/${p.url}", p.title)
     }
     val navNext = for (n <- next) yield {
-      val gURL : String = { for (g <- n.getGallery) yield Gallery.get(g).url } getOrElse("")
-      NavElem(gURL + "/" + n.url, n.title)
+      val gURL : String = { for (g <- n.getGallery) yield Gallery.get(g).url } getOrElse("album")
+      NavElem(s"$gURL/${n.url}", n.title)
     }
     val navGal = for (g <- current.getGallery) yield {
       NavElem(Gallery.get(g).url, g)

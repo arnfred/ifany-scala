@@ -64,8 +64,8 @@ case class Album(title : String,
   val isPublic : Boolean = public.getOrElse(true)
 
   val getGallery : Option[String] = galleries match {
-    case "all" :: rest => rest.headOption
-    case g :: _ => Some(g)
+    case "all" +: rest => rest.headOption
+    case g +: _ => Some(g)
     case otherwise => None
   }
 
@@ -96,7 +96,7 @@ object Album {
     val attributes: Map[String, AttributeValue] = item.attributes.map { case Attribute(k, v) => (k, v) }.toMap
     Album(
       title = attributes("title").s.get,
-      description = attributes("description").s.get,
+      description = attributes("description").s.getOrElse(""),
       url = attributes("url").s.get,
       galleries = attributes("galleries").l.map(av => AttributeValue(av).s.get),
       public = attributes("public").bl,
@@ -108,7 +108,7 @@ object Album {
     val attributes: scala.collection.Map[String, AttributeValue] = value.m.get.asScala.mapValues(AttributeValue(_))
     val im = Image(
       file = attributes("file").s.get,
-      description = attributes("description").s.get,
+      description = attributes("description").s.getOrElse(""),
       datetime = attributes("datetime").s,
       banner = attributes("banner").bl.get,
       cover = attributes("cover").bl.get,

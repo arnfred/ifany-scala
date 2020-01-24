@@ -165,7 +165,6 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 
       try {
         val s3Photo = S3Photo(album, filename)
-        println(s3Photo)
         req.respond(s3Photo)
       } catch {
         case InternalError(msg) => {

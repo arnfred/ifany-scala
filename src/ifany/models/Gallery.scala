@@ -5,7 +5,7 @@ import awscala._, dynamodbv2._
 
 case class Gallery(name : String, description : String, url: String, albums : Seq[Album]) {
 
-  def cover : Cover = {
+  val cover : Cover = {
     val covers = for (a <- albums; i <- a.images if i.cover) yield {
       Cover(i, a)
     }
@@ -20,6 +20,12 @@ case class Gallery(name : String, description : String, url: String, albums : Se
       }
       shuffle(landscapes).head
     }
+  }
+
+  def medianAge: Option[DateTime] = {
+    val datetimes: Seq[DateTime] = for (a <- albums; i <- a.images if i.datetime != None) yield new DateTime(i.datetime.get)
+    val sorted_dates: Seq[DateTime] = datetimes.sortBy(_.getMillis)
+    if (sorted_dates.length > 0) Some(sorted_dates(datetimes.length / 2)) else None
   }
 }
 
@@ -43,9 +49,8 @@ object Gallery {
     } map { // Sort all lists of albums by date
       case (k,v) => (k, v.sortBy(_.datetime._2.getMillis))
     }
-    val gals = table.scan(filter = Seq(), limit = 99999).map(galleryFromItem(_, grouped))
-    val galsWithAlbums = gals.filter(_.albums.size > 0)
-    galleries = Some(galsWithAlbums)
+    val gals = table.scan(filter = Seq(), limit = 99999).map(galleryFromItem(_, grouped)).collect { case Some(g) => g }
+    galleries = Some(gals.sortBy(_.medianAge.get.getMillis).reverse)
     galleries.get
   }
   
@@ -55,14 +60,13 @@ object Gallery {
   }
 
 
-  private def galleryFromItem(item: Item, albumMap: Map[String, Seq[Album]]): Gallery = {
+  private def galleryFromItem(item: Item, albumMap: Map[String, Seq[Album]]): Option[Gallery] = {
     val attributes: Map[String, AttributeValue] = item.attributes.map { case Attribute(k, v) => (k, v) }.toMap
-    Gallery(
-      name = attributes("name").s.get,
-      description = attributes("description").s.get,
-      url = attributes("url").s.get,
-      albums = albumMap.getOrElse(attributes("url").s.get, Seq.empty)
-    )
+    val name = attributes("name").s.getOrElse("")
+    val description = attributes("description").s.getOrElse("")
+    val url = attributes("url").s.get
+    val albums = albumMap.getOrElse(attributes("url").s.get, Seq.empty)
+    if (albums.length > 0) Some(Gallery(name, description, url, albums)) else None
   }
 
   def get(url : String) : Gallery = {

@@ -30,10 +30,10 @@ object Frontpage {
   var data : Option[Frontpage]  = None
 
   // Update data
-  def update(jsonPath : String = "galleries.json", nbCovers : Int = 20) : Frontpage = {
+  def update() : Frontpage = {
 
     // Get galleries
-    val galleries = Gallery.updateGalleries
+    val galleries: Seq[Gallery] = Gallery.updateGalleries
 
     // Map all albums
     val albums: Seq[Album] = galleries.flatMap(_.albums)
@@ -42,7 +42,6 @@ object Frontpage {
     val covers = for (a <- albums; i <- a.images if i.banner) yield {
       Cover(i, a)
     }
-    println(covers)
 
     // Get frontpage
     val frontpage = Frontpage(galleries, covers)
@@ -53,8 +52,8 @@ object Frontpage {
 
 
   // return frontpagefrom cache if available
-  def get(jsonPath : String = "galleries.json") : Frontpage = data match {
-    case None       => update(jsonPath)
+  def get() : Frontpage = data match {
+    case None       => update()
     case Some(d)    => d
   }
 
