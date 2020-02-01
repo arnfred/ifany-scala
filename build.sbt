@@ -2,7 +2,10 @@ name := "Ifany"
 
 version := "1.0"
 
-scalaVersion := "2.12.9"
+scalaVersion := "2.12.10"
+
+// Needed for `sbt compile stage` together with `project/plugins.sbt`
+enablePlugins(JavaAppPackaging)
 
 Compile / scalaSource := baseDirectory.value / "src"
 
