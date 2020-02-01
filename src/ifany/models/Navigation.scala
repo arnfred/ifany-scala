@@ -3,7 +3,6 @@ package ifany
 import org.joda.time.DateTime 
 import scala.io.Source
 import java.io.FileNotFoundException
-import net.liftweb.json._
 import java.io.File
 
 case class Navigation(next : Option[NavElem], 

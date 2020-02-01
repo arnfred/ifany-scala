@@ -1,6 +1,5 @@
 package ifany
 
-import dispatch._
 import unfiltered.request._
 import unfiltered.response._
 import unfiltered.netty._

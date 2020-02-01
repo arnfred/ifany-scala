@@ -3,14 +3,13 @@ package ifany
 case class FrontpageTemplate(view : FrontpageView) extends Template {
 
   // Implicit conversion 
-  import com.dongxiguo.fastring.Fastring.Implicits._
   implicit val v = view
 
-  val css: String = fast"""<link rel="stylesheet" type="text/css" href="/css/frontpage.css"/>"""
+  val css: String = s"""<link rel="stylesheet" type="text/css" href="/css/frontpage.css"/>"""
 
   override def toString : String = Base(Template(header + galleries), Some(Template(css)))
 
-  def header : Template = Template(fast"""
+  def header : Template = Template(s"""
     <div class="row top topmost">
         <div class="col-md-3 col-md-offset-1" id="about">
             <h1 id="header"><span><span id="if">if</span><span id="any">any</span></span></h1>
@@ -48,7 +47,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
   def gallery(g : Gallery, cover : Cover) : Template = Template { 
     val albumNum : Int = g.albums.size
     val imagesNum : Int = view.getGallerySize(g)
-    fast"""
+    s"""
       <div class="row category">
           <div class="col-sm-3 col-xs-12 col-sm-offset-1 cat-image">
               <img src="${ cover.image.url("s", cover.album.url) }" class="frame"/>
@@ -69,7 +68,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
   }
 
   def galleryAlbums(g : Gallery) : Template = Template {
-    (for (album <- g.albums.reverse) yield fast"""
+    (for (album <- g.albums.reverse) yield s"""
       <div class="row album album-hidden">
         <a href="/${ g.url }/${ album.url }/">
           <div class="col-sm-3 col-sm-offset-1 album-info hidden-xs">
@@ -103,12 +102,12 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
 
   def albumThumbnails(album : Album) : Template = Template {
     val images = view.getAlbumImages(album, 4)
-    val first = (for (image <- images.take(3)) yield fast"""
+    val first = (for (image <- images.take(3)) yield s"""
       <div class="col-xs-4 col-sm-3 img">
         <img href="${ image.url("t", album.url) }" class="frame" src="/img/loader.gif"/>
       </div>
     """).mkString
-    val last = fast"""
+    val last = s"""
       <div class="col-sm-3 hidden-xs img">
         <img href="${ images.last.url("t", album.url) }" class="frame" src="/img/loader.gif"/>
       </div>"""

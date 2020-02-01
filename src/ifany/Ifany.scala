@@ -1,10 +1,6 @@
 package ifany
 
-// Unfiltered
-//import dispatch._
 import unfiltered.netty._
-//import unfiltered.request._
-//import unfiltered.response._
 
 object Main {
 

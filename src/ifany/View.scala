@@ -1,7 +1,6 @@
 package ifany
 
-import org.joda.time.DateTime 
-import org.joda.time.format.DateTimeFormat
+import java.time.LocalDateTime
 
 
 trait View {
@@ -9,7 +8,7 @@ trait View {
   val name : String
   def getTitle : String
 
-  def getPostfix(d : DateTime) : String = (d.getDayOfMonth % 100, d.getDayOfMonth % 10) match {
+  def getPostfix(d : LocalDateTime) : String = (d.getDayOfMonth % 100, d.getDayOfMonth % 10) match {
     case (11,_) => "th"
     case (_,1)  => "st"
     case (_,2)  => "nd"
@@ -21,19 +20,19 @@ trait View {
   def getDateString(images : Seq[Image], withDay : Boolean) : String = {
 
     // Get a list of all dates
-    val dates : Seq[DateTime] = {
-      val unsorted = for (i <- images; dt <- i.datetime) yield new DateTime(dt)
+    val dates : Seq[LocalDateTime] = {
+      val unsorted = for (i <- images; dt <- i.datetime) yield new LocalDateTime(dt)
       unsorted.sortBy(_.getMillis)
     }
 
     // Get the day
-    def day(dt : DateTime) = withDay match {
+    def day(dt : LocalDateTime) = withDay match {
       case true => dt.toString("MMMM d") + getPostfix(dt)
       case false => dt.toString("MMMM")
     }
 
     // Get the year
-    def year(dt : DateTime) = dt.toString("Y")
+    def year(dt : LocalDateTime) = dt.toString("Y")
 
     dates match {
       case Nil  => ""

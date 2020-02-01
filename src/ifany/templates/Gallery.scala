@@ -3,10 +3,9 @@ package ifany
 case class GalleryTemplate(view : GalleryView) extends Template {
 
   // Implicit conversion 
-  import com.dongxiguo.fastring.Fastring.Implicits._
   implicit val v = view
 
-  val css: String = fast"""<link rel="stylesheet" type="text/css" href="/css/gallery.css"/>"""
+  val css: String = s"""<link rel="stylesheet" type="text/css" href="/css/gallery.css"/>"""
 
   override def toString : String = Base(
     Template(navigation(view.getNav) + header + gallery),
@@ -16,7 +15,7 @@ case class GalleryTemplate(view : GalleryView) extends Template {
   def nextprev : Template = {
     val next = for (n <- view.getNav.next) yield n.url
     val prev = for (p <- view.getNav.prev) yield p.url
-    Template(fast"""
+    Template(s"""
       <link rel="next" href="${ next.getOrElse("/") }"/>
       <link rel="prev" href="${ prev.getOrElse("/") }"/>
     """)
@@ -27,7 +26,7 @@ case class GalleryTemplate(view : GalleryView) extends Template {
     val nextPhone = for (n <- nav.next) yield getLink("Newer", "/" + n.url + "/", "&raquo;")
     val prev = for (p <- nav.prev) yield getLink(p.title, "/" + p.url + "/", "&laquo;")
     val next = for (n <- nav.next) yield getLink(n.title, "/" + n.url + "/", "&raquo;")
-    val t = Template(fast"""
+    val t = Template(s"""
 
       <div class="row visible-xs-block navigation">
           <div class="album-nav prev col-xs-5 col-sm-offset-1">
@@ -57,11 +56,11 @@ case class GalleryTemplate(view : GalleryView) extends Template {
     else Template("")
   }
 
-  def getHomeLink(text : String, url : String) : Template = Template(fast"""
+  def getHomeLink(text : String, url : String) : Template = Template(s"""
     <a href="/"><span class="nav home">$text</span></a>
   """)
 
-  def getLink(text : String, url : String, sign : String) : Template = Template(fast"""
+  def getLink(text : String, url : String, sign : String) : Template = Template(s"""
     <a href="$url" alt="$text">
       <span class="laquo">$sign</span>
       <span class="nav other">$text</span>
@@ -71,7 +70,7 @@ case class GalleryTemplate(view : GalleryView) extends Template {
   def header : Template = Template {
     val albumNum : Int = view.gallery.albums.size
     val imagesNum : Int = view.getSize
-    fast"""
+    s"""
     <div class="row top topmost">
         <div class="col-sm-3 col-sm-offset-1" id="about">
           <h1 id="gallery-name"><span>${ view.getTitle }</span></h1>
@@ -96,7 +95,7 @@ case class GalleryTemplate(view : GalleryView) extends Template {
 
 
   def gallery : Template = Template {
-    (for (album <- view.gallery.albums) yield fast"""
+    (for (album <- view.gallery.albums) yield s"""
       <div class="row album">
         <a href="/${ view.gallery.url }/${ album.url }/">
           <div class="col-sm-3 col-sm-offset-1 album-info hidden-xs">
@@ -130,12 +129,12 @@ case class GalleryTemplate(view : GalleryView) extends Template {
 
   def albumThumbnails(album : Album) : Template = Template {
     val images = view.getAlbumImages(album, 4)
-    val first = (for (image <- images.take(3)) yield fast"""
+    val first = (for (image <- images.take(3)) yield s"""
       <div class="col-xs-4 col-sm-3 img">
         <img src="${ image.url("t", album.url) }" class="frame"/>
       </div>
     """).mkString
-    val last = fast"""
+    val last = s"""
       <div class="col-sm-3 hidden-xs img">
         <img src="${ images.last.url("t", album.url) }" class="frame" href="/img/loader.gif"/>
       </div>"""

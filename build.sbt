@@ -2,27 +2,17 @@ name := "Ifany"
 
 version := "1.0"
 
-enablePlugins(JavaAppPackaging)
-
-scalaVersion := "2.10.4"
+scalaVersion := "2.12.9"
 
 Compile / scalaSource := baseDirectory.value / "src"
 
 scalacOptions ++= Seq("-unchecked", "-Ywarn-dead-code", "-deprecation")
 
 libraryDependencies  ++= Seq(
-    // other dependencies here
-    // pick and choose:
-    "net.databinder" %% "unfiltered-netty-server" % "0.7.1",
-    "net.databinder" %% "unfiltered-filter" % "0.7.1",
-    "net.databinder" %% "unfiltered-json" % "0.6.7",
-    "net.databinder.dispatch" %% "dispatch-core" % "0.9.5",
-    "com.dongxiguo" %% "fastring" % "0.2.1",
-    "org.mongodb" %% "casbah" % "2.5.0",
-    "com.novus" %% "salat" % "1.9.2",
+    "ws.unfiltered" %% "unfiltered-netty-server" % "0.9.1",
+    "ws.unfiltered" %% "unfiltered-filter" % "0.9.1",
     "joda-time" % "joda-time" % "2.2",
     "org.joda" % "joda-convert" % "1.2",
-    "com.sksamuel.scrimage" %% "scrimage-core" % "1.4.1",
     "com.github.seratch" %% "awscala-dynamodb" % "0.8.+",
     "com.github.seratch" %% "awscala-s3" % "0.8.+",
     "com.sun.activation" % "javax.activation" % "1.2.0"

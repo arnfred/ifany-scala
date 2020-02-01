@@ -1,11 +1,9 @@
 package ifany
 
-import dispatch._
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 import scala.util.Random.shuffle
 import java.io.File
-import net.liftweb.json._
 import scala.io.Source
 import java.io.FileNotFoundException
 
@@ -23,8 +21,6 @@ case class Cover(image : Image, album : Album) {
 
 
 object Frontpage {
-
-  implicit val formats              = DefaultFormats
 
   // We cache the data since it takes a bit of computation to get
   var data : Option[Frontpage]  = None

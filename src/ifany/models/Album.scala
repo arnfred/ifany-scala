@@ -4,7 +4,6 @@ import org.joda.time.DateTime
 import scala.io.Source
 import java.io.FileNotFoundException
 import scala.collection.JavaConverters._
-import net.liftweb.json._
 import java.io.File
 import awscala._, dynamodbv2._
 
@@ -43,9 +42,6 @@ case class Album(title : String,
                  public : Option[Boolean],
                  images : Seq[Image]) {
 
-  implicit val formats    = DefaultFormats
-  def json : String = Serialization.write(this)
-
   val datetime : (DateTime, DateTime) = {
 
     // Take all images that have a date associated and sort them
@@ -83,8 +79,6 @@ object Album {
   val table: Table = dynamoDB.table(albumTable).get
   // Should be a map
   var albums: Option[Map[String, Album]] = None
-
-  implicit val formats    = DefaultFormats
 
   // Look up album in map
   def get(id: String): Album = getAll.get(id) match {
