@@ -41,6 +41,9 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
           error.printStackTrace()
           req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
         }
+        case error: java.io.IOException => {
+          println("IOException thrown for frontpage (presumably due to rapid reload")
+        }
         case error : Throwable => {
           println("* UNKNOWN ERROR * : " + error.toString)
           error.printStackTrace()
@@ -174,6 +177,12 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         case AlbumNotFound(url) => {
           println("* ALBUM NOT FOUND * : " + url)
           req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
+        }
+        case error: java.io.IOException => {
+          println(s"Broken pipe while sending photo $album/$filename")
+        }
+        case error: java.net.SocketException => {
+          println(s"Connection Reset while sending photo $album/$filename")
         }
         case error : Throwable => {
           println("* UNKNOWN ERROR * : " + error.toString)
