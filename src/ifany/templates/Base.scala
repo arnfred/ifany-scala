@@ -1,12 +1,10 @@
 package ifany
 
-import com.dongxiguo.fastring.Fastring.Implicits._
-
 case class Base(body : Template, header : Option[Template] = None) extends Template {
 
   implicit val view = body.view
 
-  override def toString : String = fast"""
+  override def toString : String = s"""
 
     <!DOCTYPE html>
     <html lang="en">

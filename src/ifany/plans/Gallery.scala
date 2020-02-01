@@ -1,6 +1,5 @@
 package ifany
 
-import dispatch._
 import unfiltered.request._
 import unfiltered.response._
 import unfiltered.netty._
@@ -12,6 +11,7 @@ import scala.Stream
 import scala.util.Random
 import awscala._, s3._
 
+@io.netty.channel.ChannelHandler.Sharable
 object GalleryPlan extends async.Plan with ServerErrorResponse {
 
   def intent = {
@@ -178,11 +178,11 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
           println("* ALBUM NOT FOUND * : " + url)
           req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
         }
-        case error: java.io.IOException => {
-          println(s"Broken pipe while sending photo $album/$filename")
-        }
         case error: java.net.SocketException => {
           println(s"Connection Reset while sending photo $album/$filename")
+        }
+        case error: java.io.IOException => {
+          println(s"Broken pipe while sending photo $album/$filename")
         }
         case error : Throwable => {
           println("* UNKNOWN ERROR * : " + error.toString)

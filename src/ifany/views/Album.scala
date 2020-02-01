@@ -1,5 +1,9 @@
 package ifany
 
+import org.json4s._
+import org.json4s.native.Serialization
+import org.json4s.native.Serialization.{write}
+
 sealed trait Row
 case class CoverRow(image: Image) extends Row
 case class DualRow(left: Image, right: Image) extends Row {
@@ -16,6 +20,8 @@ case class DualRow(left: Image, right: Image) extends Row {
 
 case class AlbumView(album : Album, nav : Navigation, name : String = "album", cssname: String = "album") extends View {
 
+  implicit val formats = Serialization.formats(NoTypeHints)
+
   def getTitle : String = album.title
   def getDescription : String = album.description
   def getURL = album.url
@@ -30,7 +36,7 @@ case class AlbumView(album : Album, nav : Navigation, name : String = "album", c
     links.mkString(", ")
   }
 
-  def getJson : String = album.json
+  def getJson : String = write(album)
 
   def getRows(images: Seq[Image], rows: Seq[Row] = Seq.empty): Seq[Row] = images match {
     case Nil => rows.reverse

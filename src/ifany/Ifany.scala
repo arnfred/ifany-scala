@@ -1,10 +1,6 @@
 package ifany
 
-// Unfiltered
-//import dispatch._
 import unfiltered.netty._
-//import unfiltered.request._
-//import unfiltered.response._
 
 object Main {
 
@@ -36,7 +32,7 @@ object Ifany {
     println("starting on port: " + testPort)
 
     // Initialize Server
-    var srv = unfiltered.netty.Http(testPort).chunked(1048576).resources(resourceDir.toURI.toURL);
+    var srv = unfiltered.netty.Server.http(testPort).resources(resourceDir.toURI.toURL);
 
     // Run server
     //srv.handler(DataPlan).handler(GalleryPlan)
