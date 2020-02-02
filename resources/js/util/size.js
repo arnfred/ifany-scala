@@ -50,27 +50,39 @@ define(function() {
 		var maxW = 800;
 		var result = {};
 
-		if ((o == "v" && h > 1500 && w > 1500/r) || (o == "h" && w > 2000 && h > 2000*r)) {
+		console.log("h, w, o, r:", h, w, o, r)
+		console.log("h, 3200*r", h, 3200*r)
+
+		if ((o == "v" && (h > 3200 || w > 3200/r)) || (o == "h" && (w > 4000 || h > 4000*r))) {
+			maxH = 3200;
+			maxW = 4000;
+		} 
+		else if ((o == "v" && (h > 2400 || w > 2400/r)) || (o == "h" && (w > 3200 || h > 3200*r))) {
+			console.log("> 3200")
+			maxH = 2400;
+			maxW = 3200;
+		} 
+		else if ((o == "v" && (h > 1500 || w > 1500/r)) || (o == "h" && (w > 2000 || h > 2000*r))) {
 			maxH = 1500;
 			maxW = 2000;
 		} 
-		else if ((o == "v" && h > 1200 && w > 1200/r) || (o == "h" && w > 1600 && h > 1600*r)) {
+		else if ((o == "v" && (h > 1200 || w > 1200/r)) || (o == "h" && (w > 1600 || h > 1600*r))) {
 			maxH = 1200;
 			maxW = 1600;
 		} 
-		else if ((o == "v" && h > 960 && w > 960/r) || (o == "h" && w > 1280 && h > 1280*r)) {
+		else if ((o == "v" && (h > 960 || w > 960/r)) || (o == "h" && (w > 1280 || h > 1280*r))) {
 			maxH = 980;
 			maxW = 1280;
 		} 
-		else if ((o == "v" && h > 768 && w > 768/r) || (o == "h" && w > 1024 && h > 1024*r)) {
+		else if ((o == "v" && (h > 768 || w > 768/r)) || (o == "h" && (w > 1024 || h > 1024*r))) {
 			maxH = 768;
 			maxW = 1024;
 		} 
-		else if ((o == "v" && h > 600 && w > 600/r) || (o == "h" && w > 800 && h > 800*r)) {
+		else if ((o == "v" && (h > 450 || w > 450/r)) || (o == "h" && (w > 800 || h > 800*r))) {
 			maxH = 600;
 			maxW = 800;
 		} 
-		else if ((o == "v" && h > 450 && w > 450/r) || (o == "h" && w > 600 && h > 600*r)) {
+		else if ((o == "v" && (h > 600 || w > 600/r)) || (o == "h" && (w > 600 || h > 600*r))) {
 			maxH = 450;
 			maxW = 600;
 		} 
@@ -80,7 +92,11 @@ define(function() {
 		}
 
 		// Set url
-		result.url = maxW + "x" + maxH
+		if (maxH == 3200 && maxW == 4000) {
+			result.url = "original";
+		} else {
+			result.url = maxW + "x" + maxH
+		}
 
 		// Set actual size
 		if (o == "v") {

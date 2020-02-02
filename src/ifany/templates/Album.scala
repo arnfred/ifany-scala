@@ -150,16 +150,20 @@ case class AlbumTemplate(view : AlbumView) extends Template {
       "800" -> "400",
       "1200" -> "600",
       "1600" -> "800",
+      "2000" -> "1600",
       "3200" -> "1600",
-      "4000" -> "2000")
+      "4000" -> "2000",
+      "6400" -> "3200")
     val coverSizes: Map[String, String] = Map(
       "400" -> "400",
       "600" -> "600",
       "800" -> "800",
       "1200" -> "1280",
       "1600" -> "1600",
-      "3200" -> "2000",
-      "4000" -> "2000")
+      "2000" -> "2000",
+      "3200" -> "3200",
+      "4000" -> "original",
+      "6400" -> "original")
 
     def style(min: Option[String], max: Option[String]): String = {
       val size = max.getOrElse(min.get)
@@ -179,9 +183,11 @@ case class AlbumTemplate(view : AlbumView) extends Template {
       style(Some("600"), Some("800")),
       style(Some("800"), Some("1200")),
       style(Some("1200"), Some("1600")),
-      style(Some("1600"), Some("3200")),
+      style(Some("1600"), Some("2000")),
+      style(Some("2000"), Some("3200")),
       style(Some("3200"), Some("4000")),
-      style(Some("4000"), None))
+      style(Some("4000"), Some("6400")),
+      style(Some("6400"), None))
 
     styles.mkString("<style>", "\n", "</style>")
   }
