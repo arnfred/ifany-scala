@@ -50,15 +50,11 @@ define(function() {
 		var maxW = 800;
 		var result = {};
 
-		console.log("h, w, o, r:", h, w, o, r)
-		console.log("h, 3200*r", h, 3200*r)
-
 		if ((o == "v" && (h > 3200 || w > 3200/r)) || (o == "h" && (w > 4000 || h > 4000*r))) {
 			maxH = 3200;
 			maxW = 4000;
 		} 
 		else if ((o == "v" && (h > 2400 || w > 2400/r)) || (o == "h" && (w > 3200 || h > 3200*r))) {
-			console.log("> 3200")
 			maxH = 2400;
 			maxW = 3200;
 		} 

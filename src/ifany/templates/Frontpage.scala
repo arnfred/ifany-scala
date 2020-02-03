@@ -26,7 +26,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
             Inquiries and fawning fan mail are all welcome at <a
                 href="mailto:jonas@ifany.org"
                 alt="jonas@ifany.org">jonas@ifany.org</a>.</p>
-                <p id="my-name"><a href="http://www.dynkarken.com">Jonas Toft Arnfred</a></p>
+                <p id="my-name"><a mailto="jonas@ifany.org">Jonas Arnfred</a></p>
 
         </div>
 
@@ -93,7 +93,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
             </div>
           </div>
           <div class="col-sm-1 album-arrow hidden-xs">
-            <p>&raquo;</p>
+            <p>ᐅ</p>
           </div>
         </a>
       </div>

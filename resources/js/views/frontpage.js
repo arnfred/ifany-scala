@@ -51,15 +51,15 @@ define(["jquery"],
 
 	// Resize header so it fills the space
 	var resizeHeader = function() {
+		var b = $("#header");
 		var h = $("#header span");
-		var s = $("#subheader span")
+		var s = $("#subheader span");
 		var ratio = h.parent().width() / h.width();
 		var fontsize = ratio * parseInt(h.css("font-size")) * 0.95;
 		var lineheight = Math.pow(fontsize, 0.9) * 1.2;
 		var subfontsize = fontsize * 0.20;
 
 		h.css("font-size", fontsize + "px")
-		//h.parent().css("line-height", lineheight + "px")
 		s.css("font-size", subfontsize + "px")
 	}
 

@@ -1,8 +1,16 @@
 /* Css for frontpage */
 
+.container-fluid {
+	max-width:1400px;
+}
+
 /* About text */
 p#about-text {
 	margin-top:3em;
+}
+
+div#about h1 {
+	margin-top:0;
 }
 
 img {
@@ -86,8 +94,8 @@ div.album-info {
 }
 
 div.album-arrow p {
-	padding-top:50%;
-	font-size:3em;
+	padding-top:70%;
+	font-size:1.5em;
 }
 
 

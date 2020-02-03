@@ -25,10 +25,10 @@ case class MetaAlbumTemplate(view : AlbumView) extends Template {
   """)
 
   def navigation(nav : Navigation) : Template = {
-    val prevPhone = for (p <- nav.prev) yield getLink("Older", "/" + p.url + "/", "&laquo;")
-    val nextPhone = for (n <- nav.next) yield getLink("Newer", "/" + n.url + "/", "&raquo;")
-    val prev = for (p <- nav.prev) yield getLink(p.title, "/" + p.url + "/", "&laquo;")
-    val next = for (n <- nav.next) yield getLink(n.title, "/" + n.url + "/", "&raquo;")
+    val prevPhone = for (p <- nav.prev) yield getLink("Older", "/" + p.url + "/", "ᐊ")
+    val nextPhone = for (n <- nav.next) yield getLink("Newer", "/" + n.url + "/", "ᐅ")
+    val prev = for (p <- nav.prev) yield getLink(p.title, "/" + p.url + "/", "ᐊ")
+    val next = for (n <- nav.next) yield getLink(n.title, "/" + n.url + "/", "ᐅ")
     Template(s"""
 
       <div class="row visible-xs-block navigation">
@@ -72,7 +72,7 @@ case class MetaAlbumTemplate(view : AlbumView) extends Template {
   <div class="overlay" id="overlay">
       <div class="col-xs-1 overlay-prev overlay-nav">
         <div id="overlay-prev">
-          <span class="laquo">&laquo;</span>
+          <span class="laquo">ᐊ</span>
         </div>
       </div>
       <div class="col-xs-10 overlay-img" id="overlay-img">
@@ -83,7 +83,7 @@ case class MetaAlbumTemplate(view : AlbumView) extends Template {
       </div>
       <div class="col-xs-1 overlay-next overlay-nav">
         <div id="overlay-next">
-          <span class="laquo">&raquo;</span>
+          <span class="laquo">ᐅ</span>
         </div>
       </div>
   </div>

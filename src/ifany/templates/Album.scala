@@ -25,10 +25,10 @@ case class AlbumTemplate(view : AlbumView) extends Template {
   """)
 
   def navigation(nav : Navigation) : Template = {
-    val prevPhone = for (p <- nav.prev) yield getLink("Older", "/" + p.url + "/", "&laquo;")
-    val nextPhone = for (n <- nav.next) yield getLink("Newer", "/" + n.url + "/", "&raquo;")
-    val prev = for (p <- nav.prev) yield getLink(p.title, "/" + p.url + "/", "&laquo;")
-    val next = for (n <- nav.next) yield getLink(n.title, "/" + n.url + "/", "&raquo;")
+    val prevPhone = for (p <- nav.prev) yield getLink("Older", "/" + p.url + "/", "ᐊ")
+    val nextPhone = for (n <- nav.next) yield getLink("Newer", "/" + n.url + "/", "ᐅ")
+    val prev = for (p <- nav.prev) yield getLink(p.title, "/" + p.url + "/", "ᐊ")
+    val next = for (n <- nav.next) yield getLink(n.title, "/" + n.url + "/", "ᐅ")
     Template(s"""
 
       <div class="row visible-xs-block navigation">
@@ -72,7 +72,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
   <div class="overlay" id="overlay">
       <div class="col-xs-1 overlay-prev overlay-nav">
         <div id="overlay-prev">
-          <span class="laquo">&laquo;</span>
+          <span class="laquo">ᐊ</span>
         </div>
       </div>
       <div class="col-xs-10 overlay-img" id="overlay-img">
@@ -83,7 +83,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
       </div>
       <div class="col-xs-1 overlay-next overlay-nav">
         <div id="overlay-next">
-          <span class="laquo">&raquo;</span>
+          <span class="laquo">ᐅ</span>
         </div>
       </div>
   </div>
@@ -144,31 +144,33 @@ case class AlbumTemplate(view : AlbumView) extends Template {
     """)
 
   def responsiveStyles(view: AlbumView): String = {
-    val normalSizes: Map[String, String] = Map(
-      "400" -> "400",
-      "600" -> "400",
-      "800" -> "400",
-      "1200" -> "600",
-      "1600" -> "800",
-      "2000" -> "1600",
-      "3200" -> "1600",
-      "4000" -> "2000",
-      "6400" -> "3200")
-    val coverSizes: Map[String, String] = Map(
-      "400" -> "400",
-      "600" -> "600",
-      "800" -> "800",
-      "1200" -> "1280",
-      "1600" -> "1600",
-      "2000" -> "2000",
-      "3200" -> "3200",
-      "4000" -> "original",
-      "6400" -> "original")
+    val normalSizes: Map[Int, String] = Map(
+      400 -> "400",
+      600 -> "400",
+      800 -> "400",
+      1280 -> "600",
+      1600 -> "800",
+      2000 -> "1600",
+      3200 -> "1600",
+      4000 -> "2000",
+      6400 -> "3200")
+    val coverSizes: Map[Int, String] = Map(
+      400 -> "400",
+      600 -> "600",
+      800 -> "800",
+      1280 -> "1280",
+      1600 -> "1600",
+      2000 -> "2000",
+      3200 -> "3200",
+      4000 -> "original",
+      6400 -> "original")
 
-    def style(min: Option[String], max: Option[String]): String = {
+    def style(min: Option[Int], max: Option[Int]): String = {
       val size = max.getOrElse(min.get)
-      val maxWidth = max.map(m => s"and (max-width: ${m}px)").getOrElse("")
-      val minWidth = min.map(m => s"and (min-width: ${m}px)").getOrElse("")
+      val maxMarginFactor = if (size > 800) 1.0/0.8 else 1.0// images larger than 800px only take up ~80% of the screen
+      val minMarginFactor = if (size > 1280) 1.0/0.8 else 1.0// images larger than 800px only take up ~80% of the screen
+      val maxWidth = max.map(m => s"and (max-width: ${m*maxMarginFactor}px)").getOrElse("")
+      val minWidth = min.map(m => s"and (min-width: ${m*minMarginFactor}px)").getOrElse("")
       val covers: Set[String] = view.album.images.filter(_.cover).map(_.file).toSet ++ Set(view.album.images.last.file)
       val css = for (image <- view.album.images) yield covers.contains(image.file) match {
         case true => s"#${image.id} { background-image: url(${ image.url(coverSizes(size), view.getURL) }); }"
@@ -178,16 +180,16 @@ case class AlbumTemplate(view : AlbumView) extends Template {
     }
 
     val styles = Seq(
-      style(None, Some("400")),
-      style(Some("400"), Some("600")),
-      style(Some("600"), Some("800")),
-      style(Some("800"), Some("1200")),
-      style(Some("1200"), Some("1600")),
-      style(Some("1600"), Some("2000")),
-      style(Some("2000"), Some("3200")),
-      style(Some("3200"), Some("4000")),
-      style(Some("4000"), Some("6400")),
-      style(Some("6400"), None))
+      style(None, Some(400)),
+      style(Some(400), Some(600)),
+      style(Some(600), Some(800)),
+      style(Some(800), Some(1280)),
+      style(Some(1280), Some(1600)),
+      style(Some(1600), Some(2000)),
+      style(Some(2000), Some(3200)),
+      style(Some(3200), Some(4000)),
+      style(Some(4000), Some(6400)),
+      style(Some(6400), None))
 
     styles.mkString("<style>", "\n", "</style>")
   }

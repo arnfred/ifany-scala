@@ -5,7 +5,7 @@ case class GalleryTemplate(view : GalleryView) extends Template {
   // Implicit conversion 
   implicit val v = view
 
-  val css: String = s"""<link rel="stylesheet" type="text/css" href="/css/gallery.css"/>"""
+  val css: String = s"""<link rel="stylesheet" type="text/css" href="/css/frontpage.css"/>"""
 
   override def toString : String = Base(
     Template(navigation(view.getNav) + header + gallery),
@@ -22,10 +22,10 @@ case class GalleryTemplate(view : GalleryView) extends Template {
   }
 
   def navigation(nav : Navigation) : Template = {
-    val prevPhone = for (p <- nav.prev) yield getLink("Older", "/" + p.url + "/", "&laquo;")
-    val nextPhone = for (n <- nav.next) yield getLink("Newer", "/" + n.url + "/", "&raquo;")
-    val prev = for (p <- nav.prev) yield getLink(p.title, "/" + p.url + "/", "&laquo;")
-    val next = for (n <- nav.next) yield getLink(n.title, "/" + n.url + "/", "&raquo;")
+    val prevPhone = for (p <- nav.prev) yield getLink("Older", "/" + p.url + "/", "ᐊ")
+    val nextPhone = for (n <- nav.next) yield getLink("Newer", "/" + n.url + "/", "ᐅ")
+    val prev = for (p <- nav.prev) yield getLink(p.title, "/" + p.url + "/", "ᐊ")
+    val next = for (n <- nav.next) yield getLink(n.title, "/" + n.url + "/", "ᐅ")
     val t = Template(s"""
 
       <div class="row visible-xs-block navigation">
@@ -120,7 +120,7 @@ case class GalleryTemplate(view : GalleryView) extends Template {
             </div>
           </div>
           <div class="col-sm-1 album-arrow hidden-xs">
-            <p>&raquo;</p>
+            <p>ᐅ</p>
           </div>
         </a>
       </div>
