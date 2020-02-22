@@ -41,22 +41,8 @@ case class Album(title : String,
                  url : String,
                  galleries : Seq[String],
                  public : Option[Boolean],
-                 images : Seq[Image]) {
-
-  val datetime : (DateTime, DateTime) = {
-
-    // Take all images that have a date associated and sort them
-    val sorted_dates : Seq[DateTime] = {
-      for (i <- images; dt <- i.datetime) yield new DateTime(i.datetime.get)
-    } sortBy(_.getMillis)
-
-    // Return the first and last date
-    sorted_dates.size match {
-      case 0 => throw InternalError("Album '" + url + "' has no date information associated with any pictures")
-      case 1 => (sorted_dates.head, sorted_dates.head)
-      case n => (sorted_dates.head, sorted_dates.last)
-    }
-  }
+                 images : Seq[Image],
+                 datetime: (DateTime, DateTime)) {
 
   val isPublic : Boolean = public.getOrElse(true)
 
@@ -87,16 +73,38 @@ object Album {
     case None => throw new AlbumNotFound(id)
   }
 
-  private def albumFromItem(item: Item): Album = {
+  def datetimeFromImages(images: Seq[Image], id: String): (DateTime, DateTime) = {
+
+    // Take all images that have a date associated and sort them
+    val sorted_dates : Seq[DateTime] = {
+      for (i <- images; dt <- i.datetime) yield new DateTime(i.datetime.get)
+    } sortBy(_.getMillis)
+
+    // Return the first and last date
+    sorted_dates.size match {
+      case 0 => throw InternalError("Album '" + id + "' has no date information associated with any pictures")
+      case 1 => (sorted_dates.head, sorted_dates.head)
+      case n => (sorted_dates.head, sorted_dates.last)
+    }
+  }
+
+  private def albumFromItem(item: Item): Option[Album] = {
     val attributes: Map[String, AttributeValue] = item.attributes.map { case Attribute(k, v) => (k, v) }.toMap
-    Album(
-      title = attributes("title").s.get,
-      description = attributes("description").s.getOrElse(""),
-      url = attributes("url").s.get,
-      galleries = attributes("galleries").l.map(av => AttributeValue(av).s.get),
-      public = attributes("public").bl,
-      images = attributes("images").l.map(av => imageFromAttributeValue(AttributeValue(av)))
-    )
+    val images = attributes("images").l.map(av => imageFromAttributeValue(AttributeValue(av)))
+    val url = attributes("url").s.get
+    if (images.size == 0) {
+      None
+    } else {
+      Some(Album(
+        title = attributes("title").s.get,
+        description = attributes("description").s.getOrElse(""),
+        url = url,
+        galleries = attributes("galleries").l.map(av => AttributeValue(av).s.get),
+        public = attributes("public").bl,
+        images = images,
+        datetime = datetimeFromImages(images, url)
+      ))
+    }
   }
 
   private def imageFromAttributeValue(value: AttributeValue): Image = {
@@ -114,7 +122,7 @@ object Album {
 
   // Returns all albums in the photo dir
   def getAll: Map[String, Album] = albums.getOrElse {
-    albums = Some(table.scan(filter = Seq(), limit = 99999).map(albumFromItem(_)).map(a => (a.url, a)).toMap)
+    albums = Some(table.scan(filter = Seq(), limit = 99999).map(albumFromItem(_)).collect { case Some(a) => (a.url, a) }.toMap)
     albums.get
   }
 
