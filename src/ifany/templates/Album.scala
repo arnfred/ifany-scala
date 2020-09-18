@@ -145,9 +145,9 @@ case class AlbumTemplate(view : AlbumView) extends Template {
 
   def responsiveStyles(view: AlbumView): String = {
     val normalSizes: Map[Int, String] = Map(
-      400 -> "400",
-      600 -> "400",
-      800 -> "400",
+      400 -> "400", // When a display is < 800px wide, we display all images full row
+      600 -> "600", // When a display is < 800px wide, we display all images full row
+      800 -> "800", // When a display is < 800px wide, we display all images full row
       1280 -> "600",
       1600 -> "800",
       2000 -> "1600",
@@ -172,7 +172,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
       val maxWidth = max.map(m => s"and (max-width: ${m*maxMarginFactor}px)").getOrElse("")
       val minWidth = min.map(m => s"and (min-width: ${m*minMarginFactor}px)").getOrElse("")
       val covers: Set[String] = view.album.images.filter(_.cover).map(_.file).toSet ++ Set(view.album.images.last.file)
-      val css = for (image <- view.album.images) yield covers.contains(image.file) match {
+      val css = for (image <- view.album.images) yield (covers.contains(image.file) || image.isVertical) match {
         case true => s"#${image.id} { background-image: url(${ image.url(coverSizes(size), view.getURL) }); }"
         case false => s"#${image.id} { background-image: url(${ image.url(normalSizes(size), view.getURL) }); }"
       }

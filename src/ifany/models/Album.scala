@@ -18,9 +18,11 @@ case class Image(file : String,
 
   def ratio: Double = size(1) / size(0).toDouble
 
+  def isVertical: Boolean = if (ratio < 1) false else true
+
   def url(size : String, albumURL : String) : String = {
     val album : String = if (albumURL.length == 0) "" else albumURL + "/" 
-    val sizes : Map[String, String] = (Map.empty +
+    val horizontalSizes : Map[String, String] = (Map.empty +
       ("t" -> "150x150") + ("s" -> "400x300") + 
       ("m" -> "600x450") + ("l" -> "800x600") +
       ("150" -> "150x150") + ("400" -> "400x300") +
@@ -28,8 +30,32 @@ case class Image(file : String,
       ("1024" -> "1024x768") + ("1280" -> "1280x980") +
       ("1600" -> "1600x1200") + ("2000" -> "2000x1500") +
       ("3200" -> "3200x2400") + ("original" -> "original"))
+
+    // When images are saved, they are truncated between a width and a height
+    // that assumes a horisontal image. That means that if we ask for a
+    // vertical image between "800x600" we get back an image that is 450x600
+    // (assuming the aspect ratio is the same).
+    //
+    // This is really dumb, but it's the way that things have worked for a long
+    // time, and trying to redo it would take a lot of work.
+    //
+    // The best fix would be to reupload images and change how they are sized,
+    // but that's not very doable, so instead I'm providing a translation table
+    // which encodes the fact that a vertical image needs to be just under
+    // double the size of a horizontal one.
+    val verticalSizes : Map[String, String] = (Map.empty +
+      ("t" -> "150x150") + ("s" -> "400x300") + 
+      ("m" -> "600x450") + ("l" -> "800x600") +
+      ("150" -> "150x150") + ("400" -> "800x600") +
+      ("600" -> "1280x980") + ("800" -> "1600x1200") +
+      ("1024" -> "2000x1500") + ("1280" -> "3200x2400") +
+      ("1600" -> "3200x2400") + ("2000" -> "original") +
+      ("3200" -> "original") + ("original" -> "original"))
     try {
-      Ifany.photoDir + album + file + "_" + sizes(size) + ".jpg"
+      isVertical match {
+        case true => Ifany.photoDir + album + file + "_" + verticalSizes(size) + ".jpg"
+        case false => Ifany.photoDir + album + file + "_" + horizontalSizes(size) + ".jpg"
+      }
     } catch {
         case _ : Exception => throw InternalError("Image with size '" + size + "' doesn't exist")
     }
