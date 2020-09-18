@@ -42,6 +42,7 @@ case class AlbumView(album : Album, nav : Navigation, name : String = "album", c
     case Nil => rows.reverse
     case image +: Nil => (CoverRow(image) +: rows).reverse
     case image +: rest if (image.cover) => getRows(rest, CoverRow(image) +: rows)
+    case image1 +: image2 +: Nil => (DualRow(image1, image2) +: rows).reverse
     case image1 +: image2 +: rest if (image2.cover) => getRows(image1 +: rest, CoverRow(image2) +: rows)
     case image1 +: image2 +: rest => getRows(rest, DualRow(image1, image2) +: rows)
   }

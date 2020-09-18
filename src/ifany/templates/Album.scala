@@ -148,11 +148,11 @@ case class AlbumTemplate(view : AlbumView) extends Template {
       400 -> "400", // When a display is < 800px wide, we display all images full row
       600 -> "600", // When a display is < 800px wide, we display all images full row
       800 -> "800", // When a display is < 800px wide, we display all images full row
-      1280 -> "600",
-      1600 -> "800",
+      1280 -> "800",
+      1600 -> "1024",
       2000 -> "1600",
-      3200 -> "1600",
-      4000 -> "2000",
+      3200 -> "2000",
+      4000 -> "3200",
       6400 -> "3200")
     val coverSizes: Map[Int, String] = Map(
       400 -> "400",
