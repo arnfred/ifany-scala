@@ -12,7 +12,8 @@ case class Image(file : String,
                  datetime : Option[String],
                  banner : Boolean,
                  cover : Boolean,
-                 size : Seq[Int]) {
+                 size : Seq[Int],
+                 is_video: Boolean) {
 
   def id: String = "id" ++ file.replace(".","-").replace("#","-").replace("/","--")
 
@@ -22,42 +23,47 @@ case class Image(file : String,
 
   def url(size : String, albumURL : String) : String = {
     val album : String = if (albumURL.length == 0) "" else albumURL + "/" 
-    val horizontalSizes : Map[String, String] = (Map.empty +
-      ("t" -> "150x150") + ("s" -> "400x300") + 
-      ("m" -> "600x450") + ("l" -> "800x600") +
-      ("150" -> "150x150") + ("400" -> "400x300") +
-      ("600" -> "600x450") + ("800" -> "800x600") +
-      ("1024" -> "1024x768") + ("1280" -> "1280x980") +
-      ("1600" -> "1600x1200") + ("2000" -> "2000x1500") +
-      ("3200" -> "3200x2400") + ("original" -> "original"))
+    is_video match {
+      case true => Ifany.photoDir + album + file + ".mp4"
+      case false => {
+        val horizontalSizes : Map[String, String] = (Map.empty +
+          ("t" -> "150x150") + ("s" -> "400x300") + 
+          ("m" -> "600x450") + ("l" -> "800x600") +
+          ("150" -> "150x150") + ("400" -> "400x300") +
+          ("600" -> "600x450") + ("800" -> "800x600") +
+          ("1024" -> "1024x768") + ("1280" -> "1280x980") +
+          ("1600" -> "1600x1200") + ("2000" -> "2000x1500") +
+          ("3200" -> "3200x2400") + ("original" -> "original"))
 
-    // When images are saved, they are truncated between a width and a height
-    // that assumes a horisontal image. That means that if we ask for a
-    // vertical image between "800x600" we get back an image that is 450x600
-    // (assuming the aspect ratio is the same).
-    //
-    // This is really dumb, but it's the way that things have worked for a long
-    // time, and trying to redo it would take a lot of work.
-    //
-    // The best fix would be to reupload images and change how they are sized,
-    // but that's not very doable, so instead I'm providing a translation table
-    // which encodes the fact that a vertical image needs to be just under
-    // double the size of a horizontal one.
-    val verticalSizes : Map[String, String] = (Map.empty +
-      ("t" -> "150x150") + ("s" -> "400x300") + 
-      ("m" -> "600x450") + ("l" -> "800x600") +
-      ("150" -> "150x150") + ("400" -> "800x600") +
-      ("600" -> "1280x980") + ("800" -> "1600x1200") +
-      ("1024" -> "2000x1500") + ("1280" -> "3200x2400") +
-      ("1600" -> "3200x2400") + ("2000" -> "original") +
-      ("3200" -> "original") + ("original" -> "original"))
-    try {
-      isVertical match {
-        case true => Ifany.photoDir + album + file + "_" + verticalSizes(size) + ".jpg"
-        case false => Ifany.photoDir + album + file + "_" + horizontalSizes(size) + ".jpg"
+        // When images are saved, they are truncated between a width and a height
+        // that assumes a horisontal image. That means that if we ask for a
+        // vertical image between "800x600" we get back an image that is 450x600
+        // (assuming the aspect ratio is the same).
+        //
+        // This is really dumb, but it's the way that things have worked for a long
+        // time, and trying to redo it would take a lot of work.
+        //
+        // The best fix would be to reupload images and change how they are sized,
+        // but that's not very doable, so instead I'm providing a translation table
+        // which encodes the fact that a vertical image needs to be just under
+        // double the size of a horizontal one.
+        val verticalSizes : Map[String, String] = (Map.empty +
+          ("t" -> "150x150") + ("s" -> "400x300") + 
+          ("m" -> "600x450") + ("l" -> "800x600") +
+          ("150" -> "150x150") + ("400" -> "800x600") +
+          ("600" -> "1280x980") + ("800" -> "1600x1200") +
+          ("1024" -> "2000x1500") + ("1280" -> "3200x2400") +
+          ("1600" -> "3200x2400") + ("2000" -> "original") +
+          ("3200" -> "original") + ("original" -> "original"))
+        try {
+          isVertical match {
+            case true => Ifany.photoDir + album + file + "_" + verticalSizes(size) + ".jpg"
+            case false => Ifany.photoDir + album + file + "_" + horizontalSizes(size) + ".jpg"
+          }
+        } catch {
+            case _ : Exception => throw InternalError("Image with size '" + size + "' doesn't exist")
+        }
       }
-    } catch {
-        case _ : Exception => throw InternalError("Image with size '" + size + "' doesn't exist")
     }
   }
 }
@@ -141,7 +147,8 @@ object Album {
       datetime = attributes("datetime").s,
       banner = attributes("banner").bl.get,
       cover = attributes("cover").bl.get,
-      size = attributes("size").l.map(s => AttributeValue(s).n.get.toInt)
+      size = attributes("size").l.map(s => AttributeValue(s).n.get.toInt),
+      is_video = attributes.get("is_video").map(_.bl.get).getOrElse(false)
     )
     im
   }

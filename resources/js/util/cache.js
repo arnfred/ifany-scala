@@ -36,8 +36,13 @@ define(["util/size", "jquery", "radio"], function(size, $, radio) {
 	cache.save = function(img, url) {
 
 		// Cache image
-		var img_url = getImgURL(img, url)
-		var dom_img = $("<img src=\"" + img_url + "\"/>");
+        if (img.is_video) {
+            var img_url = getVideoURL(img, url);
+            var dom_img = $("<video control autoplay loop><source type=\"video/mp4\" src=\"" + img_url + "\"></video>");
+        } else {
+            var img_url = getImgURL(img, url);
+            var dom_img = $("<img src=\"" + img_url + "\"/>");
+        }
 		cache.images[img.file] = dom_img;
 
 		// set callback
@@ -64,6 +69,10 @@ define(["util/size", "jquery", "radio"], function(size, $, radio) {
 	var getImgURL = function(img, url) {
 		return "/photos/" + url + "/" + img.file + "_" + size.getImageSize(img).url + ".jpg"
 	}
+
+    var getVideoURL = function(img, url) {
+		return "/photos/" + url + "/" + img.file + ".mp4"
+    }
 
 
 	return cache;

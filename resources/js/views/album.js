@@ -80,6 +80,7 @@ define(["jquery", "radio", "util/size", "util/cache"],
 	var overlayUpdate = function(img) {
 		var dom_img = cache.load(img);
 		$("#overlay-img img").remove();
+		$("#overlay-img video").remove();
 		$("#overlay-img div").prepend(dom_img);
 		$("#caption").html(img.description);
 		$("#overlay-img img").attr("alt",img.description);

@@ -115,9 +115,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
   def coverRow(image: Image, tag: String = ""): Template = Template(s"""
     <div class="col-xs-12 col-sm-10 $tag col-sm-offset-1 album-row img">
       <div class="img-box" style="width:100%">
-        <span class="img-container" role="img" id="${ image.id }">
-          <span class="inner" style="padding-top: ${ image.ratio*100 }%;">
-          </span>
+          ${imageBox(image)}
         </span>
       </div>
     </div>
@@ -130,18 +128,22 @@ case class AlbumTemplate(view : AlbumView) extends Template {
     <div class="col-xs-12 hidden-xs col-sm-10 col-sm-offset-1 album-row img">
       <div class="frame-box">
         <div class="img-box left" style="width:${row.leftRatio*100}%;">
-          <span class="img-container" role="img" id="${ row.left.id }">
-            <span class="inner" style="padding-top: ${ row.left.ratio*100 }%;"></span>
-          </span>
+          ${imageBox(row.left)}
         </div>
         <div class="img-box right" style="width:${row.rightRatio*100}%">
-          <span class="img-container" role="img" id="${ row.right.id }">
-            <span class="inner" style="padding-top: ${ row.right.ratio*100 }%;"></span>
-          </span>
+          ${imageBox(row.right)}
         </div>
       </div>
     </div>
     """)
+
+  def imageBox(image: Image): Template = image.is_video match {
+    case true => Template(s"""<video controls><source src="${image.url("", view.getURL)}" type="video/mp4"></video>""")
+    case false => Template(s"""
+      <span class="img-container" role="img" id="${ image.id }">
+        <span class="inner" style="padding-top: ${ image.ratio*100 }%;"></span>
+      </span>""")
+  }
 
   def responsiveStyles(view: AlbumView): String = {
     val normalSizes: Map[Int, String] = Map(
@@ -172,7 +174,8 @@ case class AlbumTemplate(view : AlbumView) extends Template {
       val maxWidth = max.map(m => s"and (max-width: ${m*maxMarginFactor}px)").getOrElse("")
       val minWidth = min.map(m => s"and (min-width: ${m*minMarginFactor}px)").getOrElse("")
       val covers: Set[String] = view.album.images.filter(_.cover).map(_.file).toSet ++ Set(view.album.images.last.file)
-      val css = for (image <- view.album.images) yield (covers.contains(image.file) || image.isVertical) match {
+      val images = for (image <- view.album.images if image.is_video == false) yield image
+      val css = for (image <- images) yield (covers.contains(image.file) || image.isVertical) match {
         case true => s"#${image.id} { background-image: url(${ image.url(coverSizes(size), view.getURL) }); }"
         case false => s"#${image.id} { background-image: url(${ image.url(normalSizes(size), view.getURL) }); }"
       }
