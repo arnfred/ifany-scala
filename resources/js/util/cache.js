@@ -37,8 +37,9 @@ define(["util/size", "jquery", "radio"], function(size, $, radio) {
 
 		// Cache image
         if (img.is_video) {
-            var img_url = getVideoURL(img, url);
-            var dom_img = $("<video control autoplay loop><source type=\"video/mp4\" src=\"" + img_url + "\"></video>");
+            var video_url = getVideoURL(img, url);
+            var thumb_url = getImgURL(img, url);
+            var dom_img = $("<video control autoplay poster=\"" + thumb_url + "\"><source type=\"video/mp4\" src=\"" + video_url + "\"></video>");
         } else {
             var img_url = getImgURL(img, url);
             var dom_img = $("<img src=\"" + img_url + "\"/>");

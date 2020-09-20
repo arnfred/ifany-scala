@@ -13,6 +13,7 @@ case class Image(file : String,
                  banner : Boolean,
                  cover : Boolean,
                  size : Seq[Int],
+                 published: Boolean,
                  is_video: Boolean) {
 
   def id: String = "id" ++ file.replace(".","-").replace("#","-").replace("/","--")
@@ -21,9 +22,9 @@ case class Image(file : String,
 
   def isVertical: Boolean = if (ratio < 1) false else true
 
-  def url(size : String, albumURL : String) : String = {
+  def url(size : String, albumURL : String, use_video_url: Boolean = is_video) : String = {
     val album : String = if (albumURL.length == 0) "" else albumURL + "/" 
-    is_video match {
+    use_video_url match {
       case true => Ifany.photoDir + album + file + ".mp4"
       case false => {
         val horizontalSizes : Map[String, String] = (Map.empty +
@@ -123,6 +124,7 @@ object Album {
   private def albumFromItem(item: Item): Option[Album] = {
     val attributes: Map[String, AttributeValue] = item.attributes.map { case Attribute(k, v) => (k, v) }.toMap
     val images = attributes("images").l.map(av => imageFromAttributeValue(AttributeValue(av)))
+                                       .filter(im => im.published)
     val url = attributes("url").s.get
     if (images.size == 0) {
       None
@@ -148,6 +150,7 @@ object Album {
       banner = attributes("banner").bl.get,
       cover = attributes("cover").bl.get,
       size = attributes("size").l.map(s => AttributeValue(s).n.get.toInt),
+      published = attributes.get("published").map(_.bl.get).getOrElse(true),
       is_video = attributes.get("is_video").map(_.bl.get).getOrElse(false)
     )
     im

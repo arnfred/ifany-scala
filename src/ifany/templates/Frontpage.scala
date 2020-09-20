@@ -31,7 +31,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
         </div>
 
         <div class="col-md-7 hidden-xs" id="image">
-            <img src="${ view.cover.image.url("l", view.cover.album.url) }" class="frame"/>
+            <img src="${ view.cover.image.url("l", view.cover.album.url, false) }" class="frame"/>
             <p>From the album "<a href="${ view.cover.album.path }/" >${ view.cover.album.title }</a>"</p>
         </div>
     </div>
@@ -50,7 +50,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
     s"""
       <div class="row category">
           <div class="col-sm-3 col-xs-12 col-sm-offset-1 cat-image">
-              <img src="${ cover.image.url("s", cover.album.url) }" class="frame"/>
+              <img src="${ cover.image.url("s", cover.album.url, false) }" class="frame"/>
           </div>
 
           <div class="col-sm-7 col-xs-12 cat-info">
@@ -104,7 +104,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
     val images = view.getAlbumImages(album, 4)
     val first = (for (image <- images.take(3)) yield s"""
       <div class="col-xs-4 col-sm-3 img">
-        <img href="${ image.url("t", album.url) }" class="frame" src="/img/loader.gif"/>
+        <img href="${ image.url("t", album.url, false) }" class="frame" src="/img/loader.gif"/>
       </div>
     """).mkString
     val last = s"""

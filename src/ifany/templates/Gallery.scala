@@ -85,7 +85,7 @@ case class GalleryTemplate(view : GalleryView) extends Template {
 
         </div>
         <div class="col-sm-7" id="image">
-            <img style="background-image:url('${ view.cover.image.url("l", view.cover.album.url) }')" id="gallery-cover"/>
+            <img style="background-image:url('${ view.cover.image.url("l", view.cover.album.url, false) }')" id="gallery-cover"/>
             <p>From the album "<a href="${ view.cover.album.url }/" >${ view.cover.album.title }</a>"</p>
         </div>
 
@@ -131,7 +131,7 @@ case class GalleryTemplate(view : GalleryView) extends Template {
     val images = view.getAlbumImages(album, 4)
     val first = (for (image <- images.take(3)) yield s"""
       <div class="col-xs-4 col-sm-3 img">
-        <img src="${ image.url("t", album.url) }" class="frame"/>
+        <img src="${ image.url("t", album.url, false) }" class="frame"/>
       </div>
     """).mkString
     val last = s"""

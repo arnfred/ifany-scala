@@ -138,7 +138,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
     """)
 
   def imageBox(image: Image): Template = image.is_video match {
-    case true => Template(s"""<video controls><source src="${image.url("", view.getURL)}" type="video/mp4"></video>""")
+    case true => Template(s"""<video controls poster=\"${image.url("original", view.getURL, false)}\"><source src="${image.url("", view.getURL)}" type="video/mp4"></video>""")
     case false => Template(s"""
       <span class="img-container" role="img" id="${ image.id }">
         <span class="inner" style="padding-top: ${ image.ratio*100 }%;"></span>
