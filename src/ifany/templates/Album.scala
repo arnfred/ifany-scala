@@ -5,10 +5,11 @@ case class AlbumTemplate(view : AlbumView) extends Template {
   implicit val v = view
 
   val css: String = """<link rel="stylesheet" type="text/css" href="/css/album.css"/>"""
+  val covers: Set[String] = view.album.images.filter(_.cover).map(_.file).toSet ++ Set(view.album.images.last.file)
 
   override def toString : String = Base(
     Template(navigation(view.getNav) + overlay + album + navigation(view.getNav)),
-    Some(Template(css + responsiveStyles(view) + javascript + nextprev))
+    Some(Template(css + javascript + nextprev))
   )
 
   def nextprev : Template = {
@@ -115,7 +116,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
   def coverRow(image: Image, tag: String = ""): Template = Template(s"""
     <div class="col-xs-12 col-sm-10 $tag col-sm-offset-1 album-row img">
       <div class="img-box" style="width:100%">
-          ${imageBox(image)}
+          ${imageBox(image, 100.0)}
         </span>
       </div>
     </div>
@@ -128,72 +129,23 @@ case class AlbumTemplate(view : AlbumView) extends Template {
     <div class="col-xs-12 hidden-xs col-sm-10 col-sm-offset-1 album-row img">
       <div class="frame-box">
         <div class="img-box left" style="width:${row.leftRatio*100}%;">
-          ${imageBox(row.left)}
+          ${imageBox(row.left, row.leftRatio*100)}
         </div>
         <div class="img-box right" style="width:${row.rightRatio*100}%">
-          ${imageBox(row.right)}
+          ${imageBox(row.right, row.rightRatio*100)}
         </div>
       </div>
     </div>
     """)
 
-  def imageBox(image: Image): Template = image.is_video match {
+  def imageBox(image: Image, ratio: Double): Template = image.is_video match {
     case true => Template(s"""<video controls poster=\"${image.url("original", view.getURL, false)}\"><source src="${image.url("", view.getURL)}" type="video/mp4"></video>""")
-    case false => Template(s"""
-      <span class="img-container" role="img" id="${ image.id }">
-        <span class="inner" style="padding-top: ${ image.ratio*100 }%;"></span>
-      </span>""")
-  }
-
-  def responsiveStyles(view: AlbumView): String = {
-    val normalSizes: Map[Int, String] = Map(
-      400 -> "400", // When a display is < 800px wide, we display all images full row
-      600 -> "600", // When a display is < 800px wide, we display all images full row
-      800 -> "800", // When a display is < 800px wide, we display all images full row
-      1280 -> "800",
-      1600 -> "1024",
-      2000 -> "1600",
-      3200 -> "2000",
-      4000 -> "3200",
-      6400 -> "3200")
-    val coverSizes: Map[Int, String] = Map(
-      400 -> "400",
-      600 -> "600",
-      800 -> "800",
-      1280 -> "1280",
-      1600 -> "1600",
-      2000 -> "2000",
-      3200 -> "3200",
-      4000 -> "original",
-      6400 -> "original")
-
-    def style(min: Option[Int], max: Option[Int]): String = {
-      val size = max.getOrElse(min.get)
-      val maxMarginFactor = if (size > 800) 1.0/0.8 else 1.0// images larger than 800px only take up ~80% of the screen
-      val minMarginFactor = if (size > 1280) 1.0/0.8 else 1.0// images larger than 800px only take up ~80% of the screen
-      val maxWidth = max.map(m => s"and (max-width: ${m*maxMarginFactor}px)").getOrElse("")
-      val minWidth = min.map(m => s"and (min-width: ${m*minMarginFactor}px)").getOrElse("")
-      val covers: Set[String] = view.album.images.filter(_.cover).map(_.file).toSet ++ Set(view.album.images.last.file)
-      val images = for (image <- view.album.images if image.is_video == false) yield image
-      val css = for (image <- images) yield (covers.contains(image.file) || image.isVertical) match {
-        case true => s"#${image.id} { background-image: url(${ image.url(coverSizes(size), view.getURL) }); }"
-        case false => s"#${image.id} { background-image: url(${ image.url(normalSizes(size), view.getURL) }); }"
-      }
-      css.mkString(s"\n\t\t@media only screen $minWidth $maxWidth {\n\t\t\t", "\n\t\t\t", "\n\t\t}")
-    }
-
-    val styles = Seq(
-      style(None, Some(400)),
-      style(Some(400), Some(600)),
-      style(Some(600), Some(800)),
-      style(Some(800), Some(1280)),
-      style(Some(1280), Some(1600)),
-      style(Some(1600), Some(2000)),
-      style(Some(2000), Some(3200)),
-      style(Some(3200), Some(4000)),
-      style(Some(4000), Some(6400)),
-      style(Some(6400), None))
-
-    styles.mkString("<style>", "\n", "</style>")
+    case false => 
+      val srcset = for (label <- image.versions) yield s"${image.url(label, view.getURL)} ${image.width(label)}w"
+      Template(s"""
+        <img src="${ image.url("800", view.getURL) }"
+             srcset="${ srcset.mkString(", ") }"
+             sizes="(min-width: 800px) ${ratio * 0.8}vw, 100vw"
+             alt="${ image.description }">""")
   }
 }

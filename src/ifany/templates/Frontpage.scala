@@ -109,7 +109,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
     """).mkString
     val last = s"""
       <div class="col-sm-3 hidden-xs img">
-        <img href="${ images.last.url("t", album.url) }" class="frame" src="/img/loader.gif"/>
+        <img href="${ images.last.url("t", album.url, false) }" class="frame" src="/img/loader.gif"/>
       </div>"""
     first + last
   }

@@ -9,6 +9,7 @@ import java.io.BufferedInputStream
 import java.io.FileInputStream
 import scala.Stream
 import scala.util.Random
+import scala.util.{Success, Failure}
 import awscala._, s3._
 
 @io.netty.channel.ChannelHandler.Sharable
@@ -165,26 +166,23 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 	//////////////////////////////////////////////
 
     case req @ Path(Seg("photos" :: album :: filename :: Nil)) => {
-
-      try {
-        val s3Photo = S3Photo(album, filename)
-        req.respond(s3Photo)
-      } catch {
-        case InternalError(msg) => {
+      S3Photo.stream(album, filename).onComplete {
+        case Success(response) => req.respond(response)
+        case Failure(InternalError(msg)) => {
           println("* INTERNAL ERROR * : " + msg)
           req.respond(InternalServerError ~> HtmlContent ~> ResponseString(msg))
         }
-        case AlbumNotFound(url) => {
+        case Failure(AlbumNotFound(url)) => {
           println("* ALBUM NOT FOUND * : " + url)
           req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
         }
-        case error: java.net.SocketException => {
+        case Failure(error: java.net.SocketException) => {
           println(s"Connection Reset while sending photo $album/$filename")
         }
-        case error: java.io.IOException => {
+        case Failure(error: java.io.IOException) => {
           println(s"Broken pipe while sending photo $album/$filename")
         }
-        case error : Throwable => {
+        case Failure(error : Throwable) => {
           println("* UNKNOWN ERROR * : " + error.toString)
           error.printStackTrace()
           req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
