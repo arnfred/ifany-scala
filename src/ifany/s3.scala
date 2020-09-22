@@ -10,7 +10,7 @@ case class S3Photo(album: String, filename: String) extends ResponseStreamer {
       case Some(obj) => obj.content
       case None => throw new InternalError(s"S3 key not found: $key")
     }
-    photo.transferTo(os)
+    try { photo.transferTo(os) } finally { photo.close() }
   }
 }
 
