@@ -41,23 +41,11 @@ define(["radio",
 	// Subscribe to the event that we click a thumbnail
 	album.events = function() {
 
-		$("span.img-container").each(function (index, im) {
+		$("img.media").each(function (index, im) {
 			$(im).click(function () { 
-				createOverlay($(im).attr("id").substring(2));
+				createOverlay($(im).attr("id"));
 			});
 		});
-
-		$(".pageNavElem").each(function(index, elem) { 
-			$(elem).click(function() {
-				var page = $(elem).data("page");
-				radio("page:change").broadcast(page);
-			});
-		});
-
-		$(".image-link").click(function(e) { e.stopPropagation(); console.debug("here"); });
-
-		$(".pageNav-next").click(function() { radio("page:next").broadcast(); });
-		$(".pageNav-prev").click(function() { radio("page:prev").broadcast(); });
 
 		// Broadcast resize event
 		lazy_resize = _.debounce(function() { radio("window:resize").broadcast(); }, 300);

@@ -32,22 +32,15 @@ define(["util/size", "jquery", "radio"], function(size, $, radio) {
 	//											//
 	//////////////////////////////////////////////
 	
-	// Given an image, the url is loaded
+	// Given some media, the url is loaded
 	cache.save = function(img, url) {
 
-		// Cache image
-        if (img.is_video) {
-            var video_url = getVideoURL(img, url);
-            var thumb_url = getImgURL(img, url);
-            var dom_img = $("<video control autoplay poster=\"" + thumb_url + "\"><source type=\"video/mp4\" src=\"" + video_url + "\"></video>");
-        } else {
-            var img_url = getImgURL(img, url);
-            var dom_img = $("<img src=\"" + img_url + "\"/>");
-        }
-		cache.images[img.file] = dom_img;
+		// Cache media
+        var dom_media = $("#" + img.file).clone().attr("sizes", "100vw")
+		cache.images[img.file] = dom_media;
 
 		// set callback
-		$(dom_img).load(function() {
+		$(dom_media).load(function() {
 			cache.nbLoaded += 1;
 			radio("overlay:loaded").broadcast(cache.nbLoaded);
 		});
@@ -59,22 +52,6 @@ define(["util/size", "jquery", "radio"], function(size, $, radio) {
 		var dom_img = cache.images[img.file]
 		return dom_img
 	}
-
-
-	//////////////////////////////////////////////
-	//											//
-	//			  Private Functions				//
-	//											//
-	//////////////////////////////////////////////
-	
-	var getImgURL = function(img, url) {
-		return "/photos/" + url + "/" + img.file + "_" + size.getImageSize(img).url + ".jpg"
-	}
-
-    var getVideoURL = function(img, url) {
-		return "/photos/" + url + "/" + img.file + ".mp4"
-    }
-
 
 	return cache;
 

@@ -114,7 +114,7 @@ div.overlay-img {
 	float:left;
 }
 */
-div#overlay-prev span, div#overlay-next span, div#overlay-img div {
+div#overlay-prev span, div#overlay-next span, div#overlay-center-box {
 	display:table-cell;
 	vertical-align:middle;
 	overflow:hidden;
@@ -128,6 +128,10 @@ div#overlay-prev:hover, div#overlay-next:hover {
 span#caption {
 	width:80%;
 	display:inline-block;
+	position:relative;
+	color:#fcfcfc;
+	background-color:#3338;
+	padding: 5px
 }
 
 /* Page Logic */

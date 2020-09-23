@@ -79,28 +79,45 @@ define(["jquery", "radio", "util/size", "util/cache"],
 
 	var overlayUpdate = function(img) {
 		var dom_img = cache.load(img);
+        console.debug(dom_img);
 		$("#overlay-img img").remove();
 		$("#overlay-img video").remove();
-		$("#overlay-img div").prepend(dom_img);
+		$("#overlay-img").children("div").prepend(dom_img);
 		$("#caption").html(img.description);
-		$("#overlay-img img").attr("alt",img.description);
 	};
 
 
-	var resizeOverlay = function() {
-		//window.scrollTo(0, 1);
-		var captionHeight = $("#caption").height();
-		var img = $("#overlay-img img");
-		$("<img/>").attr("src", img.attr("src")).load(function() {
-			var ratio = this.width / this.height;
-			var height = size.getHeight() - captionHeight - 4;
-			var div_width = Math.min(size.getWidth() - 50, size.getWidth()*0.83);
-			var max_height = Math.min(this.width/ratio, div_width/ratio);
-			if (height > max_height) height = max_height;
-			$("#overlay-img img").css("height", height + "px");
-			$("#overlay-img img").css("max-width","100%");
-		});
-	};
+    var resizeOverlay = function() {
+        var captionHeight = $("#caption").height();
+        $("span#caption").css("top", "-" + (captionHeight + 11) + "px");
+        var img = $("#overlay-img .media");
+        img.load(function() {
+            var imgRatio = this.width / this.height;
+            var vpRatio = (size.getWidth()*(10.0/12.0)) / size.getHeight();
+            if (imgRatio >= vpRatio) {
+                $("#overlay-img .media").css("width", "100%");
+                $("span#caption").css("width", "100%");
+            }
+            else {
+                var width = (imgRatio/vpRatio)*100;
+                $("#overlay-img .media").css("width", width + "%");
+                $("span#caption").css("width", width + "%");
+            }
+        });
+        $(img).on('loadedmetadata', function() {
+            var imgRatio = this.videoWidth / this.videoHeight;
+            var vpRatio = (size.getWidth()*(10.0/12.0)) / size.getHeight();
+            if (imgRatio >= vpRatio) {
+                $("#overlay-img .media").css("width", "100%");
+                $("span#caption").css("width", "100%");
+            }
+            else {
+                var width = (imgRatio/vpRatio)*100;
+                $("#overlay-img .media").css("width", width + "%");
+                $("span#caption").css("width", width + "%");
+            }
+        });
+    };
 
 
 

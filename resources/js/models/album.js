@@ -41,8 +41,8 @@ define(["radio",
 	// Subscribe to the event that we click a thumbnail
 	album.events = function() {
 
-		$("span.img-container").each(function (index, im) {
-			$(im).click(function () { createOverlay($(im).attr("id").substring(2)); });
+		$("img.media").each(function (index, im) {
+			$(im).click(function () { createOverlay($(im).attr("id")); });
 		});
 
 		// Broadcast resize event
@@ -175,7 +175,7 @@ define(["radio",
 		var title = (name === null) ? album.title : album.title + " : " + album.images[name].description;
 
 		// Change state to new url string
-		history.pushState({ 'state_index' : history.getCurrentIndex(), 'name' : name }, title, new_url);
+		history.replaceState({ 'state_index' : history.getCurrentIndex(), 'name' : name }, title, new_url);
 	};
 
 
