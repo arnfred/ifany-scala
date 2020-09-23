@@ -146,10 +146,10 @@ case class MetaAlbumTemplate(view : AlbumView) extends Template {
 
     <div class="col-xs-12 hidden-xs col-sm-10 col-sm-offset-1 album-row img">
       <div class="frame-box">
-        <div class="img-box" style="width:${row.leftRatio*100}%">
+        <div class="img-box left" style="width:${row.leftRatio*100}%">
           ${imageBox(row.left, row.leftRatio*100)}
         </div>
-        <div class="img-box" style="width:${row.rightRatio*100}%">
+        <div class="img-box right" style="width:${row.rightRatio*100}%">
           ${imageBox(row.right, row.rightRatio*100)}
         </div>
       </div>
