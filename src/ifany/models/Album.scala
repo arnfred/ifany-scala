@@ -72,10 +72,9 @@ case class Image(file : String,
     filtered.toSeq ++ Seq("original")
   }
 
-  def url(size : String, albumURL : String, use_video_url: Boolean = is_video) : String = {
-    val album : String = if (albumURL.length == 0) "" else albumURL + "/" 
+  def key(size: String, use_video_url: Boolean = is_video): String = {
     use_video_url match {
-      case true => Ifany.photoDir + album + file + ".mp4"
+      case true => file + ".mp4"
       case false => {
         val sizes : Map[String, String] = (Map.empty +
           ("t" -> "150x150") + ("s" -> "400x300") + 
@@ -86,12 +85,17 @@ case class Image(file : String,
           ("1600" -> "1600x1200") + ("2000" -> "2000x1500") +
           ("3200" -> "3200x2400") + ("original" -> "original"))
         try {
-          Ifany.photoDir + album + file + "_" + sizes(size) + ".jpg"
+          file + "_" + sizes(size) + ".jpg"
         } catch {
           case _ : Exception => throw InternalError("Image with size '" + size + "' doesn't exist")
         }
       }
     }
+  }
+
+  def url(size : String, albumURL : String, use_video_url: Boolean = is_video) : String = {
+    val album : String = if (albumURL.length == 0) "" else albumURL + "/"
+    Ifany.photoDir + album + key(size, use_video_url)
   }
 }
 
