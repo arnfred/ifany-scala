@@ -9,6 +9,10 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
 
   override def toString : String = Base(Template(header + galleries), Some(Template(css)))
 
+  val coverSrcset = for (label <- view.cover.image.versions) yield {
+    s"${view.cover.image.imageURL(view.cover.album.url, label)} ${view.cover.image.width(label)}w"
+  }
+
   def header : Template = Template(s"""
     <div class="row top topmost">
         <div class="col-md-3 col-md-offset-1" id="about">
@@ -31,8 +35,12 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
         </div>
 
         <div class="col-md-7 hidden-xs" id="image">
-            <img src="${ view.cover.image.url("l", view.cover.album.url, false) }" class="frame"/>
-            <p>From the album "<a href="${ view.cover.album.path }/" >${ view.cover.album.title }</a>"</p>
+
+          <img src="${ view.cover.image.imageURL(view.cover.album.url, "800") }"
+          srcset="${ coverSrcset.mkString(", ") }"
+          sizes="(min-width: 800px) 50vw, 100vw"
+          alt="${ view.cover.image.description }" class="frame">
+          <p>From the album "<a href="${ view.cover.album.path }/" >${ view.cover.album.title }</a>"</p>
         </div>
     </div>
   """)
@@ -50,7 +58,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
     s"""
       <div class="row category">
           <div class="col-sm-3 col-xs-12 col-sm-offset-1 cat-image">
-              <img src="${ cover.image.url("s", cover.album.url, false) }" class="frame"/>
+              <img src="${ cover.image.imageURL(cover.album.url, "s") }" class="frame"/>
           </div>
 
           <div class="col-sm-7 col-xs-12 cat-info">
@@ -104,12 +112,12 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
     val images = view.getAlbumImages(album, 4)
     val first = (for (image <- images.take(3)) yield s"""
       <div class="col-xs-4 col-sm-3 img">
-        <img href="${ image.url("t", album.url, false) }" class="frame" src="/img/loader.gif"/>
+        <img href="${ image.imageURL(album.url, "t") }" class="frame" src="/img/loader.gif"/>
       </div>
     """).mkString
     val last = s"""
       <div class="col-sm-3 hidden-xs img">
-        <img href="${ images.last.url("t", album.url, false) }" class="frame" src="/img/loader.gif"/>
+        <img href="${ images.last.imageURL(album.url, "t") }" class="frame" src="/img/loader.gif"/>
       </div>"""
     first + last
   }

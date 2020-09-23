@@ -139,12 +139,12 @@ case class AlbumTemplate(view : AlbumView) extends Template {
     """)
 
   def imageBox(image: Image, ratio: Double): Template = image.is_video match {
-    case true => Template(s"""<video controls poster=\"${view.imageURL(image, "original")}\">
-      <source src="${view.videoURL(image)}" type="video/mp4"></video>""")
+    case true => Template(s"""<video controls poster=\"${image.imageURL(view.album.url, "800")}\">
+      <source src="${image.videoURL(view.album.url)}" type="video/mp4"></video>""")
     case false => 
-      val srcset = for (label <- image.versions) yield s"${view.imageURL(image, label)} ${image.width(label)}w"
+      val srcset = for (label <- image.versions) yield s"${image.imageURL(view.album.url, label)} ${image.width(label)}w"
       Template(s"""
-        <img src="${ view.imageURL(image, "800") }"
+        <img src="${ image.imageURL(view.album.url, "800") }"
              srcset="${ srcset.mkString(", ") }"
              sizes="(min-width: 800px) ${ratio * 0.8}vw, 100vw"
              alt="${ image.description }">""")

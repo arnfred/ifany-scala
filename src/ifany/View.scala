@@ -18,7 +18,6 @@ trait View {
     case _      => "th"
   }
 
-
   def getDateString(images : Seq[Image], withDay : Boolean) : String = {
 
     // Get a list of all dates

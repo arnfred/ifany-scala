@@ -72,31 +72,23 @@ case class Image(file : String,
     filtered.toSeq ++ Seq("original")
   }
 
-  def key(size: String, use_video_url: Boolean = is_video): String = {
-    use_video_url match {
-      case true => file + ".mp4"
-      case false => {
-        val sizes : Map[String, String] = (Map.empty +
-          ("t" -> "150x150") + ("s" -> "400x300") + 
-          ("m" -> "600x450") + ("l" -> "800x600") +
-          ("150" -> "150x150") + ("400" -> "400x300") +
-          ("600" -> "600x450") + ("800" -> "800x600") +
-          ("1024" -> "1024x768") + ("1280" -> "1280x980") +
-          ("1600" -> "1600x1200") + ("2000" -> "2000x1500") +
-          ("3200" -> "3200x2400") + ("original" -> "original"))
-        try {
-          file + "_" + sizes(size) + ".jpg"
-        } catch {
-          case _ : Exception => throw InternalError("Image with size '" + size + "' doesn't exist")
-        }
-      }
+  def imageURL(album: String, size: String): String = {
+    val sizes : Map[String, String] = (Map.empty +
+      ("t" -> "150x150") + ("s" -> "400x300") + 
+      ("m" -> "600x450") + ("l" -> "800x600") +
+      ("150" -> "150x150") + ("400" -> "400x300") +
+      ("600" -> "600x450") + ("800" -> "800x600") +
+      ("1024" -> "1024x768") + ("1280" -> "1280x980") +
+      ("1600" -> "1600x1200") + ("2000" -> "2000x1500") +
+      ("3200" -> "3200x2400") + ("original" -> "original"))
+    try {
+      S3Photo.getPresignedURL(album, file + "_" + sizes(size) + ".jpg")
+    } catch {
+      case _ : Exception => throw InternalError("Image with size '" + size + "' doesn't exist")
     }
   }
 
-  def url(size : String, albumURL : String, use_video_url: Boolean = is_video) : String = {
-    val album : String = if (albumURL.length == 0) "" else albumURL + "/"
-    Ifany.photoDir + album + key(size, use_video_url)
-  }
+  def videoURL(album: String) = S3Photo.getPresignedURL(album, file + ".mp4")
 }
 
 case class Album(title : String,

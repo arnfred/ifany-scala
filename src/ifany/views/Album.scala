@@ -22,21 +22,6 @@ case class AlbumView(album : Album, nav : Navigation, name : String = "album", c
 
   implicit val formats = Serialization.formats(NoTypeHints)
 
-  val urls: Map[String, String] = S3Photo.generatePresignedUrls(album.url)
-
-  def videoURL(image: Image) = {
-    val key = s"albums/${album.url}/${image.key("")}"
-    urls(key)
-  }
-
-  def imageURL(image: Image, sizeLabel: String) = {
-    val key = s"albums/${album.url}/${image.key(sizeLabel)}"
-    urls.get(key) match {
-      case Some(url) => url
-      case None => image.url(sizeLabel, album.url)
-    }
-  }
-
   def getTitle : String = album.title
   def getDescription : String = album.description
   def getURL = album.url
@@ -47,7 +32,7 @@ case class AlbumView(album : Album, nav : Navigation, name : String = "album", c
 
   def getGalleries: String = {
     val galleries = album.galleries.filter(_!="all")
-    val links = galleries map { g => s"""<a href="/${Gallery.get(g).url}" alt="Go to Gallery: $g">$g</a>""" }
+    val links = galleries map { g => s"""<a href="/${Gallery.get(g).url}" alt="Go to Gallery: $g">${Gallery.get(g).name}</a>""" }
     links.mkString(", ")
   }
 

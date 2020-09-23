@@ -8,7 +8,7 @@ case class MetaAlbumTemplate(view : AlbumView) extends Template {
 
   override def toString : String = Base(
     Template(navigation(view.getNav) + overlay + album + navigation(view.getNav)),
-    Some(Template(css + responsiveStyles(view) + javascript + nextprev))
+    Some(Template(css + javascript + nextprev))
   )
 
   def nextprev : Template = {
@@ -135,10 +135,7 @@ case class MetaAlbumTemplate(view : AlbumView) extends Template {
   def coverRow(image: Image, tag: String = ""): Template = Template(s"""
     <div class="col-xs-12 col-sm-10 $tag col-sm-offset-1 album-row img">
       <div class="img-box" style="width:100%">
-        <span class="img-container" role="img" id="${ image.id }">
-          <span class="inner" style="padding-top: ${ image.ratio*100 }%;">
-          </span>
-        </span>
+        ${imageBox(image, 100)}
       </div>
     </div>
     """)
@@ -148,61 +145,26 @@ case class MetaAlbumTemplate(view : AlbumView) extends Template {
     ${coverRow(row.right, "visible-xs-block")}
 
     <div class="col-xs-12 hidden-xs col-sm-10 col-sm-offset-1 album-row img">
-      <div class="img-box" style="width:${row.leftRatio*100}%">
-        <span class="img-container" role="img" id="${ row.left.id }">
-          <span class="inner" style="padding-top: ${ row.left.ratio*100 }%;">
-          </span>
-        </span>
-      </div>
-      <div class="img-box" style="width:${row.rightRatio*100}%">
-        <span class="img-container" role="img" id="${ row.right.id }">
-          <span class="inner" style="padding-top: ${ row.right.ratio*100 }%;">
-          </span>
-        </span>
+      <div class="frame-box">
+        <div class="img-box" style="width:${row.leftRatio*100}%">
+          ${imageBox(row.left, row.leftRatio*100)}
+        </div>
+        <div class="img-box" style="width:${row.rightRatio*100}%">
+          ${imageBox(row.right, row.rightRatio*100)}
+        </div>
       </div>
     </div>
     """)
 
-  def responsiveStyles(view: AlbumView): String = {
-    val normalSizes: Map[String, String] = Map(
-      "400" -> "400",
-      "600" -> "400",
-      "800" -> "400",
-      "1200" -> "600",
-      "1600" -> "800",
-      "3200" -> "1600",
-      "4000" -> "2000")
-    val coverSizes: Map[String, String] = Map(
-      "400" -> "400",
-      "600" -> "600",
-      "800" -> "800",
-      "1200" -> "1280",
-      "1600" -> "1600",
-      "3200" -> "2000",
-      "4000" -> "2000")
-
-    def style(min: Option[String], max: Option[String]): String = {
-      val size = max.getOrElse(min.get)
-      val maxWidth = max.map(m => s"and (max-width: ${m}px)").getOrElse("")
-      val minWidth = min.map(m => s"and (min-width: ${m}px)").getOrElse("")
-      val covers: Set[String] = view.album.images.filter(_.cover).map(_.file).toSet ++ Set(view.album.images.last.file)
-      val css = for (image <- view.album.images) yield covers.contains(image.file) match {
-        case true => s"#${image.id} { background-image: url(${ image.url(coverSizes(size), view.getURL) }); }"
-        case false => s"#${image.id} { background-image: url(${ image.url(normalSizes(size), view.getURL) }); }"
-      }
-      css.mkString(s"\n\t\t@media only screen $minWidth $maxWidth {\n\t\t\t", "\n\t\t\t", "\n\t\t}")
-    }
-
-    val styles = List(
-      style(None, Some("400")),
-      style(Some("400"), Some("600")),
-      style(Some("600"), Some("800")),
-      style(Some("800"), Some("1200")),
-      style(Some("1200"), Some("1600")),
-      style(Some("1600"), Some("3200")),
-      style(Some("3200"), Some("4000")),
-      style(Some("4000"), None))
-
-    styles.mkString("<style>", "\n", "</style>")
+  def imageBox(image: Image, ratio: Double): Template = image.is_video match {
+    case true => Template(s"""<video controls poster=\"${image.imageURL(view.album.url, "800")}\">
+      <source src="${image.videoURL(view.album.url)}" type="video/mp4"></video>""")
+    case false => 
+      val srcset = for (label <- image.versions) yield s"${image.imageURL(view.album.url, label)} ${image.width(label)}w"
+      Template(s"""
+        <img src="${ image.imageURL(view.album.url, "800") }"
+             srcset="${ srcset.mkString(", ") }"
+             sizes="(min-width: 800px) ${ratio * 0.8}vw, 100vw"
+             alt="${ image.description }">""")
   }
 }

@@ -9,10 +9,16 @@ object S3Photo {
   implicit val s3 = S3.at(Region.EU_WEST_1)
   val bucket = Bucket(sys.env("IMAGES_BUCKET"))
 
-  def generatePresignedUrls(album: String): Map[String, String] = {
-    val albumKey = s"albums/$album/"
-    val expiration = DateTime.now.plusMinutes(10).toDate
-    // Why no `s3.generatePresignedUrl(bucketName, key, expiration)` ???
+  def getPresignedURL(album: String, image: String): String = {
+    // In meta-albums, the album is prepended to the image file name as a quick
+    // hack and the album is left as an empty string. To support this, we need
+    // to make sure we don't insert extra forward slashes
+    val albumURL = if (album == "") "" else s"$album/"
+    val key = s"albums/${albumURL}${image}"
+    val expiration = DateTime.now.plusMinutes(60).toDate
+
+    // Why not `s3.generatePresignedUrl(bucketName, key, expiration)` ???
+    //
     // The presigned links are formatted as
     // `https://<bucket>.s3.<region>.amazonaws.com/<key>?...` which confuses
     // ssl certificates because the domain of the bucket doesn't match the
@@ -23,9 +29,7 @@ object S3Photo {
     // generates valid urls with no ssl issues. I came across this idea while
     // noticing the stack overflow answer here:
     // https://stackoverflow.com/a/53617069/1722504
-    s3.keys(bucket, albumKey)
-      .map(key => (key, s3.generatePresignedUrl("", s"${bucket.name}/$key", expiration).toURI.toString))
-      .toMap
+    s3.generatePresignedUrl("", s"${bucket.name}/$key", expiration).toURI.toString
   }
 
   def stream(album: String, filename: String): Future[ResponseStreamer] = {

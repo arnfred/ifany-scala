@@ -90,42 +90,6 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 
 	//////////////////////////////////////////////
 	//                                          //
-	//                  cover                   //
-	//                                          //
-	//////////////////////////////////////////////
-
-    case req @ Path(Seg("cover" :: str :: size :: Nil)) => {
-
-      try {
-        val frontpage : Frontpage = Frontpage.get()
-        val covers : Seq[Cover] = frontpage.covers
-        val n : Int = str.map(_+0).reduce({ (a,b) => (a + 1000003 * (b + 1)) % covers.length }) % covers.length
-        val img : Image = covers(n).image
-        val album : Album = covers(n).album
-        val path : String = img.url(size, album.url)
-        val bis = new BufferedInputStream(new FileInputStream(path))
-        val data = Stream.continually(bis.read).takeWhile(-1 !=).map(_.toByte).toArray
-        req.respond(Ok ~> ContentType("image/jpg") ~> 
-                          ContentLength(data.length.toString) ~>
-                          ResponseBytes(data))
-      } catch {
-        case InternalError(msg) => {
-          println("* INTERNAL ERROR * : " + msg)
-          req.respond(InternalServerError ~> HtmlContent ~> ResponseString(msg))
-        }
-        case AlbumNotFound(url) => {
-          println("* ALBUM NOT FOUND * : " + url)
-          req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
-        }
-        case error : Throwable => {
-          println("* UNKNOWN ERROR * : " + error.toString)
-          req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
-        }
-      }
-    }
-
-	//////////////////////////////////////////////
-	//                                          //
 	//                  covers                  //
 	//                                          //
 	//////////////////////////////////////////////
@@ -159,42 +123,11 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
       }
     }
 
-	//////////////////////////////////////////////
-	//                                          //
-	//                photos                    //
-	//                                          //
-	//////////////////////////////////////////////
-
-    case req @ Path(Seg("photos" :: album :: filename :: Nil)) => {
-      S3Photo.stream(album, filename).onComplete {
-        case Success(response) => req.respond(response)
-        case Failure(InternalError(msg)) => {
-          println("* INTERNAL ERROR * : " + msg)
-          req.respond(InternalServerError ~> HtmlContent ~> ResponseString(msg))
-        }
-        case Failure(AlbumNotFound(url)) => {
-          println("* ALBUM NOT FOUND * : " + url)
-          req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
-        }
-        case Failure(error: java.net.SocketException) => {
-          println(s"Connection Reset while sending photo $album/$filename")
-        }
-        case Failure(error: java.io.IOException) => {
-          println(s"Broken pipe while sending photo $album/$filename")
-        }
-        case Failure(error : Throwable) => {
-          println("* UNKNOWN ERROR * : " + error.toString)
-          error.printStackTrace()
-          req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
-        }
-      }
-    }
-
-	//////////////////////////////////////////////
-	//                                          //
-	//                  all                     //
-	//                                          //
-	//////////////////////////////////////////////
+    //////////////////////////////////////////////
+    //                                          //
+    //                  all                     //
+    //                                          //
+    //////////////////////////////////////////////
 
     case req @ Path(Seg("all" :: _)) => {
 
