@@ -43,7 +43,7 @@ define(["radio",
 
 		$("img.media").each(function (index, im) {
 			$(im).click(function () { 
-				createOverlay($(im).attr("id"));
+				createOverlay($(im).attr("file"));
 			});
 		});
 
@@ -77,8 +77,8 @@ define(["radio",
 		albumView.init();
 
 		// Get data
-		album.images = _.indexBy(data.images, function(im) { return im.file.replace("/","--"); });
-		album.names = _.map(data.images, function(im) { return im.file.replace("/","--"); });
+		album.images = _.indexBy(data.images, "file");
+		album.names = _.pluck(data.images, "file");
 		album.url = data.url;
 		album.title = document.title;
 		album.events();
@@ -110,9 +110,6 @@ define(["radio",
 	};
 
 	var createOverlay = function(name) {
-
-		// Update browser location
-		updateHistory(name);
 
 		// Update id and state
 		album.current_name = name;
@@ -164,33 +161,12 @@ define(["radio",
 		}
 	};
 
-
-	// Updates the url to reflect the page we are going to
-	var updateHistory = function(name) {
-
-		// Generate new url string
-		var parts = getURLParts();
-		var new_url = (name === null) ? parts[0] + parts[2] : parts[0] + "/" + name + parts[2];
-
-		// Check if we are already at expected state
-		if (parts[1] == name) return;
-
-		// Find image caption and create new title
-		var title = (name === null) ? album.title : album.title + " : " + album.images[name].description;
-
-		history.replaceState({}, title, new_url);
-	};
-
-
 	// Updates the url and sets overlayActive to false
 	var closeOverlay = function() {
 
 		// Update state
 		album.current_name = null;
 		album.overlayActive = false;
-
-		// Update url
-		updateHistory(null);
 
 		// Broadcast close event
 		radio("overlay:close").broadcast();

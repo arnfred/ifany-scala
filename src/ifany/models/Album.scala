@@ -16,7 +16,7 @@ case class Image(file : String,
                  published: Boolean,
                  is_video: Boolean) {
 
-  def id: String = "id" ++ file.replace(".","-").replace("#","-").replace("/","--")
+  def id: String = s"id-${file.replace("/", "--").replace(".", "--")}"
 
   def ratio: Double = size(1) / size(0).toDouble
 

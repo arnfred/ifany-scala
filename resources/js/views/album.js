@@ -79,9 +79,7 @@ define(["jquery", "radio", "util/size", "util/cache"],
 
 	var overlayUpdate = function(img) {
 		var dom_img = cache.load(img);
-        console.debug(dom_img);
-		$("#overlay-img img").remove();
-		$("#overlay-img video").remove();
+		$("#overlay-img .media").remove();
 		$("#overlay-img").children("div").prepend(dom_img);
 		$("#caption").html(img.description);
 	};
@@ -91,9 +89,9 @@ define(["jquery", "radio", "util/size", "util/cache"],
         var captionHeight = $("#caption").height();
         $("span#caption").css("top", "-" + (captionHeight + 11) + "px");
         var img = $("#overlay-img .media");
+        var vpRatio = (window.innerWidth*(10.0/12.0)) / window.innerHeight;
         img.load(function() {
             var imgRatio = this.width / this.height;
-            var vpRatio = (size.getWidth()*(10.0/12.0)) / size.getHeight();
             if (imgRatio >= vpRatio) {
                 $("#overlay-img .media").css("width", "100%");
                 $("span#caption").css("width", "100%");
@@ -106,7 +104,6 @@ define(["jquery", "radio", "util/size", "util/cache"],
         });
         $(img).on('loadedmetadata', function() {
             var imgRatio = this.videoWidth / this.videoHeight;
-            var vpRatio = (size.getWidth()*(10.0/12.0)) / size.getHeight();
             if (imgRatio >= vpRatio) {
                 $("#overlay-img .media").css("width", "100%");
                 $("span#caption").css("width", "100%");

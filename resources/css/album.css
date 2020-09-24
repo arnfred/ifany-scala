@@ -62,6 +62,10 @@ span.img-container .inner {
     height: 0;
 }
 
+.media {
+    cursor: pointer;
+}
+
 
 /* Overlay */
 div#overlay {

@@ -171,6 +171,46 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 
 	//////////////////////////////////////////////
 	//                                          //
+	//                videos                    //
+	//                                          //
+	//////////////////////////////////////////////
+
+    case req @ Path(Seg("videos" :: _)) => {
+
+      try {
+        val frontpage : Frontpage = Frontpage.get()
+        val videos = for {
+          gallery <- frontpage.galleries
+          album <- gallery.albums
+          image <- album.images if image.is_video
+        } yield image.copy(file = album.url + "/" + image.file)
+        val title : String = "All videos"
+        val desc : String = """All videos gathered on one page."""
+        val album : Album = Album(title, desc, "", Seq(), None, videos.sortBy(_.datetime).toSeq, Album.datetimeFromImages(videos, "videos"))
+        val nav : Navigation = Navigation(None, None, None)
+        val view = AlbumView(album, nav, "metaAlbum")
+        val output = MetaAlbumTemplate(view).toString
+        req.respond(HtmlContent ~> ResponseString(output))
+      } catch {
+        case InternalError(msg) => {
+          println("* INTERNAL ERROR * : " + msg)
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString(msg))
+        }
+        case AlbumNotFound(url) => {
+          println("* ALBUM NOT FOUND * : " + url)
+          req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
+        }
+        case error : Throwable => {
+          println("* UNKNOWN ERROR * : " + error.toString)
+          error.printStackTrace()
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
+        }
+      }
+    }
+
+
+	//////////////////////////////////////////////
+	//                                          //
 	//                random                    //
 	//                                          //
 	//////////////////////////////////////////////

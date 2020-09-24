@@ -78,7 +78,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
       </div>
       <div class="col-xs-10 overlay-img" id="overlay-img">
         <div id="overlay-center-box">
-          <img alt="Overlay image"/>
+          <img class="media" alt="Overlay image"/>
           <div id="caption-box"><span id="caption">Sample Caption</span></div>
         </div>
       </div>
@@ -138,12 +138,12 @@ case class AlbumTemplate(view : AlbumView) extends Template {
     """)
 
   def imageBox(image: Image, ratio: Double): Template = image.is_video match {
-    case true => Template(s"""<video class="media" id="${image.file}" controls poster=\"${image.imageURL(view.album.url, "800")}\">
+    case true => Template(s"""<video class="media" id="${image.id}" file="${image.file}" controls poster=\"${image.imageURL(view.album.url, "800")}\">
       <source src="${image.videoURL(view.album.url)}" type="video/mp4"></video>""")
     case false => 
       val srcset = for (label <- image.versions) yield s"${image.imageURL(view.album.url, label)} ${image.width(label)}w"
       Template(s"""
-        <img class="media" id="${image.file}"
+        <img class="media" id="${image.id}" file="${image.file}"
              src="${ image.imageURL(view.album.url, "800") }"
              srcset="${ srcset.mkString(", ") }"
              sizes="(min-width: 800px) ${ratio * 0.8}vw, 100vw"

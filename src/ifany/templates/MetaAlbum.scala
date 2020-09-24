@@ -77,7 +77,7 @@ case class MetaAlbumTemplate(view : AlbumView) extends Template {
       </div>
       <div class="col-xs-10 overlay-img" id="overlay-img">
           <div id="overlay-center-box">
-            <img alt="Overlay image"/>
+            <img class="media" alt="Overlay image"/>
             <div id="caption-box"><span id="caption">Sample Caption</span></div>
           </div>
       </div>
@@ -108,28 +108,7 @@ case class MetaAlbumTemplate(view : AlbumView) extends Template {
       case CoverRow(image) => coverRow(image)
       case t: DualRow => twoImageRow(t)
     }
-    val pages = rows.grouped(100).toList.zipWithIndex.map { case (row, index) =>
-      s"""<div id="page-${index + 1}" class="page">${ row.mkString("\n") }</div>""".toString
-    }
-    val nav: String = pageNav(pages)
-    Template(nav + pages.mkString("\n") + nav)
-  }
-
-  def pageNav(pages: List[String]): String = {
-    if (pages.length == 1) return ""
-    val navElems = for (i <- 1 to pages.length) yield {
-      s"""\n<span class="pageNavElem pageNav-$i" data-page="$i">
-        <a href="#$i">$i</a>
-      </span>"""
-    }
-    s"""
-    <div class="col-sm-10 col-sm-offset-1 col-xs-12 nav-row">
-      <div class="pageNav">
-        <span class="pageNav-prev"><a href="javascript:;">prev</a></span>
-        ${ navElems.mkString("\n") }
-        <span class="pageNav-next"><a href="javascript:;">next</a></span>
-      </div>
-    </div>\n"""
+    Template(rows.mkString("\n"))
   }
 
   def coverRow(image: Image, tag: String = ""): Template = Template(s"""
@@ -157,12 +136,13 @@ case class MetaAlbumTemplate(view : AlbumView) extends Template {
     """)
 
   def imageBox(image: Image, ratio: Double): Template = image.is_video match {
-    case true => Template(s"""<video controls poster=\"${image.imageURL(view.album.url, "800")}\">
-      <source class="media" id="${image.file}" src="${image.videoURL(view.album.url)}" type="video/mp4"></video>""")
+    case true => Template(s"""<video class="media" id="${image.id}" file="${image.file}"
+                                     controls poster="${image.imageURL(view.album.url, "800")}\">
+      <source src="${image.videoURL(view.album.url)}" type="video/mp4"></video>""")
     case false => 
       val srcset = for (label <- image.versions) yield s"${image.imageURL(view.album.url, label)} ${image.width(label)}w"
       Template(s"""
-        <img class="media" id="${image.file}"
+        <img class="media" id="${image.id}" file="${image.file}"
              src="${ image.imageURL(view.album.url, "800") }"
              srcset="${ srcset.mkString(", ") }"
              sizes="(min-width: 800px) ${ratio * 0.8}vw, 100vw"

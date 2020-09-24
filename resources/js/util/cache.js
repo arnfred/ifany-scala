@@ -15,16 +15,6 @@ define(["util/size", "jquery", "radio"], function(size, $, radio) {
 
 	cache.nbLoaded = 0;
 	cache.images = {};
-	cache.urlSize = {
-		tiny	: "Ti",
-		thumb	: "Th",
-		small	: "S",
-		medium	: "M",
-		large	: "L",
-		xlarge	: "XL",
-		x2large	: "X2",
-		x3large	: "X3"
-	}
 
 	//////////////////////////////////////////////
 	//											//
@@ -36,7 +26,8 @@ define(["util/size", "jquery", "radio"], function(size, $, radio) {
 	cache.save = function(img, url) {
 
 		// Cache media
-        var dom_media = $("#" + img.file).clone().attr("sizes", "100vw")
+        var id = "#id-" + img.file.replaceAll("/", "--").replaceAll(".", "--");
+        var dom_media = $(id).clone().attr("sizes", "(min-width: 800) 83.34vw, 100vw");
 		cache.images[img.file] = dom_media;
 
 		// set callback

@@ -42,7 +42,7 @@ define(["radio",
 	album.events = function() {
 
 		$("img.media").each(function (index, im) {
-			$(im).click(function () { createOverlay($(im).attr("id")); });
+			$(im).click(function () { createOverlay($(im).attr("file")); });
 		});
 
 		// Broadcast resize event
