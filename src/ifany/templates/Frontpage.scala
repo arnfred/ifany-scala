@@ -38,7 +38,7 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
 
           <img src="${ view.cover.image.imageURL(view.cover.album.url, "800") }"
           srcset="${ coverSrcset.mkString(", ") }"
-          sizes="(min-width: 800px) 50vw, 100vw"
+          sizes="(min-width: 1000px) 60vw, (min-width: 800px) 80vw, 100vw"
           alt="${ view.cover.image.description }" class="frame">
           <p>From the album "<a href="${ view.cover.album.path }/" >${ view.cover.album.title }</a>"</p>
         </div>

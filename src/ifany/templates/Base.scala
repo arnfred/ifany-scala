@@ -12,6 +12,7 @@ case class Base(body : Template, header : Option[Template] = None) extends Templ
 
       <title>&laquo; If Any &raquo; ${ view.getTitle }</title>
       <meta name="description" content="Photos by Jonas Toft Arnfred">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link rel="icon" type="image/png" href="/img/favicon.png"/>
       <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css"/>
       <link rel="stylesheet" type="text/css" href="/css/global.css"/>
