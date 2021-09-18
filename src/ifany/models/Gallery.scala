@@ -38,7 +38,7 @@ object Gallery {
 
   def getAllGalleries: Seq[Gallery] = galleries.getOrElse {
     // Get all albums
-    val albums = for ((k,a) <- Album.updateAll if a.isPublic) yield a
+    val albums = for ((k,a) <- Album.getAll if a.visible) yield a
     // Group albums by gallery
     val grouped: Map[String, Seq[Album]] = { 
       for (a <- albums; g <- a.galleries) yield (g -> a)

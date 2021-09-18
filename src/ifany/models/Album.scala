@@ -3,6 +3,8 @@ package ifany
 import org.joda.time.DateTime 
 import scala.io.Source
 import java.io.FileNotFoundException
+import java.security.MessageDigest
+import java.math.BigInteger
 import scala.collection.JavaConverters._
 import java.io.File
 import awscala._, dynamodbv2._
@@ -95,11 +97,10 @@ case class Album(title : String,
                  description : String,
                  url : String,
                  galleries : Seq[String],
-                 public : Option[Boolean],
+                 visible : Boolean,
+                 secret : Option[String],
                  images : Seq[Image],
                  datetime: (DateTime, DateTime)) {
-
-  val isPublic : Boolean = public.getOrElse(true)
 
   val getGallery : Option[String] = galleries match {
     case "all" +: rest => rest.headOption
@@ -111,6 +112,7 @@ case class Album(title : String,
     case None => "album/" + url
     case Some(gURL) => gURL + "/" + url
   }
+
 }
 
 
@@ -122,9 +124,19 @@ object Album {
   // Should be a map
   var albums: Option[Map[String, Album]] = None
 
+  def dynamic(title: String, desc: String, images: Seq[Image], datetime: (DateTime, DateTime)): Album =
+    Album(title, desc, "", Seq(), false, None, images, datetime)
+
   // Look up album in map
-  def get(id: String): Album = getAll.get(id) match {
-    case Some(a) => a
+  def get(id: String, password: Option[String]): Album = getAll.get(id) match {
+    case Some(album) => {
+      val showPrivate = password.map{ pass =>
+        val secretSHA = hash64(pass, id)
+        album.secret.getOrElse("") == secretSHA } .getOrElse(false)
+      val images = album.images.filter(im => showPrivate || im.published)
+      val visible = showPrivate || album.visible
+      album.copy(visible=visible, images=images)
+    }
     case None => throw new AlbumNotFound(id)
   }
 
@@ -143,10 +155,9 @@ object Album {
     }
   }
 
-  private def albumFromItem(item: Item): Option[Album] = {
+  private def albumFromDBItem(item: Item): Option[Album] = {
     val attributes: Map[String, AttributeValue] = item.attributes.map { case Attribute(k, v) => (k, v) }.toMap
     val images = attributes("images").l.map(av => imageFromAttributeValue(AttributeValue(av)))
-                                       .filter(im => im.published)
     val url = attributes("url").s.get
     if (images.size == 0) {
       None
@@ -156,7 +167,8 @@ object Album {
         description = attributes("description").s.getOrElse(""),
         url = url,
         galleries = attributes("galleries").l.map(av => AttributeValue(av).s.get),
-        public = attributes("public").bl,
+        visible = attributes("public").bl.getOrElse(true),
+        secret = attributes.get("secret").flatMap(_.s),
         images = images,
         datetime = datetimeFromImages(images, url)
       ))
@@ -180,12 +192,20 @@ object Album {
 
   // Returns all albums in the photo dir
   def getAll: Map[String, Album] = albums.getOrElse {
-    albums = Some(table.scan(filter = Seq(), limit = 99999).map(albumFromItem(_)).collect { case Some(a) => (a.url, a) }.toMap)
+    albums = Some(table.scan(filter = Seq(), limit = 99999).map(albumFromDBItem(_)).collect { case Some(a) => (a.url, a) }.toMap)
     albums.get
   }
 
   def updateAll: Map[String, Album] = {
     albums = None
     getAll
+  }
+
+  // From: https://stackoverflow.com/a/46332228/1722504
+  private def hash64(password: String, id: String): String = {
+    val data = password + id
+    MessageDigest.getInstance("SHA-256")
+      .digest(data.getBytes("UTF-8"))
+      .map("%02x".format(_)).mkString
   }
 }

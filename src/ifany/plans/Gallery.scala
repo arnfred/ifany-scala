@@ -101,7 +101,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         val images : Seq[Image] = Random.shuffle(frontpage.covers.map(_.makeImage)).take(100).toSeq
         val title : String = "Cover Images"
         val desc : String = """For each album I take I note the photos that I particularly like and add them to the list of covers. These images are used for the cover image on <a href="/">the frontpage</a>. They are also my usual go to images when I want new prints on my walls. In this album I'm showing 100 randomly shuffled cover images. Reload the page to see a different selection."""
-        val album : Album = Album(title, desc, "", Seq(), None, images, Album.datetimeFromImages(images, "covers"))
+        val album : Album = Album.dynamic(title, desc, images, Album.datetimeFromImages(images, "covers"))
         val nav : Navigation = Navigation(None, None, None)
         val view = AlbumView(album, nav, "metaAlbum")
         val output = MetaAlbumTemplate(view).toString
@@ -145,7 +145,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         val title : String = "All Images"
         val desc : String = s"""Images and videos published on <a href="/">ifany.org</a> in rough chronological order according to the image metadata. Page $page of $pages"""
         val date = Album.datetimeFromImages(images, "all")
-        val album : Album = Album(title, desc, "", Seq(), None, imageSets(index).toSeq.reverse, date)
+        val album : Album = Album.dynamic(title, desc, imageSets(index).toSeq.reverse, date)
         val next = if (page < pages) Some(NavElem(s"all/${page + 1}", s"Page ${page + 1}")) else None
         val prev = if (page > 1) Some(NavElem(s"all/${page - 1}", s"Page ${page - 1}")) else None
         val nav : Navigation = Navigation(next, prev, None)
@@ -186,7 +186,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         } yield image.copy(file = album.url + "/" + image.file)
         val title : String = "All videos"
         val desc : String = """All videos gathered on one page."""
-        val album : Album = Album(title, desc, "", Seq(), None, videos.sortBy(_.datetime).toSeq, Album.datetimeFromImages(videos, "videos"))
+        val album : Album = Album.dynamic(title, desc, videos.sortBy(_.datetime).toSeq, Album.datetimeFromImages(videos, "videos"))
         val nav : Navigation = Navigation(None, None, None)
         val view = AlbumView(album, nav, "metaAlbum")
         val output = MetaAlbumTemplate(view).toString
@@ -226,7 +226,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         } yield image.copy(file = album.url + "/" + image.file)
         val title : String = "100 Random Images"
         val desc : String = """A random pick of 100 images from <a href="/">ifany.org</a> (reload to reshuffle). I was browsing through random images the other day and thought it would be neat with a way to scroll through random moments and memories from my past. I suspect this will mostly be useful for my own nostalgic cravings, but still... here you go."""
-        val album : Album = Album(title, desc, "", Seq(), None, Random.shuffle(images).take(100).toSeq, Album.datetimeFromImages(images, "random"))
+        val album : Album = Album.dynamic(title, desc, Random.shuffle(images).take(100).toSeq, Album.datetimeFromImages(images, "random"))
         val nav : Navigation = Navigation(None, None, None)
         val view = AlbumView(album, nav, "metaAlbum")
         val output = MetaAlbumTemplate(view).toString
@@ -288,11 +288,12 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 	//                                          //
 	//////////////////////////////////////////////
 
-    case req @ Path(Seg(galleryURL :: albumURL :: whatever)) => {
+    case req @ Path(Seg(galleryURL :: albumURL :: rest)) => {
 
       // Piece together the album data
       try {
-        val album : Album = Album.get(albumURL)
+        val password = rest.headOption
+        val album : Album = Album.get(albumURL, password)
         val nav : Navigation = Navigation.getAlbum(albumURL)
         val view = AlbumView(album, nav)
         val output = AlbumTemplate(view).toString
