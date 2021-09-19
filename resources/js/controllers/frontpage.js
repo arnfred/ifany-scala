@@ -13,7 +13,6 @@ curl(
 
 	// Set up the required modules
 	[
-		//"googleAnalytics", 
 		"views/frontpage",
 		"lib/scrollTo",
 		"domReady!"
@@ -25,4 +24,3 @@ curl(
 		frontpage.init();
 	}
 )
-.next(["googleAnalytics"])

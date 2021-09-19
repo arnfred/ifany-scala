@@ -19,10 +19,6 @@ case class Base(body : Template, header : Option[Template] = None) extends Templ
 
       ${ header.getOrElse("") }
 
-      <!-- css3-mediaqueries.js for IE less than 9 -->
-      <!-- [if lt IE 9]>
-      <script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>
-      <![endif]-->
       <script type="text/javascript" src="/js/lib/curl/curl.js"></script>
       <script type="text/javascript" src="/js/controllers/${ view.name }.js"></script>
 

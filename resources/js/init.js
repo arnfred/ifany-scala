@@ -13,7 +13,6 @@ curl(
 
 	// Set up the required modules
 	[
-		//"googleAnalytics", 
 		"jquery",
 		"css!css/bootstrap.min.css", 
 		"css!css/bootstrap-responsive.min.css", 
@@ -35,4 +34,3 @@ curl(
 
 	}
 )
-.next(["googleAnalytics"])

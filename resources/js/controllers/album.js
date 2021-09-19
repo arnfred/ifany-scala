@@ -24,4 +24,3 @@ curl(
 		// Nothing to prepare here
 	}
 )
-.next(["googleAnalytics"])
