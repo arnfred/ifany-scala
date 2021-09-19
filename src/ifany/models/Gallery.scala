@@ -37,8 +37,9 @@ object Gallery {
   var galleries: Option[Seq[Gallery]] = None
 
   def getAllGalleries: Seq[Gallery] = galleries.getOrElse {
-    // Get all albums
-    val albums = for ((k,a) <- Album.getAll if a.visible) yield a
+    // Get all albums. We use `updateAll` to make sure that secrets are updated
+    // when we run `update`
+    val albums = for ((k,a) <- Album.updateAll if a.visible) yield a
     // Group albums by gallery
     val grouped: Map[String, Seq[Album]] = { 
       for (a <- albums; g <- a.galleries) yield (g -> a)
