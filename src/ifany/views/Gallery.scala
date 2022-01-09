@@ -20,12 +20,12 @@ case class GalleryView(gallery : Gallery, nav : Navigation) extends View {
   val cover : Cover = gallery.cover
 
   // The amount of images in an album
-  def getAlbumSize(album : Album) : Int = album.images.size
+  def getAlbumSize(album : Album) : Int = album.size
 
 
   // The amount of images in a gallery
   def getSize : Int = {
-    gallery.albums.map { a => a.images.size }.sum
+    gallery.albums.map { a => a.size }.sum
   }
 
   // Find n pictures from an album to display
@@ -34,12 +34,13 @@ case class GalleryView(gallery : Gallery, nav : Navigation) extends View {
   }
 
   def getDateString : String = {
-    getDateString(for (a <- gallery.albums; i <- a.images) yield i, false)
+    getDateString(for (a <- gallery.albums; i <- a.images if i.published) yield i, false)
   }
 
 
   def getAlbumDateString(album : Album) : String = {
-    getDateString(album.images, true)
+    val images = for (i <- album.images if i.published) yield i
+    getDateString(images, true)
   }
 
 }

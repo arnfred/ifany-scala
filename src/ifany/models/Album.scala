@@ -113,6 +113,8 @@ case class Album(title : String,
     case Some(gURL) => gURL + "/" + url
   }
 
+  val size : Int = (for (i <- images if i.published) yield i).size
+
 }
 
 

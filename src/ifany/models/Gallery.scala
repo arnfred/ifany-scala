@@ -6,7 +6,7 @@ import awscala._, dynamodbv2._
 case class Gallery(name : String, description : String, url: String, albums : Seq[Album]) {
 
   val cover : Cover = {
-    val covers = for (a <- albums; i <- a.images if (i.cover || i.banner)) yield {
+    val covers = for (a <- albums; i <- a.images if (i.cover || i.banner) && i.published) yield {
       Cover(i, a)
     }
     if (covers.size > 0) shuffle(covers).head
