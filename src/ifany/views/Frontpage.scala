@@ -37,7 +37,7 @@ case class FrontpageView(frontpage : Frontpage) extends View {
     // If we have no covers, just use any image in landscape format (width > height)
     else {
       val landscapes = {
-        for (a <- gallery.albums; i <- a.images if i.size(0) > i.size( 1 )) yield {
+        for (a <- gallery.albums; i <- a.images if !i.isVertical && i.published && !i.is_video) yield {
           Cover(i, a)
         }
       }
@@ -48,16 +48,15 @@ case class FrontpageView(frontpage : Frontpage) extends View {
 
   // Find n pictures from an album to display
   def getAlbumImages(album : Album, n : Int) : Iterable[Image] = { 
-    shuffle(album.images).take(n)
+    val candidates = for (i <- album.images if i.published) yield i
+    shuffle(candidates).take(n)
   }
 
   def getGalleryDateString(gallery : Gallery) : String = {
     getDateString(for (a <- gallery.albums; i <- a.images) yield i, false)
   }
 
-
   def getAlbumDateString(album : Album) : String = {
     getDateString(album.images, true)
   }
-
 }

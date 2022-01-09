@@ -5,7 +5,7 @@ import scala.io.Source
 import java.io.FileNotFoundException
 import java.security.MessageDigest
 import java.math.BigInteger
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import java.io.File
 import awscala._, dynamodbv2._
 
@@ -176,7 +176,7 @@ object Album {
   }
 
   private def imageFromAttributeValue(value: AttributeValue): Image = {
-    val attributes: scala.collection.Map[String, AttributeValue] = value.m.get.asScala.mapValues(AttributeValue(_))
+    val attributes: scala.collection.MapView[String, AttributeValue] = value.m.get.asScala.view.mapValues(AttributeValue(_))
     val im = Image(
       file = attributes("file").s.get,
       description = attributes("description").s.getOrElse(""),

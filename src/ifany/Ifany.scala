@@ -10,7 +10,7 @@ object Main {
     val srv = Ifany.init
 
     // Run the server
-    srv.run
+    srv.run()
   }
 }
 

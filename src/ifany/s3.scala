@@ -15,7 +15,7 @@ object S3Photo {
     // to make sure we don't insert extra forward slashes
     val albumURL = if (album == "") "" else s"$album/"
     val key = s"albums/${albumURL}${image}"
-    val expiration = DateTime.now.plusMinutes(60).toDate
+    val expiration = DateTime.now().plusMinutes(60).toDate
 
     // Why not `s3.generatePresignedUrl(bucketName, key, expiration)` ???
     //

@@ -14,7 +14,7 @@ case class Gallery(name : String, description : String, url: String, albums : Se
     // If we have no covers, just use any image in landscape format (width > height)
     else {
       val landscapes = {
-        for (a <- albums; i <- a.images if i.size(0) > i.size( 1 )) yield {
+        for (a <- albums; i <- a.images if !i.isVertical && i.published && !i.is_video) yield {
           Cover(i, a)
         }
       }
