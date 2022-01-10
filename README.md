@@ -23,3 +23,28 @@ dokku ps:stop photos
 ```
 
 This will mean a short amount of downtime, which I'm not at all concerned about.
+
+Encryption Certificates
+-----------------------
+
+I've enabled `https` for ifany.org as well as a few apps on dynkarken.com. To do so, I've used the lets-encrypt plugin: https://github.com/dokku/dokku-letsencrypt
+
+Setting it up was incredibly straightforward. I just added an ENV value for the encryption email, installed the plugin and enabled it for `photos`:
+
+```
+sudo dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
+dokku config:set --no-restart photos DOKKU_LETSENCRYPT_EMAIL=admin@ifany.org
+dokku letsencrypt:enable photos
+```
+
+I had to remove the `ifany.org` domain as it redirects to `www.ifany.org`. I've checked that the site still works fine when accessed as `ifany.org` (and that the connection is now https!)
+
+I've also enabled a cronjob to update certificates:
+
+```
+dokku letsencrypt:cron-job --add
+-----> Updated schedule file
+-----> Added cron job to dokku's crontab.
+```
+
+Hopefully that should mean that no other work here is needed. Fingers crossed.
