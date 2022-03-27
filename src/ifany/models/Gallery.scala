@@ -64,7 +64,7 @@ object Gallery {
   private def galleryFromItem(item: Item, albumMap: Map[String, Seq[Album]]): Option[Gallery] = {
     val attributes: Map[String, AttributeValue] = item.attributes.map { case Attribute(k, v) => (k, v) }.toMap
     val name = attributes("name").s.getOrElse("")
-    val description = attributes("description").s.getOrElse("")
+    val description = attributes.get("description").flatMap(_.s).getOrElse("")
     val url = attributes("url").s.get
     val albums = albumMap.getOrElse(attributes("url").s.get, Seq.empty)
     if (albums.length > 0) Some(Gallery(name, description, url, albums)) else None
