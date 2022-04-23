@@ -141,6 +141,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
     case true => Template(s"""
       <video class="media" id="${image.id}" file="${image.file}"
              controls
+             playsinline
              preload="none"
              poster=\"${image.imageURL(view.album.url, "800")}\">
       <source src="${image.videoURL(view.album.url)}" type="video/mp4"></video>""")
