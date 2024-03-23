@@ -1,5 +1,5 @@
-define(["jquery", "radio", "util/size", "util/cache"],
-	function($, radio, size, cache) {
+define(["jquery", "radio"],
+	function($, radio) {
 
 	//////////////////////////////////////////////
 	//											//
@@ -78,7 +78,9 @@ define(["jquery", "radio", "util/size", "util/cache"],
 
 
 	var overlayUpdate = function(img) {
-		var dom_img = cache.load(img);
+        var id = "#id-" + img.file.replaceAll("/", "--").replaceAll(".", "--");
+        var dom_img = $(id).clone().attr("sizes", "(min-width: 800) 83.34vw, 100vw");
+
 		$("#overlay-img .media").remove();
 		$("#overlay-img").children("div").prepend(dom_img);
 		$("#caption").html(img.description);

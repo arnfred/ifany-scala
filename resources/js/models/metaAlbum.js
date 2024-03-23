@@ -1,13 +1,9 @@
 define(["radio",
 		"views/metaAlbum",
-		"util/cache",
-		"lib/history",
 		"lib/underscore",
 	],
 	function(radio,
 		albumView,
-		cache,
-		history,
 		_
 	) {
 
@@ -60,9 +56,6 @@ define(["radio",
 		$("#overlay-prev").click(function() { goPrev(); });
 		$("#overlay-next").click(function() { goNext(); });
 		$("#overlay-img").click(function() { closeOverlay(); });
-
-		// On resize, recache
-		radio("window:resize").subscribe(cacheImages);
 	};
 
 	//////////////////////////////////////////////
@@ -123,9 +116,6 @@ define(["radio",
 		var prev = getPrevImg(name);
 		var next = getNextImg(name);
 
-		// cache surrounding images
-		cacheImages();
-
 		// Broadcast
 		radio("overlay:set").broadcast(img, (prev !== undefined), (next !== undefined));
 	};
@@ -182,19 +172,6 @@ define(["radio",
 		var index = album.names.indexOf(name);
 		return (index === -1 || index === 0) ? undefined : album.names[index-1];
 	};
-
-	var cacheImages = function() {
-		if (album.overlayActive) {
-			var next = getNextImg(album.current_name);
-			var nextnext = getNextImg(next);
-			var prev = getPrevImg(album.current_name);
-			cache.save(album.images[album.current_name], album.url);
-			if (next !== undefined) cache.save(album.images[next], album.url);
-			if (nextnext !== undefined) cache.save(album.images[nextnext], album.url);
-			if (prev !== undefined) cache.save(album.images[prev], album.url);
-		}
-	};
-
 
 	//////////////////////////////////////////////
 	//											//

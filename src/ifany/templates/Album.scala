@@ -78,7 +78,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
       </div>
       <div class="col-xs-10 overlay-img" id="overlay-img">
         <div id="overlay-center-box">
-          <img class="media" alt="Overlay image"/>
+          <img class="media" alt="Overlay image" crossorigin="anonymous"/>
           <div id="caption-box"><span id="caption">Sample Caption</span></div>
         </div>
       </div>
@@ -140,6 +140,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
   def imageBox(image: Image, ratio: Double): Template = image.is_video match {
     case true => Template(s"""
       <video class="media" id="${image.id}" file="${image.file}"
+             crossorigin="anonymous"
              controls
              playsinline
              preload="none"
@@ -151,6 +152,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
         <img class="media" id="${image.id}" file="${image.file}"
              src="${ image.imageURL(view.album.url, "800") }"
              srcset="${ srcset.mkString(", ") }"
+             crossorigin="anonymous"
              loading="lazy"
              sizes="(min-width: 800px) ${ratio * 0.8}vw, 100vw"
              alt="${ image.description }">""")

@@ -1,5 +1,5 @@
-define(["jquery", "radio", "util/size", "util/cache"],
-	function($, radio, size, cache) {
+define(["jquery", "radio"],
+	function($, radio) {
 
 	//////////////////////////////////////////////
 	//											//
@@ -23,6 +23,7 @@ define(["jquery", "radio", "util/size", "util/cache"],
 		radio("overlay:set").subscribe(overlayChange);
 		radio("overlay:close").subscribe(overlayClose);
 		radio("window:resize").subscribe(resizeOverlay);
+		radio("overlay:loaded").subscribe(printLoaded);
 
 
 	};
@@ -76,7 +77,8 @@ define(["jquery", "radio", "util/size", "util/cache"],
 
 
 	var overlayUpdate = function(img) {
-		var dom_img = cache.load(img);
+        var id = "#id-" + img.file.replaceAll("/", "--").replaceAll(".", "--");
+        var dom_img = $(id).clone().attr("sizes", "(min-width: 800) 83.34vw, 100vw");
 		var album = img.file.split("/")[0];
 		$("#overlay-img .media").remove();
 		$("#overlay-img").children("div").prepend(dom_img);
@@ -114,6 +116,10 @@ define(["jquery", "radio", "util/size", "util/cache"],
             }
         });
 	};
+
+    var printLoaded = function(img) {
+        console.log("Loaded: ", img);
+    };
 
 
 	//////////////////////////////////////////////
