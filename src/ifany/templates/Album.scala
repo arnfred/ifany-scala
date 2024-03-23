@@ -144,7 +144,7 @@ case class AlbumTemplate(view : AlbumView) extends Template {
              crossorigin="anonymous"
              controls
              playsinline
-             preload="auto"
+             preload="none"
              poster=\"${image.imageURL(view.album.url, "800")}\">
       <source src="${image.videoURL(view.album.url)}" type="video/mp4"></video>""")
     case false => 

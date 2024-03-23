@@ -44,6 +44,13 @@ define(["jquery", "radio"],
 
         // Ensure that videos play when the mouse hovers over them
         playVideosOnHover();
+
+        // Only start preloading the videos when the rest of the page has had a head start
+
+        setTimeout(function() {
+            // Select all video elements and update the preload attribute to "auto"
+            $('video').attr('preload', 'auto');
+        }, 1000); // 1000 milliseconds = 1 seconds
 	}
 
 
