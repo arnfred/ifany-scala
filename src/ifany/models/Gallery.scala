@@ -1,7 +1,9 @@
 package ifany
 
+import java.time.LocalDateTime;
 import scala.util.Random.shuffle
 import awscala._, dynamodbv2._
+import scala.util.Try
 
 case class Gallery(name : String, description : String, url: String, albums : Seq[Album]) {
 
@@ -48,10 +50,10 @@ object Gallery {
     } map { // Simplify touple to Album
       case (k,v) => (k, v.map(_._2).toSeq)
     } map { // Sort all lists of albums by date
-      case (k,v) => (k, v.sortBy(_.datetime._2.getMillis))
+      case (k,v) => (k, v.sortBy(_.datetime._2))
     }
     val gals = table.scan(filter = Seq(), limit = 99999).map(galleryFromItem(_, grouped)).collect { case Some(g) => g }
-    galleries = Some(gals.sortBy(_.medianAge.get.getMillis).reverse)
+    galleries = Some(gals.sortBy(_.medianAge).reverse)
     galleries.get
   }
   

@@ -3,7 +3,6 @@ package ifany
 import scala.util.Random.nextInt
 import scala.util.Random.shuffle
 import scala.math.abs
-import org.joda.time.DateTime
 
 case class GalleryView(gallery : Gallery, nav : Navigation) extends View {
 

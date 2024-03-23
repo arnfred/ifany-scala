@@ -3,6 +3,7 @@ package ifany
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.ZoneId
+import scala.util.Try
 
 
 trait View {
@@ -23,8 +24,10 @@ trait View {
     // Get a list of all dates
     val zoneId = ZoneId.systemDefault
     val dates : Seq[LocalDateTime] = {
-      val unsorted = for (i <- images; dt <- i.datetime) yield LocalDateTime.parse(dt)
-      unsorted.sortBy(_.atZone(zoneId).toEpochSecond)
+      val unsorted = for (i <- images;
+                          dt <- i.datetime;
+                          d <- Try(LocalDateTime.parse(dt)).toOption) yield d
+      unsorted.sorted
     }
 
     val monthDayFormatter = DateTimeFormatter.ofPattern("MMMM d")

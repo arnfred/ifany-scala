@@ -1,5 +1,7 @@
 package ifany
 
+import java.time._
+import java.time.format.DateTimeFormatter
 import org.json4s._
 import org.json4s.native.Serialization
 import org.json4s.native.Serialization.{write}
@@ -18,9 +20,22 @@ case class DualRow(left: Image, right: Image) extends Row {
   }
 }
 
+class LocalDateTimeSerializer extends CustomSerializer[LocalDateTime](format => (
+  {
+    case JString(s) => LocalDateTime.parse(s, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+    case JNull => null
+  },
+  {
+    case d: LocalDateTime => JString(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(d))
+  }
+))
+
+
+
+
 case class AlbumView(album : Album, nav : Navigation, name : String = "album", cssname: String = "album") extends View {
 
-  implicit val formats = Serialization.formats(NoTypeHints)
+  implicit val formats: Formats = Serialization.formats(NoTypeHints) + new LocalDateTimeSerializer
 
   def getTitle : String = album.title
   def getDescription : String = album.description

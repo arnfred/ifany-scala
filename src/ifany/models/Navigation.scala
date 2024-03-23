@@ -22,7 +22,7 @@ object Navigation {
     val albums : Seq[Album] = for (g <- galleries; a <- g.albums) yield a
 
     // get album order
-    val albums_sorted : Seq[Album] = albums.sortBy(_.datetime._2.getMillis)
+    val albums_sorted : Seq[Album] = albums.sortBy(_.datetime._2)
 
     // Build list of Navigation elements
     val navGalleries : Map[String, Navigation] = scan(galleries.reverse, None, galleryNav)
@@ -54,8 +54,9 @@ object Navigation {
                         : Map[String, Navigation] = galleries match {
 
     // In case we have two or more items left
-    case current +: next +: rest =>
+    case current +: next +: rest => {
       scan(next +:rest, Some(current), getNavPair) + getNavPair(prev, current, Some(next))
+    }
 
     // In case the current item is the last
     case current +: Nil => 

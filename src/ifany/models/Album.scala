@@ -1,11 +1,12 @@
 package ifany
 
-import org.joda.time.DateTime 
+import java.time.LocalDateTime;
 import scala.io.Source
 import java.io.FileNotFoundException
 import java.security.MessageDigest
 import java.math.BigInteger
 import scala.jdk.CollectionConverters._
+import scala.util.Try
 import java.io.File
 import awscala._, dynamodbv2._
 
@@ -100,7 +101,7 @@ case class Album(title : String,
                  visible : Boolean,
                  secret : Option[String],
                  images : Seq[Image],
-                 datetime: (DateTime, DateTime)) {
+                 datetime: (LocalDateTime, LocalDateTime)) {
 
   val getGallery : Option[String] = galleries match {
     case "all" +: rest => rest.headOption
@@ -126,7 +127,7 @@ object Album {
   // Should be a map
   var albums: Option[Map[String, Album]] = None
 
-  def dynamic(title: String, desc: String, images: Seq[Image], datetime: (DateTime, DateTime)): Album =
+  def dynamic(title: String, desc: String, images: Seq[Image], datetime: (LocalDateTime, LocalDateTime)): Album =
     Album(title, desc, "", Seq(), false, None, images, datetime)
 
   // Look up album in map
@@ -142,12 +143,14 @@ object Album {
     case None => throw new AlbumNotFound(id)
   }
 
-  def datetimeFromImages(images: Seq[Image], id: String): (DateTime, DateTime) = {
+  def datetimeFromImages(images: Seq[Image], id: String): (LocalDateTime, LocalDateTime) = {
 
     // Take all images that have a date associated and sort them
-    val sorted_dates : Seq[DateTime] = {
-      for (i <- images; dt <- i.datetime) yield new DateTime(i.datetime.get)
-    } sortBy(_.getMillis)
+    val sorted_dates : Seq[LocalDateTime] = {
+      for (i <- images;
+           dt <- i.datetime;
+           d <- Try(LocalDateTime.parse(dt)).toOption) yield d
+    } .sorted
 
     // Return the first and last date
     sorted_dates.size match {
