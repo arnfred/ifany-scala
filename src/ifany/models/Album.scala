@@ -114,14 +114,14 @@ case class Album(title : String,
     case Some(gURL) => gURL + "/" + url
   }
 
-  val size : Int = (for (i <- images if i.published) yield i).size
+  val size : Int = images.size
 
 }
 
 
 object Album {
 
-  implicit val dynamoDB = DynamoDB.at(Region.EU_WEST_1)
+  implicit val dynamoDB: DynamoDB = DynamoDB.at(Region.EU_WEST_1)
   val albumTable = sys.env("ALBUMS_TABLE")
   val table: Table = dynamoDB.table(albumTable).get
   // Should be a map
@@ -189,21 +189,30 @@ object Album {
       banner = attributes("banner").bl.get,
       cover = attributes("cover").bl.get,
       size = attributes("size").l.map(s => AttributeValue(s).n.get.toInt),
-      published = attributes.get("published").map(_.bl.get).getOrElse(true),
-      is_video = attributes.get("is_video").map(_.bl.get).getOrElse(false)
+      published = attributes.get("published").flatMap(_.bl).getOrElse(true),
+      is_video = attributes.get("is_video").flatMap(_.bl).getOrElse(false)
     )
     im
   }
 
   // Returns all albums in the photo dir
-  def getAll: Map[String, Album] = albums.getOrElse {
-    albums = Some(table.scan(filter = Seq(), limit = 99999).map(albumFromDBItem(_)).collect { case Some(a) => (a.url, a) }.toMap)
+  private def getAll: Map[String, Album] = albums.getOrElse {
+    albums = Some(table.scan(filter = Seq(), limit = 99999)
+                       .map(albumFromDBItem(_))
+                       .collect { case Some(a) => (a.url, a) }
+                       .toMap)
     albums.get
   }
 
+  // Refresh all albums and return only visible albums with visible images
   def updateAll: Map[String, Album] = {
     albums = None
-    getAll
+    // Only include published images and public albums
+    getAll.map { case (k, a) =>
+      val images: Seq[Image] = a.images.filter(im => im.published)
+      val visible: Boolean = a.visible && images.size > 0
+      (k, a.copy(visible=visible, images=images))
+    }.filter(_._2.visible)
   }
 
   // From: https://stackoverflow.com/a/46332228/1722504

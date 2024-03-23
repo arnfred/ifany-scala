@@ -8,7 +8,7 @@ import scala.util.Try
 case class Gallery(name : String, description : String, url: String, albums : Seq[Album]) {
 
   val cover : Cover = {
-    val covers = for (a <- albums; i <- a.images if (i.cover || i.banner) && i.published) yield {
+    val covers = for (a <- albums; i <- a.images if (i.cover || i.banner)) yield {
       Cover(i, a)
     }
     if (covers.size > 0) shuffle(covers).head
@@ -16,7 +16,7 @@ case class Gallery(name : String, description : String, url: String, albums : Se
     // If we have no covers, just use any image in landscape format (width > height)
     else {
       val landscapes = {
-        for (a <- albums; i <- a.images if !i.isVertical && i.published && !i.is_video) yield {
+        for (a <- albums; i <- a.images if !i.isVertical && !i.is_video) yield {
           Cover(i, a)
         }
       }
@@ -24,16 +24,19 @@ case class Gallery(name : String, description : String, url: String, albums : Se
     }
   }
 
-  def medianAge: Option[DateTime] = {
-    val datetimes: Seq[DateTime] = for (a <- albums; i <- a.images if i.datetime != None) yield new DateTime(i.datetime.get)
-    val sorted_dates: Seq[DateTime] = datetimes.sortBy(_.getMillis)
-    if (sorted_dates.length > 0) Some(sorted_dates(datetimes.length / 2)) else None
+  def medianAge: LocalDateTime = {
+    val datetimes: Seq[LocalDateTime] = for (a <- albums;
+                                             i <- a.images;
+                                             dt <- i.datetime;
+                                             d <- Try(LocalDateTime.parse(dt)).toOption) yield d
+    val sorted_dates: Seq[LocalDateTime] = datetimes.sorted
+    if (sorted_dates.length > 0) sorted_dates(datetimes.length / 2) else LocalDateTime.now()
   }
 }
 
 object Gallery {
 
-  implicit val dynamoDB = DynamoDB.at(Region.EU_WEST_1)
+  implicit val dynamoDB: DynamoDB = DynamoDB.at(Region.EU_WEST_1)
   val galleryTable = sys.env("GALLERIES_TABLE")
   val table: Table = dynamoDB.table(galleryTable).get
   var galleries: Option[Seq[Gallery]] = None

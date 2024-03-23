@@ -33,12 +33,12 @@ case class GalleryView(gallery : Gallery, nav : Navigation) extends View {
   }
 
   def getDateString : String = {
-    getDateString(for (a <- gallery.albums; i <- a.images if i.published) yield i, false)
+    getDateString(for (a <- gallery.albums; i <- a.images) yield i, false)
   }
 
 
   def getAlbumDateString(album : Album) : String = {
-    val images = for (i <- album.images if i.published) yield i
+    val images = for (i <- album.images) yield i
     getDateString(images, true)
   }
 

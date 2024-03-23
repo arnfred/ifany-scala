@@ -46,7 +46,7 @@ case class AlbumView(album : Album, nav : Navigation, name : String = "album", c
   def getDateString : String = getDateString(album.images, true)
 
   def getGalleries: String = {
-    val galleries = album.galleries.filter(_!="all")
+    val galleries = album.galleries.filter(_ != "all")
     val links = galleries map { g => s"""<a href="/${Gallery.get(g).url}" alt="Go to Gallery: $g">${Gallery.get(g).name}</a>""" }
     links.mkString(", ")
   }
