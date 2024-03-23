@@ -2,7 +2,7 @@ name := "Ifany"
 
 version := "1.0"
 
-scalaVersion := "2.13.7"
+scalaVersion := "2.13.13"
 
 // Needed for `sbt compile stage` together with `project/plugins.sbt`
 enablePlugins(JavaAppPackaging)
