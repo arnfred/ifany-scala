@@ -19,18 +19,15 @@ case class FrontpageTemplate(view : FrontpageView) extends Template {
             <h1 id="header"><span><span id="if">if</span><span id="any">any</span></span></h1>
             <h4 id="subheader"><span>photography</span></h4>
 
-            <p id="about-text">The photos on this site are an ongoing collection of things, people
-            and places that happen to stand in my way the moment I press the
-            shutter. They are licensed under a copyleft license (<a
-                href="http://creativecommons.org/licenses/by-sa/3.0/" alt="Creative
-                Commons CC-BY-SA">CC-BY-SA</a>) which means that as long as you
-            credit me and keep any deriviative work under the same license, you can
-            use the photos for whatever you want. Check out the meta albums of <a href="/all/1">all</a>, 
-            <a href="/random">random</a> and <a href="/covers">cover</a> photos. 
-            Inquiries and fawning fan mail are all welcome at <a
-                href="mailto:jonas@ifany.org"
-                alt="jonas@ifany.org">jonas@ifany.org</a>.</p>
-                <p id="my-name"><a mailto="jonas@ifany.org">Jonas Arnfred</a></p>
+            <p id="about-text">The photos on this site are an ongoing
+            collection of things, people and places that happen to stand in my
+            way the moment I press the shutter. These days, that's mainly my
+            son Ash who was born in November 2020. Check out the meta albums of
+            <a href="/all/1">all</a>, <a href="/random">random</a> and <a
+            href="/covers">cover</a> photos. Inquiries and fawning fan mail are
+            all welcome at <a href="mailto:jonas@ifany.org"
+            alt="jonas@ifany.org">jonas@ifany.org</a>.</p> <p id="my-name"><a
+            mailto="jonas@ifany.org">Jonas Arnfred</a></p>
 
         </div>
 

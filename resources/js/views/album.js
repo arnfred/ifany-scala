@@ -41,6 +41,9 @@ define(["jquery", "radio"],
 
 		// Toggle events
 		album.events();
+
+        // Ensure that videos play when the mouse hovers over them
+        playVideosOnHover();
 	}
 
 
@@ -117,6 +120,20 @@ define(["jquery", "radio"],
             }
         });
     };
+
+    var playVideosOnHover = function() {
+        $('video').each(function() {
+            // Play video on mouseover
+            $(this).on('mouseover', function() {
+                $(this).get(0).play();
+            });
+
+            // Pause video on mouseleave
+            $(this).on('mouseleave', function() {
+                $(this).get(0).pause();
+            });
+        });
+    }
 
 
 
