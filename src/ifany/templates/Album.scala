@@ -140,7 +140,8 @@ case class AlbumTemplate(view : AlbumView) extends Template {
   def imageBox(image: Image, ratio: Double): Template = image.is_video match {
     case true => Template(s"""
       <video class="media" id="${image.id}" file="${image.file}"
-             muted="muted"
+             muted
+             loop
              crossorigin="anonymous"
              controls
              playsinline

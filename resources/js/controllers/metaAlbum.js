@@ -15,7 +15,7 @@ curl(
 	[
 		"jquery",
 		"models/metaAlbum",
-		"views/metaAlbum",
+		"views/album",
 		"domReady!"
 	],
 

@@ -104,7 +104,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         val album : Album = Album.dynamic(title, desc, images, Album.datetimeFromImages(images, "covers"))
         val nav : Navigation = Navigation(None, None, None)
         val view = AlbumView(album, nav, "metaAlbum")
-        val output = MetaAlbumTemplate(view).toString
+        val output = AlbumTemplate(view).toString
         req.respond(HtmlContent ~> ResponseString(output))
       } catch {
         case InternalError(msg) => {
@@ -150,7 +150,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         val prev = if (page > 1) Some(NavElem(s"all/${page - 1}", s"Page ${page - 1}")) else None
         val nav : Navigation = Navigation(next, prev, None)
         val view = AlbumView(album, nav, "metaAlbum")
-        val output = MetaAlbumTemplate(view).toString
+        val output = AlbumTemplate(view).toString
         req.respond(HtmlContent ~> ResponseString(output))
       } catch {
         case InternalError(msg) => {
@@ -189,7 +189,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         val album : Album = Album.dynamic(title, desc, videos.sortBy(_.datetime).toSeq, Album.datetimeFromImages(videos, "videos"))
         val nav : Navigation = Navigation(None, None, None)
         val view = AlbumView(album, nav, "metaAlbum")
-        val output = MetaAlbumTemplate(view).toString
+        val output = AlbumTemplate(view).toString
         req.respond(HtmlContent ~> ResponseString(output))
       } catch {
         case InternalError(msg) => {
@@ -229,7 +229,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         val album : Album = Album.dynamic(title, desc, Random.shuffle(images).take(100).toSeq, Album.datetimeFromImages(images, "random"))
         val nav : Navigation = Navigation(None, None, None)
         val view = AlbumView(album, nav, "metaAlbum")
-        val output = MetaAlbumTemplate(view).toString
+        val output = AlbumTemplate(view).toString
         req.respond(HtmlContent ~> ResponseString(output))
       } catch {
         case InternalError(msg) => {

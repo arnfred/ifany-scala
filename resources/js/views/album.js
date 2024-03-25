@@ -12,6 +12,16 @@ define(["jquery", "radio"],
 
 	//////////////////////////////////////////////
 	//											//
+	//				 Properties					//
+	//											//
+	//////////////////////////////////////////////
+
+    album.type = null;
+
+
+
+	//////////////////////////////////////////////
+	//											//
 	//				   Events					//
 	//											//
 	//////////////////////////////////////////////
@@ -26,7 +36,6 @@ define(["jquery", "radio"],
 
 		// Overlay close
 		radio("overlay:close").subscribe(overlayClose);
-
 	}
 
 
@@ -37,7 +46,10 @@ define(["jquery", "radio"],
 	//											//
 	//////////////////////////////////////////////
 
-	album.init = function() {
+	album.init = function(albumType) {
+
+        // Toggle state
+        album.type = albumType;
 
 		// Toggle events
 		album.events();
@@ -46,7 +58,6 @@ define(["jquery", "radio"],
         playVideosOnHover();
 
         // Only start preloading the videos when the rest of the page has had a head start
-
         setTimeout(function() {
             // Select all video elements and update the preload attribute to "auto"
             $('video').attr('preload', 'auto');
@@ -90,10 +101,16 @@ define(["jquery", "radio"],
 	var overlayUpdate = function(img) {
         var id = "#id-" + img.file.replaceAll("/", "--").replaceAll(".", "--");
         var dom_img = $(id).clone().attr("sizes", "(min-width: 800) 83.34vw, 100vw");
+		var album_name = img.file.split("/")[0];
+        if (album.type === "meta") {
+            var description = img.description + " [<a target=\"_blank\" href=\"/photos/" + album_name + "\" class=\"image-link\" onClick=\"arguments[0].stopPropagation()\">Album</a>]"
+        } else {
+            var description = img.description
+        }
 
 		$("#overlay-img .media").remove();
 		$("#overlay-img").children("div").prepend(dom_img);
-		$("#caption").html(img.description);
+		$("#caption").html(description);
 	};
 
 
@@ -141,7 +158,6 @@ define(["jquery", "radio"],
             });
         });
     }
-
 
 
 	//////////////////////////////////////////////

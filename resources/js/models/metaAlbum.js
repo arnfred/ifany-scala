@@ -1,5 +1,5 @@
 define(["radio",
-		"views/metaAlbum",
+		"views/album",
 		"lib/underscore",
 	],
 	function(radio,
@@ -27,6 +27,7 @@ define(["radio",
 	album.title = null;
 	album.current_image = null;
 	album.overlayActive = false;
+
 
 	//////////////////////////////////////////////
 	//											//
@@ -67,7 +68,7 @@ define(["radio",
 	album.init = function() {
 
 		// Init albumView
-		albumView.init();
+		albumView.init("meta");
 
 		// Get data
 		album.images = _.indexBy(data.images, "file");

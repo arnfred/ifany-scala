@@ -67,7 +67,7 @@ define(["radio",
 	album.init = function() {
 
 		// Init albumView
-		albumView.init();
+		albumView.init("standard");
 
 		// Get data
 		album.images = _.indexBy(data.images, "file");
