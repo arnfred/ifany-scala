@@ -1,5 +1,7 @@
-define(["jquery", "radio"],
-	function($, radio) {
+define(["jquery",
+        "radio",
+		"lib/underscore"],
+	function($, radio, _) {
 
 	//////////////////////////////////////////////
 	//											//
@@ -57,11 +59,9 @@ define(["jquery", "radio"],
         // Ensure that videos play when the mouse hovers over them
         playVideosOnHover();
 
-        // Only start preloading the videos when the rest of the page has had a head start
-        setTimeout(function() {
-            // Select all video elements and update the preload attribute to "auto"
-            $('video').attr('preload', 'auto');
-        }, 1000); // 1000 milliseconds = 1 seconds
+        // Only start preloading the videos when they enter the viewport
+        var lazy_load_videos = _.debounce(function() { loadVideosIfVisible(); }, 300)
+        $(window).on('scroll', lazy_load_videos);
 	}
 
 
@@ -159,6 +159,26 @@ define(["jquery", "radio"],
         });
     }
 
+    var loadVideosIfVisible = function() {
+        $('video').each(function() {
+            var video = $(this); // Current video in the loop
+            if (isElementInViewport(video[0])) { // Convert jQuery object to DOM element
+                console.log("Video is in viewport", video);
+                video.attr('preload', 'auto');
+            }
+        });
+
+    };
+
+    var isElementInViewport = function(el) {
+        var rect = el.getBoundingClientRect();
+        return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        );
+    };
 
 	//////////////////////////////////////////////
 	//											//
