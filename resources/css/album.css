@@ -178,5 +178,6 @@ div#credits p {
 video {
 	width:100%;
 	margin:auto;
+    margin-bottom: -0.5rem;
 	text-align:center;
 }
