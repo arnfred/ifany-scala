@@ -7,15 +7,29 @@ import scala.concurrent._
 import ExecutionContext.Implicits.global
 import java.io.BufferedInputStream
 import java.io.FileInputStream
-import scala.Stream
 import scala.util.Random
 import scala.util.{Success, Failure}
-import awscala._, s3._
+import awscala.*, s3.*
 
 @io.netty.channel.ChannelHandler.Sharable
 object GalleryPlan extends async.Plan with ServerErrorResponse {
 
+  private val aiCrawlers = Seq(
+    "GPTBot", "ChatGPT-User", "CCBot", "Google-Extended",
+    "anthropic-ai", "ClaudeBot", "Bytespider", "FacebookBot",
+    "cohere-ai", "Diffbot", "ImagesiftBot", "Omgili", "PerplexityBot"
+  )
+
+  private def isAiCrawler(userAgent: String): Boolean = {
+    val ua = userAgent.toLowerCase
+    aiCrawlers.exists(bot => ua.contains(bot.toLowerCase))
+  }
+
   def intent = {
+
+    case req if req.headers("User-Agent").exists(isAiCrawler) =>
+      req.respond(Forbidden ~> ResponseString("Forbidden"))
+
 
 	//////////////////////////////////////////////
 	//                                          //
