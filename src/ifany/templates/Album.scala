@@ -1,15 +1,18 @@
 package ifany
 
-case class AlbumTemplate(view : AlbumView) extends Template {
+import scala.language.implicitConversions
 
-  implicit val v = view
+case class AlbumTemplate(view : AlbumView, session : Option[Session]) extends Template {
+
+  given View = view
 
   val css: String = """<link rel="stylesheet" type="text/css" href="/css/album.css"/>"""
   val covers: Set[String] = view.album.images.filter(_.cover).map(_.file).toSet ++ Set(view.album.images.last.file)
 
   override def toString : String = Base(
     Template(navigation(view.getNav) + overlay + album + navigation(view.getNav)),
-    Some(Template(css + javascript + nextprev))
+    Some(Template(css + javascript + nextprev)),
+    session
   )
 
   def nextprev : Template = {

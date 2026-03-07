@@ -35,7 +35,6 @@ object Ifany {
     var srv = unfiltered.netty.Server.http(testPort).resources(resourceDir.toURI.toURL);
 
     // Run server
-    //srv.handler(DataPlan).handler(GalleryPlan)
     srv.handler(GalleryPlan)
   }
 

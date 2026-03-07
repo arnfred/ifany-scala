@@ -2,21 +2,22 @@ name := "Ifany"
 
 version := "1.0"
 
-scalaVersion := "2.13.13"
+scalaVersion := "3.6.4"
 
 // Needed for `sbt compile stage` together with `project/plugins.sbt`
 enablePlugins(JavaAppPackaging)
 
 Compile / scalaSource := baseDirectory.value / "src"
 
-scalacOptions ++= Seq("-unchecked", "-Ywarn-dead-code", "-deprecation")
+scalacOptions ++= Seq("-unchecked", "-deprecation")
 
 libraryDependencies  ++= Seq(
-    "ws.unfiltered" %% "unfiltered-netty-server" % "0.10.+",
-    "ws.unfiltered" %% "unfiltered-filter" % "0.10.+",
-    "org.json4s" %% "json4s-native" % "4.+",
-    "com.github.seratch" %% "awscala-dynamodb" % "0.9.+",
-    "com.github.seratch" %% "awscala-s3" % "0.9.+",
+    "ws.unfiltered" %% "unfiltered-netty-server" % "0.10.4",
+    "ws.unfiltered" %% "unfiltered-filter" % "0.10.4",
+    "org.json4s" %% "json4s-native" % "4.0.7",
+    "com.github.seratch" %% "awscala-dynamodb" % "0.9.2",
+    "com.github.seratch" %% "awscala-s3" % "0.9.2",
+    "com.github.jwt-scala" %% "jwt-json4s-native" % "10.0.4",
     )
 
 resolvers ++= Seq(

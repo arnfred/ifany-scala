@@ -1,15 +1,17 @@
 package ifany
 
-case class GalleryTemplate(view : GalleryView) extends Template {
+import scala.language.implicitConversions
 
-  // Implicit conversion 
-  implicit val v = view
+case class GalleryTemplate(view : GalleryView, session : Option[Session]) extends Template {
+
+  given View = view
 
   val css: String = s"""<link rel="stylesheet" type="text/css" href="/css/frontpage.css"/>"""
 
   override def toString : String = Base(
     Template(navigation(view.getNav) + header + gallery),
-    Some(Template(css + nextprev))
+    Some(Template(css + nextprev)),
+    session
   )
 
   def nextprev : Template = {

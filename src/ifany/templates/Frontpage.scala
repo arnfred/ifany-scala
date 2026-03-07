@@ -1,13 +1,14 @@
 package ifany
 
-case class FrontpageTemplate(view : FrontpageView) extends Template {
+import scala.language.implicitConversions
 
-  // Implicit conversion 
-  implicit val v = view
+case class FrontpageTemplate(view : FrontpageView, session : Option[Session]) extends Template {
+
+  given View = view
 
   val css: String = s"""<link rel="stylesheet" type="text/css" href="/css/frontpage.css"/>"""
 
-  override def toString : String = Base(Template(header + galleries), Some(Template(css)))
+  override def toString : String = Base(Template(header + galleries), Some(Template(css)), session)
 
   val coverSrcset = for (label <- view.cover.image.versions) yield {
     s"${view.cover.image.imageURL(view.cover.album.url, label)} ${view.cover.image.width(label)}w"

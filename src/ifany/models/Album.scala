@@ -8,7 +8,7 @@ import java.math.BigInteger
 import scala.jdk.CollectionConverters._
 import scala.util.Try
 import java.io.File
-import awscala._, dynamodbv2._
+import awscala.*, dynamodbv2.*
 
 case class Image(file : String,
                  description : String,

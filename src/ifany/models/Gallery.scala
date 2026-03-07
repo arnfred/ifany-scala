@@ -2,7 +2,7 @@ package ifany
 
 import java.time.LocalDateTime;
 import scala.util.Random.shuffle
-import awscala._, dynamodbv2._
+import awscala.*, dynamodbv2.*
 import scala.util.Try
 
 case class Gallery(name : String, description : String, url: String, albums : Seq[Album]) {

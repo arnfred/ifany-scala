@@ -1,12 +1,12 @@
 package ifany
 
 import unfiltered.response._
-import awscala._, s3._
+import awscala.*, s3.*
 import scala.concurrent._
 
 object S3Photo {
   implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
-  implicit val s3 = S3.at(Region.EU_WEST_1)
+  implicit val s3: S3 = S3.at(Region.EU_WEST_1)
   val bucket = Bucket(sys.env("IMAGES_BUCKET"))
 
   def getPresignedURL(album: String, image: String): String = {

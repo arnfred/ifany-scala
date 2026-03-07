@@ -1,6 +1,6 @@
 package ifany
 
-case class Base(body : Template, header : Option[Template] = None) extends Template {
+case class Base(body : Template, header : Option[Template], session : Option[Session]) extends Template {
 
   val view = body.view
 
@@ -32,7 +32,12 @@ case class Base(body : Template, header : Option[Template] = None) extends Templ
         <div class="row">
           <div class="col-sm-7 col-sm-offset-4" id="credits">
             <p>Design, code and photos by <a href="mailto:jonas@ifany.org"
-              alt="jonas@ifany.org">Jonas Arnfred</a><p>
+              alt="jonas@ifany.org">Jonas Arnfred</a>
+              ${ session match {
+                case Some(s) => s"""&middot; ${s.email} (<a href="/auth/logout">log out</a>)"""
+                case None => s"""&middot; <a href="/auth/login">log in</a>"""
+              }}
+            <p>
           </div>
         </div>
       </div>

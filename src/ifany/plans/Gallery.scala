@@ -10,6 +10,7 @@ import java.io.FileInputStream
 import scala.util.Random
 import scala.util.{Success, Failure}
 import awscala.*, s3.*
+import java.time.LocalDateTime
 
 @io.netty.channel.ChannelHandler.Sharable
 object GalleryPlan extends async.Plan with ServerErrorResponse {
@@ -25,11 +26,69 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
     aiCrawlers.exists(bot => ua.contains(bot.toLowerCase))
   }
 
+  private val authCutoff = LocalDateTime.of(2020, 11, 25, 0, 0)
+
+  private def isProtectedAlbum(album: Album): Boolean =
+    album.datetime._2.isAfter(authCutoff) || album.datetime._2.isEqual(authCutoff)
+
   def intent = {
 
     case req if req.headers("User-Agent").exists(isAiCrawler) =>
       req.respond(Forbidden ~> ResponseString("Forbidden"))
 
+
+	//////////////////////////////////////////////
+	//                                          //
+	//                  Auth                    //
+	//                                          //
+	//////////////////////////////////////////////
+
+    // Login page at /login
+    case req @ Path(Seg("login" :: Nil)) => {
+      val session = SessionCookie.fromRequest(req)
+      session match {
+        case Some(_) => req.respond(Redirect("/"))
+        case None =>
+          val output = LoginRequiredTemplate("/").toString
+          req.respond(HtmlContent ~> ResponseString(output))
+      }
+    }
+
+    // Login: redirect to Kinde with return URL
+    case req @ Path(Seg("auth" :: "login" :: Nil)) => {
+      val returnTo = req.parameterNames
+        .find(_ == "return_to")
+        .flatMap(n => req.parameterValues(n).headOption)
+        .getOrElse("/")
+      val url = KindeClient.authorizationUrl(returnTo)
+      req.respond(Redirect(url))
+    }
+
+    // Callback: exchange code for tokens, set session cookie
+    case req @ Path(Seg("auth" :: "callback" :: Nil)) => {
+      val code = req.parameterValues("code").headOption
+      val state = req.parameterValues("state").headOption.getOrElse("")
+      val returnTo = KindeClient.returnToFromState(state)
+
+      code.flatMap(KindeClient.exchangeCode) match {
+        case Some(session) =>
+          val cookie = SessionCookie.setCookieHeader(session)
+          req.respond(
+            Found ~> Location(returnTo) ~> ResponseHeader("Set-Cookie", List(cookie))
+          )
+        case None =>
+          req.respond(
+            Redirect(s"/auth/login?return_to=${java.net.URLEncoder.encode(returnTo, "UTF-8")}")
+          )
+      }
+    }
+
+    // Logout: clear cookie and redirect to Kinde logout
+    case req @ Path(Seg("auth" :: "logout" :: Nil)) => {
+      req.respond(
+        Found ~> Location(KindeClient.logoutUrl) ~> ResponseHeader("Set-Cookie", List(SessionCookie.clearCookieHeader))
+      )
+    }
 
 	//////////////////////////////////////////////
 	//                                          //
@@ -39,9 +98,10 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
     case req @ Path(Seg(Nil)) => {
 
       try {
+        val session = SessionCookie.fromRequest(req)
         val frontpage : Frontpage = Frontpage.get()
         val view = FrontpageView(frontpage)
-        val output = FrontpageTemplate(view).toString
+        val output = FrontpageTemplate(view, session).toString
         req.respond(HtmlContent ~> ResponseString(output))
 
       } catch {
@@ -77,11 +137,17 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
     case req @ Path(Seg("update" :: Nil)) => {
 
       try {
+        val session = SessionCookie.fromRequest(req)
+        if (!session.exists(_.isAdmin)) {
+          val output = LoginRequiredTemplate("/update").toString
+          req.respond(HtmlContent ~> ResponseString(output))
+        } else {
         val frontpage : Frontpage = Frontpage.update()
         val nav : Map[String, Navigation] = Navigation.update
         val view = FrontpageView(frontpage)
-        val output = FrontpageTemplate(view).toString
+        val output = FrontpageTemplate(view, session).toString
         req.respond(HtmlContent ~> ResponseString(output))
+        }
 
       } catch {
 
@@ -111,6 +177,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
     case req @ Path(Seg("covers" :: _)) => {
 
       try {
+        val session = SessionCookie.fromRequest(req)
         val frontpage : Frontpage = Frontpage.get()
         val images : Seq[Image] = Random.shuffle(frontpage.covers.map(_.makeImage)).take(100).toSeq
         val title : String = "Cover Images"
@@ -118,7 +185,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         val album : Album = Album.dynamic(title, desc, images, Album.datetimeFromImages(images, "covers"))
         val nav : Navigation = Navigation(None, None, None)
         val view = AlbumView(album, nav, "metaAlbum")
-        val output = AlbumTemplate(view).toString
+        val output = AlbumTemplate(view, session).toString
         req.respond(HtmlContent ~> ResponseString(output))
       } catch {
         case InternalError(msg) => {
@@ -146,6 +213,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
     case req @ Path(Seg("all" :: pageStr :: _)) => {
 
       try {
+        val session = SessionCookie.fromRequest(req)
         val frontpage : Frontpage = Frontpage.get()
         val images = for {
           gallery <- frontpage.galleries
@@ -164,7 +232,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         val prev = if (page > 1) Some(NavElem(s"all/${page - 1}", s"Page ${page - 1}")) else None
         val nav : Navigation = Navigation(next, prev, None)
         val view = AlbumView(album, nav, "metaAlbum")
-        val output = AlbumTemplate(view).toString
+        val output = AlbumTemplate(view, session).toString
         req.respond(HtmlContent ~> ResponseString(output))
       } catch {
         case InternalError(msg) => {
@@ -192,6 +260,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
     case req @ Path(Seg("videos" :: _)) => {
 
       try {
+        val session = SessionCookie.fromRequest(req)
         val frontpage : Frontpage = Frontpage.get()
         val videos = for {
           gallery <- frontpage.galleries
@@ -203,7 +272,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         val album : Album = Album.dynamic(title, desc, videos.sortBy(_.datetime).toSeq, Album.datetimeFromImages(videos, "videos"))
         val nav : Navigation = Navigation(None, None, None)
         val view = AlbumView(album, nav, "metaAlbum")
-        val output = AlbumTemplate(view).toString
+        val output = AlbumTemplate(view, session).toString
         req.respond(HtmlContent ~> ResponseString(output))
       } catch {
         case InternalError(msg) => {
@@ -232,6 +301,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
     case req @ Path(Seg("random" :: _)) => {
 
       try {
+        val session = SessionCookie.fromRequest(req)
         val frontpage : Frontpage = Frontpage.get()
         val images = for {
           gallery <- frontpage.galleries
@@ -243,7 +313,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         val album : Album = Album.dynamic(title, desc, Random.shuffle(images).take(100).toSeq, Album.datetimeFromImages(images, "random"))
         val nav : Navigation = Navigation(None, None, None)
         val view = AlbumView(album, nav, "metaAlbum")
-        val output = AlbumTemplate(view).toString
+        val output = AlbumTemplate(view, session).toString
         req.respond(HtmlContent ~> ResponseString(output))
       } catch {
         case InternalError(msg) => {
@@ -272,10 +342,11 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 
       // Piece together the album data
       try {
+        val session = SessionCookie.fromRequest(req)
         val gallery = Gallery.get(galleryURL)
         val nav : Navigation = Navigation.getGallery(galleryURL)
         val view = GalleryView(gallery, nav)
-        val output = GalleryTemplate(view).toString
+        val output = GalleryTemplate(view, session).toString
         req.respond(HtmlContent ~> ResponseString(output))
 
       // Respond to errors that might occur
@@ -304,14 +375,37 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
 
     case req @ Path(Seg(galleryURL :: albumURL :: rest)) => {
 
+      println(s"[DEBUG] Album route matched: uri='${req.uri}' gallery='$galleryURL' album='$albumURL' rest='$rest'")
+
       // Piece together the album data
       try {
         val password = rest.headOption
         val album : Album = Album.get(albumURL, password)
-        val nav : Navigation = Navigation.getAlbum(albumURL)
-        val view = AlbumView(album, nav)
-        val output = AlbumTemplate(view).toString
-        req.respond(HtmlContent ~> ResponseString(output))
+
+        // Auth check for albums published on or after Nov 25, 2020
+        if (isProtectedAlbum(album)) {
+          val session = SessionCookie.fromRequest(req)
+          val albumPath = s"/$galleryURL/$albumURL/"
+          session match {
+            case None =>
+              val output = LoginRequiredTemplate(albumPath).toString
+              req.respond(HtmlContent ~> ResponseString(output))
+            case Some(s) if !s.isTrusted =>
+              val output = PendingApprovalTemplate(s.email).toString
+              req.respond(HtmlContent ~> ResponseString(output))
+            case Some(s) => // authorized, render album
+              val nav : Navigation = Navigation.getAlbum(albumURL)
+              val view = AlbumView(album, nav)
+              val output = AlbumTemplate(view, session).toString
+              req.respond(HtmlContent ~> ResponseString(output))
+          }
+        } else {
+          val session = SessionCookie.fromRequest(req)
+          val nav : Navigation = Navigation.getAlbum(albumURL)
+          val view = AlbumView(album, nav)
+          val output = AlbumTemplate(view, session).toString
+          req.respond(HtmlContent ~> ResponseString(output))
+        }
 
       // Respond to errors that might occur
       } catch {
@@ -322,12 +416,16 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         }
         case AlbumNotFound(url) => {
           println("* ALBUM NOT FOUND * : " + url)
-          req.respond(NotFound ~> HtmlContent ~> ResponseString("Album not found: " + url))
+          req.respond(NotFound ~> HtmlContent ~> ResponseString(
+            s"Album not found: $url | uri: ${req.uri} | gallery: $galleryURL | album: $albumURL | rest: $rest"
+          ))
         }
         case error : Throwable => {
           println("* UNKNOWN ERROR * : " + error.toString)
           error.printStackTrace()
-          req.respond(InternalServerError ~> HtmlContent ~> ResponseString("Error occured: " + error.toString))
+          req.respond(InternalServerError ~> HtmlContent ~> ResponseString(
+            s"Error: ${error.toString} | uri: ${req.uri} | gallery: $galleryURL | album: $albumURL"
+          ))
         }
       }
     }
