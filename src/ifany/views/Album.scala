@@ -1,10 +1,8 @@
 package ifany
 
-import java.time._
 import java.time.format.DateTimeFormatter
-import org.json4s._
-import org.json4s.native.Serialization
-import org.json4s.native.Serialization.{write}
+import org.json4s.JsonDSL._
+import org.json4s.native.JsonMethods.{compact, render}
 
 sealed trait Row
 case class CoverRow(image: Image) extends Row
@@ -20,22 +18,8 @@ case class DualRow(left: Image, right: Image) extends Row {
   }
 }
 
-class LocalDateTimeSerializer extends CustomSerializer[LocalDateTime](format => (
-  {
-    case JString(s) => LocalDateTime.parse(s, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-    case JNull => null
-  },
-  {
-    case d: LocalDateTime => JString(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(d))
-  }
-))
-
-
-
 
 case class AlbumView(album : Album, nav : Navigation, name : String = "album", cssname: String = "album") extends View {
-
-  implicit val formats: Formats = Serialization.formats(NoTypeHints) + new LocalDateTimeSerializer
 
   def getTitle : String = album.title
   def getDescription : String = album.description
@@ -51,7 +35,30 @@ case class AlbumView(album : Album, nav : Navigation, name : String = "album", c
     links.mkString(", ")
   }
 
-  def getJson : String = write(album)
+  def getJson : String = {
+    val imagesJson = album.images.map { i =>
+      ("file" -> i.file) ~
+      ("description" -> i.description) ~
+      ("datetime" -> i.datetime) ~
+      ("banner" -> i.banner) ~
+      ("cover" -> i.cover) ~
+      ("size" -> i.size) ~
+      ("published" -> i.published) ~
+      ("is_video" -> i.is_video)
+    }
+    val json =
+      ("title" -> album.title) ~
+      ("description" -> album.description) ~
+      ("url" -> album.url) ~
+      ("galleries" -> album.galleries) ~
+      ("visible" -> album.visible) ~
+      ("images" -> imagesJson) ~
+      ("datetime" -> List(
+        DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(album.datetime._1),
+        DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(album.datetime._2)
+      ))
+    compact(render(json))
+  }
 
   def getRows(images: Seq[Image], rows: Seq[Row] = Seq.empty): Seq[Row] = images match {
     case Nil => rows.reverse
