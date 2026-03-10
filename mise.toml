@@ -1,0 +1,27 @@
+[tools]
+java = "21"
+sbt = "1.9.7"
+"ubi:tailwindlabs/tailwindcss" = "4.2.1"
+overmind = "2.5.1"
+tmux = "3.5a"
+
+[tasks.css]
+description = "Build Tailwind CSS"
+run = "tailwindcss -i resources/css/input.css -o resources/css/site.css --minify"
+
+[tasks."css:watch"]
+description = "Watch and rebuild Tailwind CSS on changes"
+run = "tailwindcss -i resources/css/input.css -o resources/css/site.css --watch"
+
+[tasks.dev]
+description = "Run dev server with test env + Tailwind watch"
+depends = ["css"]
+raw = true
+run = "overmind start -N -f Procfile.dev"
+
+[tasks."dev:prod"]
+description = "Run dev server with prod env + Tailwind watch"
+env.IFANY_ENV = "prod"
+depends = ["css"]
+raw = true
+run = "overmind start -N -f Procfile.dev"

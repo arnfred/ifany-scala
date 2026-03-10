@@ -4,12 +4,21 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.ZoneId
 import scala.util.Try
+import scala.util.Random.shuffle
 
 
 trait View {
 
   val name : String
   def getTitle : String
+
+  def getAlbumSize(album: Album): Int = album.size
+
+  def getAlbumImages(album: Album, n: Int): Iterable[Image] =
+    shuffle(album.images).take(n)
+
+  def getAlbumDateString(album: Album): String =
+    getDateString(album.images, true)
 
   def getPostfix(d : LocalDateTime) : String = (d.getDayOfMonth % 100, d.getDayOfMonth % 10) match {
     case (11,_) => "th"

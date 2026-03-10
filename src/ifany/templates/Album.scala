@@ -1,165 +1,191 @@
 package ifany
 
-import scala.language.implicitConversions
+import scalatags.Text.all.*
+import HtmxAttrs.*
 
-case class AlbumTemplate(view : AlbumView, session : Option[Session]) extends Template {
+object AlbumTemplate {
 
-  given View = view
-
-  val css: String = """<link rel="stylesheet" type="text/css" href="/css/album.css"/>"""
-  val covers: Set[String] = view.album.images.filter(_.cover).map(_.file).toSet ++ Set(view.album.images.last.file)
-
-  override def toString : String = Base(
-    Template(navigation(view.getNav) + overlay + album + navigation(view.getNav)),
-    Some(Template(css + javascript + nextprev)),
-    session
-  )
-
-  def nextprev : Template = {
-    val next = for (n <- view.getNav.next) yield n.url
-    val prev = for (p <- view.getNav.prev) yield p.url
-    Template(s"""
-      <link rel="next" href="${ next.getOrElse("/") }"/>
-      <link rel="prev" href="${ prev.getOrElse("/") }"/>
-    """)
+  def apply(view: AlbumView, session: Option[Session]): String = {
+    val headerExtra = Seq(
+      script(raw(s"data = ${view.getJson}")),
+      nextPrevLinks(view.getNav)
+    )
+    Base.page(view, session, headerExtra = headerExtra, body = frag(
+      albumNavigation(view.getNav),
+      overlayMarkup,
+      albumBody(view),
+      albumNavigation(view.getNav),
+      lightboxScript
+    ))
   }
 
-  def javascript : Template = Template(s"""
-    <script type="text/javascript">data = ${ view.getJson }</script>
-  """)
+  private def overlayMarkup: Frag =
+    div(
+      id := "overlay",
+      cls := Seq(
+        "hidden",
+        "fixed",
+        "inset-0",
+        "z-50",
+        "bg-site-overlay-bg"
+      ).mkString(" "),
+      // Nav arrows overlay on left/right edges
+      div(id := "overlay-prev", cls := s"$overlayNavCls left-0",
+        span(cls := "inline-block select-none", style := "border:12px solid transparent;border-width:12px 18px;border-right-color:currentColor")
+      ),
+      div(id := "overlay-next", cls := s"$overlayNavCls right-0",
+        span(cls := "inline-block select-none", style := "border:12px solid transparent;border-width:12px 18px;border-left-color:currentColor")
+      ),
+      // Image area fills the entire overlay
+      div(
+        id := "overlay-img",
+        cls := Seq(
+          "absolute",
+          "inset-0",
+          "flex",
+          "items-center",
+          "justify-center"
+        ).mkString(" "),
+        div(
+          id := "overlay-center-box",
+          cls := "relative inline-block",
+          img(cls := Seq(
+            "media",
+            "max-h-screen",
+            "max-w-full"
+          ).mkString(" "), crossorigin := "anonymous", alt := "Overlay image"),
+          div(id := "caption-box", cls := Seq(
+            "absolute",
+            "bottom-0",
+            "left-0",
+            "right-0",
+            "text-center"
+          ).mkString(" "),
+            span(
+              id := "caption",
+              cls := Seq(
+                "inline-block",
+                "text-white",
+                "bg-gray-800/70",
+                "backdrop-blur-sm",
+                "px-3",
+                "py-1",
+                "text-sm"
+              ).mkString(" ")
+            )
+          )
+        )
+      )
+    )
 
-  def navigation(nav : Navigation) : Template = {
-    val prevPhone = for (p <- nav.prev) yield getLink("Older", "/" + p.url + "/", "ᐊ")
-    val nextPhone = for (n <- nav.next) yield getLink("Newer", "/" + n.url + "/", "ᐅ")
-    val prev = for (p <- nav.prev) yield getLink(p.title, "/" + p.url + "/", "ᐊ")
-    val next = for (n <- nav.next) yield getLink(n.title, "/" + n.url + "/", "ᐅ")
-    Template(s"""
+  private def albumBody(view: AlbumView): Frag =
+    div(cls := "pt-8",
+      div(cls := Seq(
+        "max-w-md",
+        "mx-auto",
+        "mb-8",
+        "px-4"
+      ).mkString(" "),
+        h2(cls := "text-2xl leading-tight", view.getTitle),
+        p(cls := Seq(
+          "italic",
+          "text-sm",
+          "text-site-muted",
+          "mt-1"
+        ).mkString(" "), raw(view.getGalleries)),
+        p(cls := "mt-2 text-sm hyphens-auto", raw(view.getDescription)),
+        p(cls := Seq(
+          "italic",
+          "text-sm",
+          "text-site-muted",
+          "text-right",
+          "mt-1"
+        ).mkString(" "), view.getDateString)
+      ),
+      thumbnails(view)
+    )
 
-      <div class="row visible-xs-block navigation">
-          <div class="album-nav prev col-xs-5 col-sm-offset-1">
-            ${ prevPhone.getOrElse("")  }
-          </div>
-          <div class="home album-nav col-xs-2 col-sm-2">
-            ${ getHomeLink("Home", "") }
-          </div>
-          <div class="album-nav next col-xs-5">
-            ${ nextPhone.getOrElse("") }
-          </div>
-      </div>
+  private def thumbnails(view: AlbumView): Frag =
+    frag(view.getRows(view.album.images).map {
+      case CoverRow(image) => coverRow(view, image)
+      case r: DualRow => twoImageRow(view, r)
+    }*)
 
-      <div class="row hidden-xs navigation">
-          <div class="album-nav prev col-xs-4 col-sm-offset-1">
-            ${ prev.getOrElse("")  }
-          </div>
-          <div class="home album-nav col-sm-2">
-            ${ getHomeLink("Home", "") }
-          </div>
-          <div class="album-nav next col-xs-4">
-            ${ next.getOrElse("") }
-          </div>
-      </div>
-    """)
+  private def coverRow(view: AlbumView, image: Image, extraCls: String = ""): Frag =
+    div(cls := s"$albumRowCls $extraCls",
+      imageBox(view, image, 100.0)
+    )
+
+  private def twoImageRow(view: AlbumView, row: DualRow): Frag = {
+    val a1 = row.left.size(0).toDouble / row.left.size(1).toDouble
+    val a2 = row.right.size(0).toDouble / row.right.size(1).toDouble
+
+    frag(
+      // Mobile: stacked (each full width)
+      coverRow(view, row.left, "sm:hidden"),
+      coverRow(view, row.right, "sm:hidden"),
+      // Desktop: side by side with flex-grow = aspect ratio
+      div(cls := Seq(
+        albumRowCls,
+        "hidden",
+        "sm:flex",
+        "gap-0.5"
+      ).mkString(" "),
+        div(cls := "min-w-0", style := s"flex:$a1 1 0%",
+          imageBox(view, row.left, a1 / (a1 + a2) * 100)
+        ),
+        div(cls := "min-w-0", style := s"flex:$a2 1 0%",
+          imageBox(view, row.right, a2 / (a1 + a2) * 100)
+        )
+      )
+    )
   }
 
-  def getHomeLink(text : String, url : String) : Template = Template(s"""
-    <a href="/$url"><span class="nav home">$text</span></a>
-  """)
-
-  def getLink(text : String, url : String, sign : String) : Template = Template(s"""
-    <a href="$url" alt="$text">
-      <span class="laquo">$sign</span>
-      <span class="nav other">$text</span>
-    </a>
-  """)
-
-  def overlay : Template = Template(s"""
-  <div class="overlay" id="overlay">
-      <div class="col-xs-1 overlay-prev overlay-nav">
-        <div id="overlay-prev">
-          <span class="laquo">ᐊ</span>
-        </div>
-      </div>
-      <div class="col-xs-10 overlay-img" id="overlay-img">
-        <div id="overlay-center-box">
-          <img class="media" alt="Overlay image" crossorigin="anonymous"/>
-          <div id="caption-box"><span id="caption">Sample Caption</span></div>
-        </div>
-      </div>
-      <div class="col-xs-1 overlay-next overlay-nav">
-        <div id="overlay-next">
-          <span class="laquo">ᐅ</span>
-        </div>
-      </div>
-  </div>
-  """)
-
-  def album : Template = Template(s"""
-    <div class="row album top">
-        <div class="col-sm-4 col-sm-offset-4 album-info">
-          <h2 class="album-title">${ view.getTitle }</h2>
-          <p class="album-galleries">${ view.getGalleries }</p>
-          <p class="album-desc">${ view.getDescription }</p>
-          <p class="album-date">${ view.getDateString }</p>
-          <br class="clear" />
-        </div>
-
-        ${ thumbnails }
-    </div>
-  """)
-
-  def thumbnails : Template = {
-    val rows = for (row <- view.getRows(view.album.images)) yield row match {
-      case CoverRow(image) => coverRow(image)
-      case t: DualRow => twoImageRow(t)
-    }
-    Template(rows.mkString("\n"))
+  private def imageBox(view: AlbumView, image: Image, ratio: Double): Frag = {
+    if (image.is_video)
+      videoBox(view, image)
+    else
+      imgBox(view, image, ratio)
   }
 
+  private def videoBox(view: AlbumView, image: Image): Frag =
+    video(
+      cls := s"media $imgCls",
+      id := image.id,
+      attr("file") := image.file,
+      attr("muted") := "muted",
+      attr("loop") := "loop",
+      attr("controls") := "controls",
+      crossorigin := "anonymous",
+      playsinline := "true",
+      preload := "none",
+      poster := image.imageURL(view.album.url, "800"),
+      attr("onmouseover") := "this.play()",
+      attr("onmouseleave") := "this.pause()",
+      tag("source")(src := image.videoURL(view.album.url), `type` := "video/mp4")
+    )
 
-  def coverRow(image: Image, tag: String = ""): Template = Template(s"""
-    <div class="col-xs-12 col-sm-10 $tag col-sm-offset-1 album-row img">
-      <div class="img-box" style="width:100%">
-          ${imageBox(image, 100.0)}
-      </div>
-    </div>
-    """)
+  private def imgBox(view: AlbumView, image: Image, ratio: Double): Frag = {
+    val srcsetVal = (for (label <- image.versions)
+      yield s"${image.imageURL(view.album.url, label)} ${image.width(label)}w"
+    ).mkString(", ")
 
-  def twoImageRow(row: DualRow): Template = Template(s"""
-    ${coverRow(row.left, "visible-xs-block")}
-    ${coverRow(row.right, "visible-xs-block")}
-
-    <div class="col-xs-12 hidden-xs col-sm-10 col-sm-offset-1 album-row img">
-      <div class="frame-box">
-        <div class="img-box left" style="width:${row.leftRatio*100}%;">
-          ${imageBox(row.left, row.leftRatio*100)}
-        </div>
-        <div class="img-box right" style="width:${row.rightRatio*100}%">
-          ${imageBox(row.right, row.rightRatio*100)}
-        </div>
-      </div>
-    </div>
-    """)
-
-  def imageBox(image: Image, ratio: Double): Template = image.is_video match {
-    case true => Template(s"""
-      <video class="media" id="${image.id}" file="${image.file}"
-             muted
-             loop
-             crossorigin="anonymous"
-             controls
-             playsinline
-             preload="none"
-             poster=\"${image.imageURL(view.album.url, "800")}\">
-      <source src="${image.videoURL(view.album.url)}" type="video/mp4"></video>""")
-    case false => 
-      val srcset = for (label <- image.versions) yield s"${image.imageURL(view.album.url, label)} ${image.width(label)}w"
-      Template(s"""
-        <img class="media" id="${image.id}" file="${image.file}"
-             src="${ image.imageURL(view.album.url, "800") }"
-             srcset="${ srcset.mkString(", ") }"
-             crossorigin="anonymous"
-             loading="lazy"
-             sizes="(min-width: 800px) ${ratio * 0.8}vw, 100vw"
-             alt="${ image.description }">""")
+    img(
+      cls := s"media $imgCls",
+      id := image.id,
+      attr("file") := image.file,
+      src := image.imageURL(view.album.url, "800"),
+      srcset := srcsetVal,
+      crossorigin := "anonymous",
+      loading := "lazy",
+      sizes := s"(min-width: 800px) ${ratio * 0.8}vw, 100vw",
+      alt := image.description
+    )
   }
+
+  private def lightboxScript: Frag =
+    script(`type` := "module", raw("""
+      import lightbox from '/js/lightbox.js'
+      lightbox.init(data)
+    """))
 }

@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Helvetica Neue", Geneva, Arial, Helvetica, Verdana, sans-serif;
+  --color-site-bg: #fafafa;
+  --color-site-text: #222;
+  --color-site-muted: #888;
+  --color-site-secondary: #444;
+  --color-site-link: rgb(15, 172, 90);
+  --color-site-link-hover: rgb(27, 85, 18);
+  --color-site-hover-bg: #eaeaea;
+  --color-site-overlay-bg: rgba(32, 32, 32, 0.9);
+}

@@ -1,122 +1,130 @@
 package ifany
 
-import scala.language.implicitConversions
+import scalatags.Text.all.*
+import HtmxAttrs.*
 
-case class FrontpageTemplate(view : FrontpageView, session : Option[Session]) extends Template {
+object FrontpageTemplate {
 
-  given View = view
-
-  val css: String = s"""<link rel="stylesheet" type="text/css" href="/css/frontpage.css"/>"""
-
-  override def toString : String = Base(Template(header + galleries), Some(Template(css)), session)
-
-  val coverSrcset = for (label <- view.cover.image.versions) yield {
-    s"${view.cover.image.imageURL(view.cover.album.url, label)} ${view.cover.image.width(label)}w"
+  def apply(view: FrontpageView, session: Option[Session]): String = {
+    Base.page(view, session, body = frag(
+      headerSection(view),
+      galleries(view)
+    ))
   }
 
-  def header : Template = Template(s"""
-    <div class="row top topmost">
-        <div class="col-md-3 col-md-offset-1" id="about">
-            <h1 id="header"><span><span id="if">if</span><span id="any">any</span></span></h1>
-            <h4 id="subheader"><span>photography</span></h4>
+  private def headerSection(view: FrontpageView): Frag = {
+    val coverSrcset = (for (label <- view.cover.image.versions)
+      yield s"${view.cover.image.imageURL(view.cover.album.url, label)} ${view.cover.image.width(label)}w"
+    ).mkString(", ")
 
-            <p id="about-text">The photos on this site are an ongoing
-            collection of things, people and places that happen to stand in my
-            way the moment I press the shutter. These days, that's mainly my
-            son Ash who was born in November 2020. Check out the meta albums of
-            <a href="/all/1">all</a>, <a href="/random">random</a> and <a
-            href="/covers">cover</a> photos. Inquiries and fawning fan mail are
-            all welcome at <a href="mailto:jonas@ifany.org"
-            alt="jonas@ifany.org">jonas@ifany.org</a>.</p> <p id="my-name"><a
-            mailto="jonas@ifany.org">Jonas Arnfred</a></p>
-
-        </div>
-
-        <div class="col-md-7 hidden-xs" id="image">
-
-          <img src="${ view.cover.image.imageURL(view.cover.album.url, "800") }"
-          srcset="${ coverSrcset.mkString(", ") }"
-          sizes="(min-width: 1000px) 60vw, (min-width: 800px) 80vw, 100vw"
-          alt="${ view.cover.image.description }" class="frame">
-          <p>From the album "<a href="${ view.cover.album.path }/" >${ view.cover.album.title }</a>"</p>
-        </div>
-    </div>
-  """)
-
-  def galleries : Template = Template({
-    for (g <- view.getGalleries) yield {
-       val cover = view.getGalleryCover(g)
-       gallery(g, cover) + galleryAlbums(g)
-    }
-  }.mkString)
-
-  def gallery(g : Gallery, cover : Cover) : Template = Template { 
-    val albumNum : Int = g.albums.size
-    val imagesNum : Int = view.getGallerySize(g)
-    s"""
-      <div class="row category">
-          <div class="col-sm-3 col-xs-12 col-sm-offset-1 cat-image">
-              <img src="${ cover.image.imageURL(cover.album.url, "s") }" class="frame"/>
-          </div>
-
-          <div class="col-sm-7 col-xs-12 cat-info">
-              <h2 class="cat-title">${ g.name }</h2>
-              <p class="cat-date">${ view.getGalleryDateString(g) }.</p>
-              <p class="cat-meta">This gallery contains 
-                <span class="num">${ albumNum }</span> 
-                ${ if (albumNum == 1) "album" else "albums" } with 
-                <span class="num">${ imagesNum }</span> images.
-              </p>
-              <p class="cat-desc">${ g.description }</p>
-          </div>
-      </div>
-    """
+    div(cls := s"$twoColLayout pt-8",
+      div(cls := "sm:col-start-2",
+        h1(cls := Seq(
+          "text-[min(9rem,18vw)]",
+          "sm:text-[min(9rem,12vw)]",
+          "font-bold",
+          "leading-none",
+          "tracking-tight",
+          "-ml-1"
+        ).mkString(" "),
+          span(cls := "text-site-muted", "if"),
+          span(cls := "text-site-secondary", "any")
+        ),
+        h4(cls := "text-site-muted -mt-[0.6em] mb-6 text-2xl font-medium ml-0.5", "photography"),
+        p(cls := "mt-12 text-sm",
+          raw("""The photos on this site are an ongoing
+          collection of things, people and places that happen to stand in my
+          way the moment I press the shutter. Check out the meta albums of
+          <a href="/all/1" class="text-site-link hover:text-site-link-hover">all</a>,
+          <a href="/random" class="text-site-link hover:text-site-link-hover">random</a> and
+          <a href="/covers" class="text-site-link hover:text-site-link-hover">cover</a>
+          photos. Inquiries and fawning fan mail are
+          all welcome at <a href="mailto:jonas@ifany.org" class="text-site-link hover:text-site-link-hover">jonas@ifany.org</a>.""")
+        ),
+        p(cls := "text-right mt-2",
+          a(href := "mailto:jonas@ifany.org", cls := Seq(
+            "text-site-link",
+            "hover:text-site-link-hover"
+          ).mkString(" "), "Jonas Arnfred")
+        )
+      ),
+      div(cls := "sm:col-start-3 hidden sm:block",
+        img(
+          src := view.cover.image.imageURL(view.cover.album.url, "800"),
+          srcset := coverSrcset,
+          sizes := "(min-width: 1000px) 60vw, (min-width: 800px) 80vw, 100vw",
+          alt := view.cover.image.description,
+          cls := "w-full"
+        ),
+        p(cls := Seq(
+          "text-right",
+          "italic",
+          "text-site-muted",
+          "text-sm",
+          "mt-1"
+        ).mkString(" "),
+          raw(s"""From the album "<a href="${view.cover.album.path}/" class="text-site-link hover:text-site-link-hover">${view.cover.album.title}</a>"""")
+        )
+      )
+    )
   }
 
-  def galleryAlbums(g : Gallery) : Template = Template {
-    (for (album <- g.albums.reverse) yield s"""
-      <div class="row album album-hidden">
-        <a href="/${ g.url }/${ album.url }/">
-          <div class="col-sm-3 col-sm-offset-1 album-info hidden-xs">
-            <h3 class="album-title">${ album.title }</h3>
-            <p class="album-date">${ view.getAlbumDateString(album) }</p>
-            <p class="album-meta">
-              <span class="num">${ view.getAlbumSize(album) }</span> 
-              ${ if (view.getAlbumSize(album) == 1) "Image" else "Images" } 
-            </p>
-          </div>
-          <div class="col-sm-3 col-sm-offset-1 visible-xs">
-            <h3 class="album-title">${ album.title }</h3>
-            <p class="album-date album-date-small">${ view.getAlbumDateString(album) }.
-            <span class="album-meta"><span class="num">${ view.getAlbumSize(album) }</span> 
-              ${ if (view.getAlbumSize(album) == 1) "Image" else "Images" } 
-            </span></p>
-          </div>
+  private def galleries(view: FrontpageView): Frag =
+    frag(for (g <- view.getGalleries) yield {
+      val cover = view.getGalleryCover(g)
+      galleryAccordion(view, g, cover)
+    })
 
-          <div class="col-sm-7 album-images">
-            <div class="row">
-              ${ albumThumbnails(album) }
-            </div>
-          </div>
-          <div class="col-sm-1 album-arrow hidden-xs">
-            <p>ᐅ</p>
-          </div>
-        </a>
-      </div>
-    """).mkString
-  }
+  private def galleryAccordion(view: FrontpageView, g: Gallery, cover: Cover): Frag = {
+    val albumNum = g.albums.size
+    val imagesNum = view.getGallerySize(g)
 
-  def albumThumbnails(album : Album) : Template = Template {
-    val images = view.getAlbumImages(album, 4)
-    val first = (for (image <- images.take(3)) yield s"""
-      <div class="col-xs-4 col-sm-3 img">
-        <img href="${ image.imageURL(album.url, "t") }" class="frame" src="/img/loader.gif"/>
-      </div>
-    """).mkString
-    val last = s"""
-      <div class="col-sm-3 hidden-xs img">
-        <img href="${ images.last.imageURL(album.url, "t") }" class="frame" src="/img/loader.gif"/>
-      </div>"""
-    first + last
+    tag("details")(cls := "group",
+      attr("ontoggle") := "if(this.open) this.scrollIntoView({behavior:'smooth', block:'start'})",
+      tag("summary")(cls := "cursor-pointer list-none",
+        div(cls := Seq(
+          twoColLayout,
+          "py-4",
+          "hover:bg-site-hover-bg",
+          "transition-colors"
+        ).mkString(" "),
+          div(cls := "sm:col-start-2",
+            img(
+              src := cover.image.imageURL(cover.album.url, "s"),
+              cls := Seq(
+                "w-full",
+                "aspect-[5/3]",
+                "object-cover",
+                "object-center"
+              ).mkString(" "),
+              loading := "lazy"
+            )
+          ),
+          div(cls := "sm:col-start-3",
+            h2(cls := "text-2xl leading-tight", g.name),
+            p(cls := "inline text-sm", view.getGalleryDateString(g), "."),
+            p(cls := "inline italic text-sm",
+              s" This gallery contains $albumNum",
+              if (albumNum == 1) " album" else " albums",
+              s" with $imagesNum images.",
+            ),
+            p(cls := "mt-1 text-sm", raw(g.description))
+          )
+        )
+      ),
+      div(cls := Seq(
+        "grid",
+        "grid-rows-[0fr]",
+        "group-open:grid-rows-[1fr]",
+        "transition-[grid-template-rows]",
+        "duration-300",
+        "ease-in-out",
+        "overflow-hidden"
+      ).mkString(" "),
+        div(cls := "overflow-hidden",
+          for (album <- g.albums.reverse) yield albumRow(view, g.url, album)
+        )
+      )
+    )
   }
 }

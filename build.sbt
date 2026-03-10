@@ -18,6 +18,7 @@ libraryDependencies  ++= Seq(
     "com.github.seratch" %% "awscala-dynamodb" % "0.9.2",
     "com.github.seratch" %% "awscala-s3" % "0.9.2",
     "com.github.jwt-scala" %% "jwt-json4s-native" % "10.0.4",
+    "com.lihaoyi" %% "scalatags" % "0.13.1",
     )
 
 resolvers ++= Seq(

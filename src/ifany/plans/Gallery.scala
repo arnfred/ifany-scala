@@ -49,7 +49,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
       session match {
         case Some(_) => req.respond(Redirect("/"))
         case None =>
-          val output = LoginRequiredTemplate("/").toString
+          val output = LoginRequiredTemplate("/")
           req.respond(HtmlContent ~> ResponseString(output))
       }
     }
@@ -101,7 +101,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         val session = SessionCookie.fromRequest(req)
         val frontpage : Frontpage = Frontpage.get()
         val view = FrontpageView(frontpage)
-        val output = FrontpageTemplate(view, session).toString
+        val output = FrontpageTemplate(view, session)
         req.respond(HtmlContent ~> ResponseString(output))
 
       } catch {
@@ -139,13 +139,13 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
       try {
         val session = SessionCookie.fromRequest(req)
         if (!session.exists(_.isAdmin)) {
-          val output = LoginRequiredTemplate("/update").toString
+          val output = LoginRequiredTemplate("/update")
           req.respond(HtmlContent ~> ResponseString(output))
         } else {
         val frontpage : Frontpage = Frontpage.update()
         val nav : Map[String, Navigation] = Navigation.update
         val view = FrontpageView(frontpage)
-        val output = FrontpageTemplate(view, session).toString
+        val output = FrontpageTemplate(view, session)
         req.respond(HtmlContent ~> ResponseString(output))
         }
 
@@ -185,7 +185,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         val album : Album = Album.dynamic(title, desc, images, Album.datetimeFromImages(images, "covers"))
         val nav : Navigation = Navigation(None, None, None)
         val view = AlbumView(album, nav, "metaAlbum")
-        val output = AlbumTemplate(view, session).toString
+        val output = AlbumTemplate(view, session)
         req.respond(HtmlContent ~> ResponseString(output))
       } catch {
         case InternalError(msg) => {
@@ -232,7 +232,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         val prev = if (page > 1) Some(NavElem(s"all/${page - 1}", s"Page ${page - 1}")) else None
         val nav : Navigation = Navigation(next, prev, None)
         val view = AlbumView(album, nav, "metaAlbum")
-        val output = AlbumTemplate(view, session).toString
+        val output = AlbumTemplate(view, session)
         req.respond(HtmlContent ~> ResponseString(output))
       } catch {
         case InternalError(msg) => {
@@ -272,7 +272,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         val album : Album = Album.dynamic(title, desc, videos.sortBy(_.datetime).toSeq, Album.datetimeFromImages(videos, "videos"))
         val nav : Navigation = Navigation(None, None, None)
         val view = AlbumView(album, nav, "metaAlbum")
-        val output = AlbumTemplate(view, session).toString
+        val output = AlbumTemplate(view, session)
         req.respond(HtmlContent ~> ResponseString(output))
       } catch {
         case InternalError(msg) => {
@@ -313,7 +313,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         val album : Album = Album.dynamic(title, desc, Random.shuffle(images).take(100).toSeq, Album.datetimeFromImages(images, "random"))
         val nav : Navigation = Navigation(None, None, None)
         val view = AlbumView(album, nav, "metaAlbum")
-        val output = AlbumTemplate(view, session).toString
+        val output = AlbumTemplate(view, session)
         req.respond(HtmlContent ~> ResponseString(output))
       } catch {
         case InternalError(msg) => {
@@ -346,7 +346,7 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
         val gallery = Gallery.get(galleryURL)
         val nav : Navigation = Navigation.getGallery(galleryURL)
         val view = GalleryView(gallery, nav)
-        val output = GalleryTemplate(view, session).toString
+        val output = GalleryTemplate(view, session)
         req.respond(HtmlContent ~> ResponseString(output))
 
       // Respond to errors that might occur
@@ -388,22 +388,22 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
           val albumPath = s"/$galleryURL/$albumURL/"
           session match {
             case None =>
-              val output = LoginRequiredTemplate(albumPath).toString
+              val output = LoginRequiredTemplate(albumPath)
               req.respond(HtmlContent ~> ResponseString(output))
             case Some(s) if !s.isTrusted =>
-              val output = PendingApprovalTemplate(s.email).toString
+              val output = PendingApprovalTemplate(s.email)
               req.respond(HtmlContent ~> ResponseString(output))
             case Some(s) => // authorized, render album
               val nav : Navigation = Navigation.getAlbum(albumURL)
               val view = AlbumView(album, nav)
-              val output = AlbumTemplate(view, session).toString
+              val output = AlbumTemplate(view, session)
               req.respond(HtmlContent ~> ResponseString(output))
           }
         } else {
           val session = SessionCookie.fromRequest(req)
           val nav : Navigation = Navigation.getAlbum(albumURL)
           val view = AlbumView(album, nav)
-          val output = AlbumTemplate(view, session).toString
+          val output = AlbumTemplate(view, session)
           req.respond(HtmlContent ~> ResponseString(output))
         }
 
@@ -431,4 +431,3 @@ object GalleryPlan extends async.Plan with ServerErrorResponse {
     }
   }
 }
-

@@ -6,20 +6,10 @@ import org.json4s.native.JsonMethods.{compact, render}
 
 sealed trait Row
 case class CoverRow(image: Image) extends Row
-case class DualRow(left: Image, right: Image) extends Row {
-  val (leftRatio: Double, rightRatio: Double) = {
-    val (x1, y1) = (left.size(0).toDouble, left.size(1).toDouble)
-    val (x2, y2) = (right.size(0).toDouble, right.size(1).toDouble)
-    val r2 = 1.0 // Can be any number. It's just a ratio
-    val r1 = y2/y1 // Relationship between heights
-    val p1 = r1*x1 / (x1 * r1 + x2 * r2) // Percentage of image 1 width to entire width
-    val p2 = r2*x2 / (x1 * r1 + x2 * r2) // Percentage of image 2 width to entire width
-    (p1, p2)
-  }
-}
+case class DualRow(left: Image, right: Image) extends Row
 
 
-case class AlbumView(album : Album, nav : Navigation, name : String = "album", cssname: String = "album") extends View {
+case class AlbumView(album : Album, nav : Navigation, name : String = "album") extends View {
 
   def getTitle : String = album.title
   def getDescription : String = album.description
@@ -31,7 +21,7 @@ case class AlbumView(album : Album, nav : Navigation, name : String = "album", c
 
   def getGalleries: String = {
     val galleries = album.galleries.filter(_ != "all")
-    val links = galleries map { g => s"""<a href="/${Gallery.get(g).url}" alt="Go to Gallery: $g">${Gallery.get(g).name}</a>""" }
+    val links = galleries map { g => s"""<a href="/${Gallery.get(g).url}" class="text-site-link hover:text-site-link-hover" alt="Go to Gallery: $g">${Gallery.get(g).name}</a>""" }
     links.mkString(", ")
   }
 

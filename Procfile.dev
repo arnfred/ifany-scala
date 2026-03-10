@@ -1,0 +1,2 @@
+sbt: env $(cat aws.${IFANY_ENV:-test}.env) sbt ~reStart
+tailwind: tailwindcss -i resources/css/input.css -o resources/css/site.css --watch

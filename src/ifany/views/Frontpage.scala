@@ -16,10 +16,6 @@ case class FrontpageView(frontpage : Frontpage) extends View {
   def getGalleries : Seq[Gallery] = frontpage.galleries
 
 
-  // The amount of images in an album
-  def getAlbumSize(album : Album) : Int = album.size
-
-
   // The amount of images in a gallery
   def getGallerySize(gallery : Gallery) : Int = {
     gallery.albums.map { a => a.size }.sum
@@ -45,17 +41,8 @@ case class FrontpageView(frontpage : Frontpage) extends View {
   }
 
 
-  // Find n pictures from an album to display
-  def getAlbumImages(album : Album, n : Int) : Iterable[Image] = { 
-    val candidates = for (i <- album.images) yield i
-    shuffle(candidates).take(n)
-  }
-
   def getGalleryDateString(gallery : Gallery) : String = {
     getDateString(for (a <- gallery.albums; i <- a.images) yield i, false)
   }
 
-  def getAlbumDateString(album : Album) : String = {
-    getDateString(album.images, true)
-  }
 }

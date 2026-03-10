@@ -1,47 +1,57 @@
 package ifany
 
-case class Base(body : Template, header : Option[Template], session : Option[Session]) extends Template {
+import scalatags.Text.all.*
+import scalatags.Text.tags2
 
-  val view = body.view
+object Base {
 
-  override def toString : String = s"""
-
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-
-      <title>&laquo; If Any &raquo; ${ view.getTitle }</title>
-      <meta name="description" content="Photos by Jonas Toft Arnfred">
-      <meta name="robots" content="noai, noimageai">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <link rel="icon" type="image/png" href="/img/favicon.png"/>
-      <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css"/>
-      <link rel="stylesheet" type="text/css" href="/css/global.css"/>
-
-      ${ header.getOrElse("") }
-
-      <script type="text/javascript" src="/js/lib/curl/curl.js"></script>
-      <script type="text/javascript" src="/js/controllers/${ view.name }.js"></script>
-
-    </head>
-    <body>
-
-      <div class="container-fluid">
-        $body
-
-        <div class="row">
-          <div class="col-sm-7 col-sm-offset-4" id="credits">
-            <p>Design, code and photos by <a href="mailto:jonas@ifany.org"
-              alt="jonas@ifany.org">Jonas Arnfred</a>
-              ${ session match {
-                case Some(s) => s"""&middot; ${s.email} (<a href="/auth/logout">log out</a>)"""
-                case None => s"""&middot; <a href="/auth/login">log in</a>"""
-              }}
-            <p>
-          </div>
-        </div>
-      </div>
-    </body>
-    </html>
-  """
+  def page(view: View, session: Option[Session],
+           headerExtra: Seq[Frag] = Seq.empty, body: Frag): String =
+    "<!DOCTYPE html>\n" + html(lang := "en",
+      head(
+        tags2.title(raw("&laquo; If Any &raquo; "), view.getTitle),
+        meta(name := "description", content := "Photos by Jonas Toft Arnfred"),
+        meta(name := "robots", content := "noai, noimageai"),
+        meta(name := "viewport", content := "width=device-width, initial-scale=1.0"),
+        link(rel := "icon", `type` := "image/png", href := "/img/favicon.png"),
+        link(rel := "stylesheet", href := "/css/site.css"),
+        script(src := "https://unpkg.com/htmx.org@2.0.4"),
+        headerExtra
+      ),
+      tag("body")(cls := Seq(
+        "bg-site-bg",
+        "text-site-text",
+        "font-sans"
+      ).mkString(" "),
+        div(
+          body,
+          div(cls := Seq(
+            "max-w-[1200px]",
+            "mx-auto",
+            "text-right",
+            "text-sm",
+            "italic",
+            "text-site-muted",
+            "px-2",
+            "py-8"
+          ).mkString(" "),
+            "Design, code and photos by ",
+            a(href := "mailto:jonas@ifany.org", cls := Seq(
+              "text-site-link",
+              "hover:text-site-link-hover"
+            ).mkString(" "), "Jonas Arnfred"),
+            session match {
+              case Some(s) => frag(raw(" &middot; "), s.email, " (", a(href := "/auth/logout", cls := Seq(
+                "text-site-link",
+                "hover:text-site-link-hover"
+              ).mkString(" "), "log out"), ")")
+              case None => frag(raw(" &middot; "), a(href := "/auth/login", cls := Seq(
+                "text-site-link",
+                "hover:text-site-link-hover"
+              ).mkString(" "), "log in"))
+            }
+          )
+        )
+      )
+    ).render
 }
